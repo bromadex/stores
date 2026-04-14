@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Bravura Stores — Operations</title>
+<title>Bravura Kamativi — Operations</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -337,9 +337,9 @@ tr:hover td{background:rgba(255,255,255,.015);}
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">Bravura Stores</div>
+    <div class="login-logo">Bravura Kamativi</div>
     <div class="login-title">Operations<span>.</span></div>
-    <div class="login-sub">Inventory &amp; Operations Management System</div>
+    <div class="login-sub">Kamativi Operations Management System</div>
     <input class="login-input" type="text" id="l-user" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('l-pass').focus()">
     <input class="login-input" type="password" id="l-pass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-error" id="l-err">Incorrect username or password</div>
@@ -351,7 +351,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
 <div id="app">
 <aside class="sidebar" id="sidebar">
   <div class="logo">
-    <div class="logo-mark">Bravura Stores</div>
+    <div class="logo-mark">Bravura Kamativi</div>
     <h1>Operations<span>.</span></h1>
     <div class="logo-sub">Inventory &amp; Ops Manager</div>
   </div>
@@ -367,7 +367,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="nav-sec">Logistics</div>
     <button class="nav-btn" onclick="showPage('goodsreceived',this)"><span class="ic">&#128230;</span><span class="nav-label">Goods Received</span><span class="tt">Goods Received</span></button>
     <button class="nav-btn" onclick="showPage('fuel',this)"><span class="ic">&#9981;</span><span class="nav-label">Fuel Management</span><span class="tt">Fuel Management</span></button>
-    <button class="nav-btn" onclick="showPage('concrete',this)"><span class="ic">&#127959;&#65039;</span><span class="nav-label">Concrete / Bulk</span><span class="tt">Concrete / Bulk</span></button>
+    <button class="nav-btn" onclick="showPage('concrete',this)"><span class="ic">&#127959;&#65039;</span><span class="nav-label">Batch Plant</span><span class="tt">Batch Plant</span></button>
     <button class="nav-btn" onclick="showPage('campsite',this)"><span class="ic">&#127957;&#65039;</span><span class="nav-label">Campsite</span><span class="tt">Campsite</span></button>
     <div class="nav-sec">Management</div>
     <button class="nav-btn" onclick="showPage('fleet',this)"><span class="ic">&#128668;</span><span class="nav-label">Fleet</span><span class="tt">Fleet</span></button>
@@ -379,7 +379,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <button class="nav-btn" onclick="showPage('settings',this)"><span class="ic">&#9881;&#65039;</span><span class="nav-label">Settings</span><span class="tt">Settings</span></button>
   </nav>
   <div class="sidebar-user" id="sidebar-user"></div>
-  <div class="sidebar-footer">Designed by Clement Mpala<br>Junior Electrical Engineer<br>v4.0 &middot; Offline Capable</div>
+  <div class="sidebar-footer">Designed by Clement Mpala · Bravura Kamativi<br>Junior Electrical Engineer<br>v4.0 &middot; Offline Capable</div>
 </aside>
 <main class="main" id="main-area">
   <div class="topbar">
@@ -529,11 +529,33 @@ tr:hover td{background:rgba(255,255,255,.015);}
           <button class="btn btn-outline btn-sm" onclick="applyFuelFilter()">Filter</button>
           <button class="btn btn-outline btn-sm" onclick="clearFuelFilter()">Clear</button>
         </div>
+        <button class="btn btn-gold btn-sm" onclick="reqLogin(openDipstickModal)">📏 Daily Dip</button>
         <button class="btn btn-blue" onclick="reqLogin(openFuelModal)">+ Issuance</button>
-        <button class="btn btn-teal btn-sm" onclick="reqLogin(openFuelDeliveryModal)">&#128665; Delivery</button>
-        <button class="btn btn-outline btn-sm" onclick="printFuelLog()">&#128424; Print</button>
+        <button class="btn btn-teal btn-sm" onclick="reqLogin(openFuelDeliveryModal)">🚛 Delivery</button>
+        <button class="btn btn-outline btn-sm" onclick="printFuelLog()">🖨 Print</button>
       </div>
       <div class="fuel-kpis" id="fuel-kpis"></div>
+      <!-- Tank Level Gauge -->
+      <div class="tcard" style="margin-bottom:14px">
+        <div class="tcard-head"><span class="tcard-title">⛽ Main Tank Level (ZUFTA10 — 10,103L)</span></div>
+        <div style="padding:14px">
+          <div id="tank-gauge-wrap" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <div style="background:var(--surface2);border-radius:8px;height:28px;overflow:hidden;border:1px solid var(--border);position:relative">
+                <div id="tank-gauge-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .5s;border-radius:8px"></div>
+                <div id="tank-gauge-label" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:11px;font-weight:700"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:8px;color:var(--text-dim);margin-top:3px"><span>0L</span><span>20% (2,021L)</span><span>10,103L</span></div>
+            </div>
+            <div id="tank-stats" style="font-family:var(--font-mono);font-size:10px;color:var(--text-mid);display:flex;flex-direction:column;gap:3px"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Daily Dipstick Records -->
+      <div class="tcard" style="margin-bottom:14px">
+        <div class="tcard-head"><span class="tcard-title">📏 Daily Dipstick Reconciliation</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Date</th><th>Dip Start (m)</th><th>Fuel Start (L)</th><th>Dip End (m)</th><th>Fuel End (L)</th><th>Deliveries (L)</th><th>Flowmeter Total (L)</th><th>Actual Issued (L)</th><th>Error (L)</th><th>Error %</th><th></th></tr></thead><tbody id="dipstick-tbody"></tbody></table></div>
+      </div>
       <div class="tcard"><div class="tcard-head"><span class="tcard-title">Fuel Issuance Log</span>
         <div class="ftabs">
           <button class="ftab active" onclick="filterFuelType('ALL',this)">All</button>
@@ -541,10 +563,10 @@ tr:hover td{background:rgba(255,255,255,.015);}
           <button class="ftab" onclick="filterFuelType('PETROL',this)">Petrol</button>
         </div>
       </div>
-        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Time</th><th>Type</th><th>Amount(L)</th><th>Vehicle</th><th>Driver</th><th>Auth By</th><th>Purpose</th><th>Odometer</th><th>Dip Before/After</th><th></th></tr></thead><tbody id="fuel-tbody"></tbody></table></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Time</th><th>Type</th><th>Flowmeter(L)</th><th>Vehicle</th><th>Driver</th><th>Auth By</th><th>Purpose</th><th>Odometer</th><th></th></tr></thead><tbody id="fuel-tbody"></tbody></table></div>
       </div>
       <div class="tcard"><div class="tcard-head"><span class="tcard-title">Fuel Deliveries</span></div>
-        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Type</th><th>Qty(L)</th><th>Supplier</th><th>Notes</th><th></th></tr></thead><tbody id="fuel-del-tbody"></tbody></table></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Type</th><th>Qty(L)</th><th>Supplier</th><th>Dip Before(m)</th><th>Dip After(m)</th><th>Notes</th><th></th></tr></thead><tbody id="fuel-del-tbody"></tbody></table></div>
       </div>
     </div>
 
@@ -676,7 +698,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
         </div>
         <div class="chart-card" style="grid-column:1/-1">
           <div class="chart-card-head">
-            <span class="chart-title">🏗️ Concrete / Bulk Usage Over Time</span>
+            <span class="chart-title">🏗️ Batch Plant Usage Over Time</span>
             <button class="btn btn-outline btn-sm" onclick="downloadChart('chart-concrete','concrete-usage')">&#128247; PNG</button>
           </div>
           <canvas id="chart-concrete"></canvas>
@@ -749,7 +771,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <div class="settings-section">
         <div class="settings-title">ℹ️ About</div>
         <div class="settings-row">
-          <div><div class="settings-label">Application</div><div class="settings-sub">Bravura Stores — Inventory & Operations Management</div></div>
+          <div><div class="settings-label">Application</div><div class="settings-sub">Bravura Kamativi — Inventory & Operations Management</div></div>
           <span style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">v4.0</span>
         </div>
         <div class="settings-row">
@@ -807,7 +829,12 @@ tr:hover td{background:rgba(255,255,255,.015);}
 <!-- STOCK IN -->
 <div class="overlay" id="m-si"><div class="modal">
   <div class="mtitle">📥 Stock <span>In</span></div>
-  <div class="fg"><label>Item</label><select id="si-item"></select></div>
+  <div class="fg"><label>Item</label>
+    <div style="display:flex;gap:6px">
+      <select id="si-item" style="flex:1"></select>
+      <button class="btn btn-gold btn-sm" onclick="openQuickAddItem('si-item')" title="Add new item on the fly">＋ New</button>
+    </div>
+  </div>
   <div class="fr">
     <div class="fg"><label>Quantity</label><input type="number" id="si-qty" placeholder="0" min="1"></div>
     <div class="fg"><label>Date</label><input type="date" id="si-date"></div>
@@ -847,7 +874,12 @@ tr:hover td{background:rgba(255,255,255,.015);}
 <div class="overlay" id="m-st"><div class="modal">
   <div class="mtitle">📋 Stock <span>Take</span></div>
   <div class="warn-box" style="margin-bottom:12px;font-size:10px">This overrides the current system balance with your physically counted value.</div>
-  <div class="fg"><label>Item</label><select id="st-item" onchange="showSTCurrent()"></select></div>
+  <div class="fg"><label>Item</label>
+    <div style="display:flex;gap:6px">
+      <select id="st-item" onchange="showSTCurrent()" style="flex:1"></select>
+      <button class="btn btn-gold btn-sm" onclick="openQuickAddItem('st-item')" title="Add new item on the fly">＋ New</button>
+    </div>
+  </div>
   <div id="st-current" style="font-family:var(--font-mono);font-size:11px;color:var(--teal);margin:-4px 0 8px"></div>
   <div class="fr">
     <div class="fg"><label>Counted Quantity</label><input type="number" id="st-qty" placeholder="0" min="0"></div>
@@ -915,9 +947,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="fr">
     <div class="fg"><label>Odometer Reading (km)</label><input type="number" id="f-odometer" placeholder="Optional"></div>
-    <div class="fg"><label>Dipstick Before (L)</label><input type="number" id="f-dip-before" placeholder="Tank level before"></div>
+    <div class="fg"><label>Flowmeter Amount (L)</label><input type="number" id="f-flowmeter" placeholder="Amount on pump meter" min="0" step="0.1"></div>
   </div>
-  <div class="fg"><label>Dipstick After (L)</label><input type="number" id="f-dip-after" placeholder="Tank level after issuance"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-fuel')">Cancel</button>
     <button class="btn btn-blue" onclick="doFuelIssuance()">Log Issuance</button>
@@ -925,16 +956,21 @@ tr:hover td{background:rgba(255,255,255,.015);}
 </div></div>
 
 <!-- FUEL DELIVERY -->
-<div class="overlay" id="m-fuel-del"><div class="modal">
+<div class="overlay" id="m-fuel-del"><div class="modal modal-lg">
   <div class="mtitle">🚛 Fuel <span>Delivery</span></div>
   <div class="fr">
     <div class="fg"><label>Date</label><input type="date" id="fd-date"></div>
     <div class="fg"><label>Fuel Type</label><select id="fd-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Quantity (Litres)</label><input type="number" id="fd-qty" placeholder="0" min="1"></div>
+    <div class="fg"><label>Quantity Delivered (Litres)</label><input type="number" id="fd-qty" placeholder="0" min="1"></div>
     <div class="fg"><label>Supplier</label><input type="text" id="fd-supplier" placeholder="Supplier name"></div>
   </div>
+  <div class="fr">
+    <div class="fg"><label>Dipstick Before Delivery (m)</label><input type="number" id="fd-dip-before" placeholder="e.g. 0.85" step="0.01" oninput="calcDeliveryVerify()"></div>
+    <div class="fg"><label>Dipstick After Delivery (m)</label><input type="number" id="fd-dip-after" placeholder="e.g. 1.40" step="0.01" oninput="calcDeliveryVerify()"></div>
+  </div>
+  <div id="fd-verify" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);background:rgba(45,212,191,.08);border-radius:6px;padding:6px 10px;margin-bottom:8px;display:none"></div>
   <div class="fg"><label>Notes</label><input type="text" id="fd-notes" placeholder="Optional"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-fuel-del')">Cancel</button>
@@ -942,18 +978,70 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
 </div></div>
 
+<!-- DAILY DIPSTICK -->
+<div class="overlay" id="m-dipstick"><div class="modal modal-lg">
+  <div class="mtitle">📏 Daily Dipstick <span>Record</span></div>
+  <div class="fr">
+    <div class="fg"><label>Date</label><input type="date" id="dip-date"></div>
+    <div class="fg"><label>Recorded By</label><select id="dip-emp"></select></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Dipstick — Start of Day (m)</label><input type="number" id="dip-start" placeholder="e.g. 1.20" step="0.01" oninput="calcDipstickLive()"></div>
+    <div class="fg"><label>Dipstick — End of Day (m)</label><input type="number" id="dip-end" placeholder="e.g. 0.95" step="0.01" oninput="calcDipstickLive()"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Flowmeter Start (totalizer)</label><input type="number" id="dip-fm-start" placeholder="Pump counter reading" step="0.1" oninput="calcDipstickLive()"></div>
+    <div class="fg"><label>Flowmeter End (totalizer)</label><input type="number" id="dip-fm-end" placeholder="Pump counter reading" step="0.1" oninput="calcDipstickLive()"></div>
+  </div>
+  <div id="dip-calc" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;font-family:var(--font-mono);font-size:10px;display:none">
+    <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px">📊 Calculated Results</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div>Fuel Start: <span id="dc-start" style="color:var(--teal)">—</span></div>
+      <div>Fuel End: <span id="dc-end" style="color:var(--teal)">—</span></div>
+      <div>Actual Issued: <span id="dc-actual" style="color:var(--blue)">—</span></div>
+      <div>Flowmeter Issued: <span id="dc-flow" style="color:var(--blue)">—</span></div>
+      <div>Error: <span id="dc-error" style="color:var(--yellow)">—</span></div>
+      <div>Error %: <span id="dc-errpct" style="color:var(--yellow)">—</span></div>
+    </div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="dip-notes" placeholder="Optional"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-dipstick')">Cancel</button>
+    <button class="btn btn-gold" onclick="saveDipstickRecord()">Save Record</button>
+  </div>
+</div></div>
+
+<!-- QUICK ADD ITEM -->
+<div class="overlay" id="m-quick-item"><div class="modal">
+  <div class="mtitle">➕ Quick Add <span>Item</span></div>
+  <input type="hidden" id="quick-target-select">
+  <div class="fr">
+    <div class="fg"><label>Item Name</label><input type="text" id="qi-name" placeholder="Item name"></div>
+    <div class="fg"><label>Category</label><select id="qi-cat"></select></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Unit</label><input type="text" id="qi-unit" placeholder="pcs, kg, m, L..." value="pcs"></div>
+    <div class="fg"><label>Low Stock Threshold</label><input type="number" id="qi-thresh" placeholder="5" value="5" min="0"></div>
+  </div>
+  <div class="fg"><label>Unit Cost (USD, optional)</label><input type="number" id="qi-cost" placeholder="0" min="0" step="0.01"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-quick-item')">Cancel</button>
+    <button class="btn btn-gold" onclick="doQuickAddItem()">Add &amp; Select</button>
+  </div>
+</div></div>
+
 <!-- CONCRETE -->
 <div class="overlay" id="m-concrete"><div class="modal">
-  <div class="mtitle">🏗️ Concrete / Bulk <span>Material</span></div>
+  <div class="mtitle">🏗️ Batch Plant <span>Material</span></div>
   <div class="fr">
     <div class="fg"><label>Material Type</label>
-      <select id="c-material"><option value="CEMENT">Cement (Bags)</option><option value="STONE">Quarry Stone (m³)</option><option value="AGGREGATE">Aggregate (m³)</option><option value="SAND">Sand (m³)</option><option value="WATER">Water (L)</option></select>
+      <select id="c-material"><option value="CEMENT">Cement (Tonnes)</option><option value="STONE">Quarry Stone (m³)</option><option value="AGGREGATE">Aggregate (m³)</option><option value="SAND">Sand (m³)</option></select>
     </div>
     <div class="fg"><label>Date</label><input type="date" id="c-date"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Qty In (received)</label><input type="number" id="c-qin" placeholder="0" min="0"></div>
-    <div class="fg"><label>Qty Used (consumed)</label><input type="number" id="c-qout" placeholder="0" min="0"></div>
+    <div class="fg"><label>Qty Received (delivery)</label><input type="number" id="c-qin" placeholder="0" min="0" step="0.01"></div>
+    <div class="fg"><label>Qty Used / Consumed</label><input type="number" id="c-qout" placeholder="0" min="0" step="0.01"></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Supplier / Source</label><input type="text" id="c-supplier" placeholder="Optional"></div>
@@ -971,14 +1059,16 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🏕️ Campsite <span>Supply</span></div>
   <div class="fr">
     <div class="fg"><label>Supply Item</label>
-      <select id="cs-item"><option>Water (L)</option><option>Soap (bars)</option><option>Washing Powder (kg)</option><option>Toilet Paper (rolls)</option><option>Cleaning Chemicals (L)</option><option>Food Supplies (kg)</option><option>Other</option></select>
+      <select id="cs-item" onchange="updateCampsiteUnit()"><option value="Water (Cases)">Water (Cases)</option><option value="Soap (bars)">Soap (bars)</option><option value="Washing Powder (kg)">Washing Powder (kg)</option><option value="Toilet Paper (rolls)">Toilet Paper (rolls)</option><option value="Cleaning Chemicals (L)">Cleaning Chemicals (L)</option><option value="Food Supplies (kg)">Food Supplies (kg)</option><option value="Other">Other</option></select>
     </div>
     <div class="fg"><label>Date</label><input type="date" id="cs-date"></div>
   </div>
+  <div id="cs-water-info" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);background:rgba(45,212,191,.08);border-radius:6px;padding:6px 10px;margin-bottom:8px">1 Case = 24 × 500ml bottles = 12 Litres</div>
   <div class="fr">
-    <div class="fg"><label>Qty In</label><input type="number" id="cs-qin" placeholder="0" min="0"></div>
-    <div class="fg"><label>Qty Out / Used</label><input type="number" id="cs-qout" placeholder="0" min="0"></div>
+    <div class="fg"><label id="cs-qin-label">Qty In (Cases)</label><input type="number" id="cs-qin" placeholder="0" min="0" oninput="updateCampsiteConversion()"></div>
+    <div class="fg"><label id="cs-qout-label">Qty Out (Cases)</label><input type="number" id="cs-qout" placeholder="0" min="0" oninput="updateCampsiteConversion()"></div>
   </div>
+  <div id="cs-conversion" style="font-family:var(--font-mono);font-size:10px;color:var(--gold);margin:-4px 0 8px;padding:4px 8px"></div>
   <div class="fg"><label>Notes</label><input type="text" id="cs-notes" placeholder="Optional"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-campsite')">Cancel</button>
@@ -1008,7 +1098,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 <!-- EMPLOYEE -->
 <div class="overlay" id="m-emp"><div class="modal">
-  <div class="mtitle">👨‍💼 Add <span>Employee</span></div>
+  <input type="hidden" id="e-edit-id">
+  <div class="mtitle" id="emp-modal-title">👨‍💼 Add <span>Employee</span></div>
   <div class="fr">
     <div class="fg"><label>Full Name</label><input type="text" id="e-name" placeholder="Full name"></div>
     <div class="fg"><label>Employee ID</label><input type="text" id="e-id" placeholder="e.g. BRA001"></div>
@@ -1023,7 +1114,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-emp')">Cancel</button>
-    <button class="btn btn-gold" onclick="doAddEmployee()">Add Employee</button>
+    <button class="btn btn-gold" id="emp-save-btn" onclick="doAddEmployee()">Add Employee</button>
   </div>
 </div></div>
 
@@ -1095,7 +1186,7 @@ let db = {
   items: [], transactions: [],
   goodsReceived: [], fuelLog: [], fuelDeliveries: [],
   stockTakes: [], concreteLog: [], campsiteLog: [],
-  employees: [], fleet: [], settings: {}
+  employees: [], fleet: [], settings: {}, dipstickLog: []
 };
 
 // Load all data from Supabase into db object
@@ -1114,7 +1205,8 @@ async function loadDB() {
       { data: employees },
       { data: fleet },
       { data: categories },
-      { data: settings }
+      { data: settings },
+      { data: dipstickLog }
     ] = await Promise.all([
       SB.from('items').select('*').order('created_at'),
       SB.from('transactions').select('*').order('created_at'),
@@ -1127,7 +1219,8 @@ async function loadDB() {
       SB.from('employees').select('*').order('created_at'),
       SB.from('fleet').select('*').order('created_at'),
       SB.from('categories').select('*').order('created_at'),
-      SB.from('settings').select('*').limit(1)
+      SB.from('settings').select('*').limit(1),
+      SB.from('dipstick_log').select('*').order('created_at')
     ]);
 
     db.items        = (items || []).map(r => ({ ...r, totalIn: r.total_in||0, totalOut: r.total_out||0 }));
@@ -1140,7 +1233,8 @@ async function loadDB() {
     db.campsiteLog  = (campsiteLog || []).map(r => ({ ...r, qIn: r.q_in||0, qOut: r.q_out||0, user: r.user_name }));
     db.employees    = (employees || []).map(r => ({ ...r, empId: r.emp_id }));
     db.fleet        = (fleet || []).map(r => ({ ...r, driverId: r.driver_id }));
-    db.settings     = (settings && settings[0]) ? { ...settings[0], companyName: settings[0].company_name } : { companyName: 'Bravura Stores' };
+    db.settings     = (settings && settings[0]) ? { ...settings[0], companyName: settings[0].company_name } : { companyName: 'Bravura Kamativi' };
+    db.dipstickLog  = (dipstickLog || []).map(r => ({ ...r, dipStart: r.dip_start, dipEnd: r.dip_end, fuelStart: r.fuel_start, fuelEnd: r.fuel_end, fmStart: r.fm_start, fmEnd: r.fm_end, flowmeterIssued: r.flowmeter_issued, actualIssued: r.actual_issued, errorLiters: r.error_liters, errorPct: r.error_pct, doneBy: r.done_by }));
 
     if (categories && categories.length > 0) {
       db.categories = categories.map(c => ({ name: c.name, icon: c.icon }));
@@ -1212,6 +1306,280 @@ function importJSON(input) {
 function updateStorageSize() {
   const el = document.getElementById('storage-size');
   if (el) el.textContent = 'Supabase Cloud';
+}
+
+// ═══════════════════════════════════════════════════════════
+// DIPSTICK CHART — ZUFTA10 10,000L Aboveground Tank
+// ═══════════════════════════════════════════════════════════
+const DIPSTICK_TABLE = [
+  [0.00,0],[0.01,6],[0.02,17],[0.03,31],[0.04,48],[0.05,67],[0.06,88],[0.07,111],[0.08,136],[0.09,162],
+  [0.10,189],[0.11,218],[0.12,247],[0.13,279],[0.14,311],[0.15,344],[0.16,379],[0.17,414],[0.18,450],[0.19,488],
+  [0.20,526],[0.21,565],[0.22,605],[0.23,645],[0.24,687],[0.25,729],[0.26,772],[0.27,815],[0.28,860],[0.29,905],
+  [0.30,950],[0.31,997],[0.32,1043],[0.33,1091],[0.34,1139],[0.35,1188],[0.36,1237],[0.37,1286],[0.38,1337],[0.39,1387],
+  [0.40,1439],[0.41,1490],[0.42,1542],[0.43,1595],[0.44,1648],[0.45,1702],[0.46,1755],[0.47,1810],[0.48,1865],[0.49,1920],
+  [0.50,1975],[0.51,2031],[0.52,2087],[0.53,2144],[0.54,2201],[0.55,2258],[0.56,2316],[0.57,2374],[0.58,2432],[0.59,2490],
+  [0.60,2549],[0.61,2608],[0.62,2668],[0.63,2727],[0.64,2787],[0.65,2847],[0.66,2908],[0.67,2968],[0.68,3029],[0.69,3090],
+  [0.70,3151],[0.71,3213],[0.72,3275],[0.73,3336],[0.74,3398],[0.75,3461],[0.76,3523],[0.77,3585],[0.78,3648],[0.79,3711],
+  [0.80,3774],[0.81,3837],[0.82,3900],[0.83,3964],[0.84,4027],[0.85,4091],[0.86,4154],[0.87,4218],[0.88,4282],[0.89,4346],
+  [0.90,4410],[0.91,4474],[0.92,4538],[0.93,4602],[0.94,4666],[0.95,4730],[0.96,4794],[0.97,4859],[0.98,4923],[0.99,4987],
+  [1.00,5052],[1.01,5116],[1.02,5180],[1.03,5245],[1.04,5309],[1.05,5373],[1.06,5437],[1.07,5502],[1.08,5566],[1.09,5630],
+  [1.10,5694],[1.11,5758],[1.12,5822],[1.13,5885],[1.14,5949],[1.15,6013],[1.16,6076],[1.17,6140],[1.18,6203],[1.19,6266],
+  [1.20,6329],[1.21,6392],[1.22,6455],[1.23,6518],[1.24,6580],[1.25,6643],[1.26,6705],[1.27,6767],[1.28,6829],[1.29,6890],
+  [1.30,6952],[1.31,7013],[1.32,7074],[1.33,7135],[1.34,7196],[1.35,7256],[1.36,7316],[1.37,7376],[1.38,7436],[1.39,7495],
+  [1.40,7554],[1.41,7613],[1.42,7671],[1.43,7730],[1.44,7788],[1.45,7845],[1.46,7902],[1.47,7959],[1.48,8016],[1.49,8072],
+  [1.50,8128],[1.51,8184],[1.52,8239],[1.53,8294],[1.54,8348],[1.55,8402],[1.56,8455],[1.57,8508],[1.58,8561],[1.59,8613],
+  [1.60,8665],[1.61,8716],[1.62,8767],[1.63,8817],[1.64,8867],[1.65,8916],[1.66,8964],[1.67,9012],[1.68,9060],[1.69,9107],
+  [1.70,9153],[1.71,9199],[1.72,9244],[1.73,9288],[1.74,9332],[1.75,9374],[1.76,9417],[1.77,9458],[1.78,9499],[1.79,9539],
+  [1.80,9578],[1.81,9616],[1.82,9653],[1.83,9689],[1.84,9725],[1.85,9759],[1.86,9792],[1.87,9825],[1.88,9856],[1.89,9886],
+  [1.90,9914],[1.91,9942],[1.92,9968],[1.93,9992],[1.94,10015],[1.95,10036],[1.96,10055],[1.97,10072],[1.98,10086],[1.99,10097],[2.00,10103]
+];
+const TANK_MAX = 10103;
+
+function getFuelFromDipstick(m) {
+  if (m === null || m === undefined || m === '') return null;
+  const v = parseFloat(m);
+  if (isNaN(v)) return null;
+  if (v <= 0) return 0;
+  if (v >= 2.00) return TANK_MAX;
+  // Find bracket and interpolate
+  for (let i = 0; i < DIPSTICK_TABLE.length - 1; i++) {
+    const [d0, l0] = DIPSTICK_TABLE[i];
+    const [d1, l1] = DIPSTICK_TABLE[i + 1];
+    if (v >= d0 && v <= d1) {
+      const frac = (v - d0) / (d1 - d0);
+      return Math.round(l0 + frac * (l1 - l0));
+    }
+  }
+  return null;
+}
+
+function calcDipstickLive() {
+  const start = parseFloat(document.getElementById('dip-start')?.value);
+  const end   = parseFloat(document.getElementById('dip-end')?.value);
+  const fmS   = parseFloat(document.getElementById('dip-fm-start')?.value);
+  const fmE   = parseFloat(document.getElementById('dip-fm-end')?.value);
+  const el    = document.getElementById('dip-calc');
+  if (!el) return;
+  const fuelStart = getFuelFromDipstick(start);
+  const fuelEnd   = getFuelFromDipstick(end);
+  if (fuelStart === null && fuelEnd === null) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  setEl('dc-start', fuelStart !== null ? fuelStart.toLocaleString() + ' L' : '—');
+  setEl('dc-end',   fuelEnd   !== null ? fuelEnd.toLocaleString()   + ' L' : '—');
+  if (fuelStart !== null && fuelEnd !== null) {
+    const actual = fuelStart - fuelEnd;
+    setEl('dc-actual', actual.toLocaleString() + ' L');
+    if (!isNaN(fmS) && !isNaN(fmE)) {
+      const flow = fmE - fmS;
+      const err = flow - actual;
+      const errPct = actual !== 0 ? ((err / actual) * 100).toFixed(2) : '—';
+      setEl('dc-flow', flow.toLocaleString() + ' L');
+      setEl('dc-error', (err >= 0 ? '+' : '') + err.toFixed(1) + ' L');
+      setEl('dc-errpct', (err >= 0 ? '+' : '') + errPct + '%');
+      document.getElementById('dc-error').style.color = Math.abs(err) > 50 ? 'var(--red)' : 'var(--green)';
+      document.getElementById('dc-errpct').style.color = Math.abs(parseFloat(errPct)) > 2 ? 'var(--red)' : 'var(--green)';
+    } else {
+      setEl('dc-flow', '—'); setEl('dc-error', '—'); setEl('dc-errpct', '—');
+    }
+  }
+}
+
+function calcDeliveryVerify() {
+  const before = parseFloat(document.getElementById('fd-dip-before')?.value);
+  const after  = parseFloat(document.getElementById('fd-dip-after')?.value);
+  const el     = document.getElementById('fd-verify');
+  if (!el) return;
+  const lBefore = getFuelFromDipstick(before);
+  const lAfter  = getFuelFromDipstick(after);
+  if (lBefore !== null && lAfter !== null) {
+    const dipDiff = lAfter - lBefore;
+    el.style.display = 'block';
+    el.innerHTML = `Dip Before: <strong>${lBefore.toLocaleString()}L</strong> → After: <strong>${lAfter.toLocaleString()}L</strong> → Dip Difference: <strong style="color:var(--gold)">${dipDiff.toLocaleString()}L</strong>`;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function openDipstickModal() {
+  document.getElementById('dip-date').value = today();
+  document.getElementById('dip-emp').innerHTML = empOptions('', true);
+  document.getElementById('dip-calc').style.display = 'none';
+  ['dip-start','dip-end','dip-fm-start','dip-fm-end','dip-notes'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
+  openM('m-dipstick');
+}
+
+async function saveDipstickRecord() {
+  const date    = document.getElementById('dip-date').value;
+  const empId   = document.getElementById('dip-emp').value;
+  const dipStart = parseFloat(document.getElementById('dip-start').value);
+  const dipEnd   = parseFloat(document.getElementById('dip-end').value);
+  const fmStart  = parseFloat(document.getElementById('dip-fm-start').value) || 0;
+  const fmEnd    = parseFloat(document.getElementById('dip-fm-end').value) || 0;
+  const notes    = document.getElementById('dip-notes').value.trim();
+  if (!date) return toast('Enter a date', 'err');
+  if (isNaN(dipStart) || isNaN(dipEnd)) return toast('Enter both dipstick readings', 'err');
+  const fuelStart = getFuelFromDipstick(dipStart);
+  const fuelEnd   = getFuelFromDipstick(dipEnd);
+  const actualIssued = fuelStart - fuelEnd;
+  const flowmeterIssued = fmEnd - fmStart;
+  const error = flowmeterIssued - actualIssued;
+  const errorPct = actualIssued !== 0 ? parseFloat(((error / actualIssued) * 100).toFixed(2)) : 0;
+  const id = uid();
+  const rec = { id, date, dip_start: dipStart, dip_end: dipEnd, fuel_start: fuelStart, fuel_end: fuelEnd,
+    fm_start: fmStart, fm_end: fmEnd, flowmeter_issued: flowmeterIssued,
+    actual_issued: actualIssued, error_liters: parseFloat(error.toFixed(1)),
+    error_pct: errorPct, done_by: empName(empId), notes, user_name: session.user };
+  await sbSave('dipstick_log', rec);
+  if (!db.dipstickLog) db.dipstickLog = [];
+  db.dipstickLog.push({ ...rec, dipStart, dipEnd, fuelStart, fuelEnd, fmStart, fmEnd, flowmeterIssued, actualIssued, errorLiters: rec.error_liters, errorPct, doneBy: empName(empId) });
+  closeM('m-dipstick');
+  toast(`✓ Dipstick record saved — ${actualIssued.toLocaleString()}L actual issued`);
+  renderFuel();
+}
+
+function renderDipstickTable() {
+  const rows = [...(db.dipstickLog || [])].reverse();
+  const tb = document.getElementById('dipstick-tbody');
+  if (!tb) return;
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="11"><div class="empty"><div class="ei">📏</div><p>No dipstick records yet</p></div></td></tr>`; return; }
+  tb.innerHTML = rows.map(r => {
+    const errColor = Math.abs(r.errorPct || r.error_pct || 0) > 2 ? 'var(--red)' : 'var(--green)';
+    const actual = r.actualIssued ?? r.actual_issued ?? 0;
+    const flow = r.flowmeterIssued ?? r.flowmeter_issued ?? 0;
+    const err = r.errorLiters ?? r.error_liters ?? 0;
+    const errPct = r.errorPct ?? r.error_pct ?? 0;
+    return `<tr>
+      <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+      <td style="font-family:var(--font-mono)">${(r.dipStart??r.dip_start??'—')}m</td>
+      <td style="font-family:var(--font-mono);color:var(--teal)">${(r.fuelStart??r.fuel_start??'—').toLocaleString()}L</td>
+      <td style="font-family:var(--font-mono)">${(r.dipEnd??r.dip_end??'—')}m</td>
+      <td style="font-family:var(--font-mono);color:var(--blue)">${(r.fuelEnd??r.fuel_end??'—').toLocaleString()}L</td>
+      <td style="font-family:var(--font-mono);color:var(--green)">—</td>
+      <td style="font-family:var(--font-mono)">${flow.toLocaleString()}L</td>
+      <td style="font-family:var(--font-mono);color:var(--gold);font-weight:700">${actual.toLocaleString()}L</td>
+      <td style="font-family:var(--font-mono);color:${errColor}">${(err>=0?'+':'')+err.toFixed(1)}L</td>
+      <td style="font-family:var(--font-mono);color:${errColor};font-weight:700">${(errPct>=0?'+':'')+errPct.toFixed(2)}%</td>
+      <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('dipstick','${r.id}','Dip record ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateTankGauge() {
+  const lastDip = db.dipstickLog && db.dipstickLog.length ? [...db.dipstickLog].sort((a,b) => (a.date > b.date ? -1 : 1))[0] : null;
+  const bar = document.getElementById('tank-gauge-bar');
+  const lbl = document.getElementById('tank-gauge-label');
+  const stats = document.getElementById('tank-stats');
+  if (!bar || !lbl) return;
+  if (!lastDip) {
+    bar.style.width = '0%'; lbl.textContent = 'No data';
+    if (stats) stats.innerHTML = '<span style="color:var(--text-dim)">Record a dipstick reading to see tank level</span>';
+    return;
+  }
+  const liters = lastDip.fuelEnd ?? lastDip.fuel_end ?? 0;
+  const pct = Math.min(100, Math.round((liters / TANK_MAX) * 100));
+  bar.style.width = pct + '%';
+  bar.style.background = pct < 20 ? 'linear-gradient(90deg,var(--red),var(--yellow))' : pct < 40 ? 'linear-gradient(90deg,var(--yellow),var(--gold))' : 'linear-gradient(90deg,var(--blue),var(--teal))';
+  lbl.textContent = `${liters.toLocaleString()}L (${pct}%)`;
+  if (pct < 20) lbl.style.color = '#fff';
+  if (stats) stats.innerHTML = `
+    <span>📅 Last reading: ${fmtDate(lastDip.date)}</span>
+    <span>📏 Dip end: ${lastDip.dipEnd ?? lastDip.dip_end ?? '—'}m</span>
+    <span ${pct < 20 ? 'style="color:var(--red);font-weight:700"' : ''}>⛽ ${pct < 20 ? '⚠️ LOW — Below 20%!' : 'Level OK'}</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUICK ADD ITEM (on the fly from Stock In / Stock Take)
+// ═══════════════════════════════════════════════════════════
+let _quickTargetSelect = '';
+function openQuickAddItem(selectId) {
+  _quickTargetSelect = selectId;
+  document.getElementById('quick-target-select').value = selectId;
+  document.getElementById('qi-cat').innerHTML = catOptions();
+  ['qi-name','qi-unit','qi-cost'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('qi-unit').value = 'pcs';
+  document.getElementById('qi-thresh').value = '5';
+  openM('m-quick-item');
+}
+
+async function doQuickAddItem() {
+  const name   = document.getElementById('qi-name').value.trim();
+  const cat    = document.getElementById('qi-cat').value;
+  const unit   = document.getElementById('qi-unit').value.trim() || 'pcs';
+  const thresh = parseInt(document.getElementById('qi-thresh').value) || 5;
+  const cost   = parseFloat(document.getElementById('qi-cost').value) || 0;
+  if (!name) return toast('Enter an item name', 'err');
+  if (db.items.find(i => i.name.toLowerCase() === name.toLowerCase() && i.category === cat))
+    return toast('Item already exists', 'err');
+  const id = uid();
+  await sbSave('items', { id, name, category: cat, balance: 0, threshold: thresh, total_in: 0, total_out: 0, unit, cost, notes: '' });
+  db.items.push({ id, name, category: cat, balance: 0, threshold: thresh, totalIn: 0, totalOut: 0, unit, cost, notes: '' });
+  // Re-populate the target select and select the new item
+  const targetSel = document.getElementById(_quickTargetSelect);
+  if (targetSel) {
+    targetSel.innerHTML = itemOptions(id);
+    targetSel.value = id;
+    if (_quickTargetSelect === 'st-item') showSTCurrent();
+    if (_quickTargetSelect === 'so-item') updateAvail();
+  }
+  closeM('m-quick-item');
+  toast(`✓ "${name}" created and selected`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CAMPSITE WATER CASES
+// ═══════════════════════════════════════════════════════════
+function updateCampsiteUnit() {
+  const sel = document.getElementById('cs-item')?.value || '';
+  const isWater = sel === 'Water (Cases)';
+  const infoEl = document.getElementById('cs-water-info');
+  const inLbl  = document.getElementById('cs-qin-label');
+  const outLbl = document.getElementById('cs-qout-label');
+  if (infoEl) infoEl.style.display = isWater ? 'block' : 'none';
+  if (inLbl)  inLbl.textContent  = isWater ? 'Qty In (Cases)' : 'Qty In';
+  if (outLbl) outLbl.textContent = isWater ? 'Qty Out (Cases)' : 'Qty Out';
+  updateCampsiteConversion();
+}
+
+function updateCampsiteConversion() {
+  const sel = document.getElementById('cs-item')?.value || '';
+  const isWater = sel === 'Water (Cases)';
+  const convEl = document.getElementById('cs-conversion');
+  if (!convEl) return;
+  if (!isWater) { convEl.textContent = ''; return; }
+  const qin  = parseFloat(document.getElementById('cs-qin')?.value) || 0;
+  const qout = parseFloat(document.getElementById('cs-qout')?.value) || 0;
+  const parts = [];
+  if (qin  > 0) parts.push(`In: ${qin} cases = ${qin * 12}L`);
+  if (qout > 0) parts.push(`Out: ${qout} cases = ${qout * 12}L`);
+  convEl.textContent = parts.join('   |   ');
+}
+
+// ═══════════════════════════════════════════════════════════
+// EMPLOYEE EDIT
+// ═══════════════════════════════════════════════════════════
+function openEditEmployee(empId) {
+  const e = db.employees.find(x => x.id === empId);
+  if (!e) return;
+  document.getElementById('e-edit-id').value = empId;
+  document.getElementById('e-name').value    = e.name;
+  document.getElementById('e-id').value      = e.empId || e.emp_id || '';
+  document.getElementById('e-role').value    = e.role || '';
+  document.getElementById('e-dept').value    = e.dept || '';
+  document.getElementById('e-contact').value = e.contact || '';
+  document.getElementById('e-status').value  = e.status || 'Active';
+  document.getElementById('emp-modal-title').innerHTML = '✏️ Edit <span>Employee</span>';
+  document.getElementById('emp-save-btn').textContent = 'Save Changes';
+  openM('m-emp');
+}
+
+function openEmpModal() {
+  document.getElementById('e-edit-id').value = '';
+  ['e-name','e-id','e-role','e-dept','e-contact'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('e-status').value = 'Active';
+  document.getElementById('emp-modal-title').innerHTML = '👨‍💼 Add <span>Employee</span>';
+  document.getElementById('emp-save-btn').textContent = 'Add Employee';
+  openM('m-emp');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1328,7 +1696,7 @@ function updateAuthUI() {
 const pageTitles = {
   dashboard:'Dashboard', balance:'Stock Balance', stockin:'Stock In', stockout:'Stock Out',
   transactions:'All Transactions', stocktake:'Stock Taking', goodsreceived:'Goods Received',
-  fuel:'Fuel Management', concrete:'Concrete / Bulk', campsite:'Campsite',
+  fuel:'Fuel Management', concrete:'Batch Plant', campsite:'Campsite',
   fleet:'Fleet Management', employees:'Employees', categories:'Categories',
   alerts:'Low Stock Alerts', reports:'Reports', settings:'Settings'
 };
@@ -1845,6 +2213,8 @@ function clearFuelFilter() { fuelFromF = ''; fuelToF = ''; document.getElementBy
 function filterFuelType(t, btn) { fuelTypeF = t; document.querySelectorAll('#page-fuel .ftab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderFuel(); }
 
 function renderFuel() {
+  renderDipstickTable();
+  updateTankGauge();
   let rows = [...db.fuelLog].reverse();
   if (fuelFromF) rows = rows.filter(r => r.date >= fuelFromF);
   if (fuelToF) rows = rows.filter(r => r.date <= fuelToF);
@@ -1866,25 +2236,26 @@ function renderFuel() {
     <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
     <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
     <td style="font-family:var(--font-mono);font-size:10px">${r.time||'—'}</td>
-    <td><span class="badge bg-blue">${r.fuelType}</span></td>
-    <td style="font-family:var(--font-mono);font-weight:700;color:var(--blue)">${parseFloat(r.amount).toLocaleString()} L</td>
+    <td><span class="badge bg-blue">${r.fuelType||r.fuel_type}</span></td>
+    <td style="font-family:var(--font-mono);font-weight:700;color:var(--blue)">${parseFloat(r.amount||r.flowmeter||0).toLocaleString()} L</td>
     <td style="font-family:var(--font-mono);font-size:10px">${r.vehicle||'—'}</td>
     <td>${r.driver||'—'}</td>
-    <td>${r.authorizedBy||'—'}</td>
+    <td>${r.authorizedBy||r.authorized_by||'—'}</td>
     <td style="color:var(--text-dim);font-size:11px">${r.purpose||'—'}</td>
     <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">${r.odometer||'—'}</td>
-    <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">${r.dipBefore||'—'} / ${r.dipAfter||'—'}</td>
     <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('fuel','${r.id}','${r.amount}L ${r.fuelType} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
   </tr>`).join('');
   const dtb = document.getElementById('fuel-del-tbody');
   const drows = [...db.fuelDeliveries].reverse();
-  dtb.innerHTML = !drows.length ? `<tr><td colspan="7"><div class="empty"><div class="ei">🚛</div><p>No deliveries</p></div></td></tr>`
+  dtb.innerHTML = !drows.length ? `<tr><td colspan="9"><div class="empty"><div class="ei">🚛</div><p>No deliveries</p></div></td></tr>`
     : drows.map((r,i) => `<tr>
       <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
       <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
-      <td><span class="badge bg-blue">${r.fuelType}</span></td>
+      <td><span class="badge bg-blue">${r.fuelType||r.fuel_type}</span></td>
       <td style="font-family:var(--font-mono);font-weight:700;color:var(--teal)">${parseFloat(r.qty).toLocaleString()} L</td>
       <td>${r.supplier||'—'}</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${r.dipBefore||r.dip_before||'—'}m</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${r.dipAfter||r.dip_after||'—'}m</td>
       <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
       <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('fuelDel','${r.id}','Fuel delivery: ${r.qty}L')">🗑</button>`:'—'}</td>
     </tr>`).join('');
@@ -1900,16 +2271,16 @@ function renderConcrete() {
   const mats = {};
   db.concreteLog.forEach(r => { if(!mats[r.material]) mats[r.material]={in:0,out:0}; mats[r.material].in+=r.qIn||0; mats[r.material].out+=r.qOut||0; });
   document.getElementById('concrete-kpis').innerHTML = Object.entries(mats).map(([m,v]) =>
-    `<div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">${m}</div><div class="kpi-val" style="font-size:20px">${(v.in-v.out).toLocaleString()}</div><div class="kpi-sub">In:${v.in} Used:${v.out}</div></div>`).join('');
+    `<div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">${m}</div><div class="kpi-val" style="font-size:20px">${(v.in-v.out).toLocaleString()}</div><div class="kpi-sub">In:${v.in} ${m==='CEMENT'?'t':m.includes('m³')?'m³':'units'} · Used:${v.out}</div></div>`).join('');
   const tb = document.getElementById('concrete-tbody');
   if (!rows.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">🏗️</div><p>No records</p></div></td></tr>`; return; }
   tb.innerHTML = [...rows].reverse().map((r,i) => `<tr>
     <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
     <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
     <td style="font-weight:700">${r.material}</td>
-    <td style="font-family:var(--font-mono);color:var(--green)">${r.qIn||0}</td>
-    <td style="font-family:var(--font-mono);color:var(--red)">${r.qOut||0}</td>
-    <td style="font-family:var(--font-mono);font-weight:700">${r.balance||0}</td>
+    <td style="font-family:var(--font-mono);color:var(--green)">${r.qIn||0} ${r.material==='CEMENT'?'t':'m³'}</td>
+    <td style="font-family:var(--font-mono);color:var(--red)">${r.qOut||0} ${r.material==='CEMENT'?'t':'m³'}</td>
+    <td style="font-family:var(--font-mono);font-weight:700">${r.balance||0} ${r.material==='CEMENT'?'t':'m³'}</td>
     <td>${r.supplier||'—'}</td>
     <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
     <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('concrete','${r.id}','${r.material} batch on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
@@ -1922,22 +2293,32 @@ function renderConcrete() {
 function renderCampsite() {
   const balances = {};
   db.campsiteLog.forEach(r => { if(!balances[r.supply]) balances[r.supply]={in:0,out:0}; balances[r.supply].in+=r.qIn||0; balances[r.supply].out+=r.qOut||0; });
-  document.getElementById('campsite-kpis').innerHTML = Object.entries(balances).map(([s,v]) =>
-    `<div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">${s}</div><div class="kpi-val" style="font-size:20px">${v.in-v.out}</div><div class="kpi-sub">In:${v.in} Out:${v.out}</div></div>`).join('');
+  document.getElementById('campsite-kpis').innerHTML = Object.entries(balances).map(([s,v]) => {
+    const bal = v.in - v.out;
+    const isW = s.includes('Water');
+    const valDisp = isW ? `${bal}<span style="font-size:12px;font-weight:400"> cases</span>` : bal;
+    const subDisp = isW ? `In:${v.in} Out:${v.out} · ${bal*12}L` : `In:${v.in} Out:${v.out}`;
+    return `<div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">${s}</div><div class="kpi-val" style="font-size:20px">${valDisp}</div><div class="kpi-sub">${subDisp}</div></div>`;
+  }).join('');
   const rows = [...db.campsiteLog].reverse();
   const tb = document.getElementById('campsite-tbody');
   if (!rows.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">🏕️</div><p>No records</p></div></td></tr>`; return; }
-  tb.innerHTML = rows.map((r,i) => `<tr>
+  tb.innerHTML = rows.map((r,i) => {
+    const isWater = (r.supply||'').includes('Water');
+    const qInDisp  = isWater ? `${r.qIn||0} cases (${(r.qIn||0)*12}L)` : (r.qIn||0);
+    const qOutDisp = isWater ? `${r.qOut||0} cases (${(r.qOut||0)*12}L)` : (r.qOut||0);
+    const balDisp  = isWater ? `${r.balance||0} cases (${(r.balance||0)*12}L)` : (r.balance||0);
+    return `<tr>
     <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
     <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
     <td style="font-weight:600">${r.supply}</td>
-    <td style="font-family:var(--font-mono);color:var(--green)">${r.qIn||0}</td>
-    <td style="font-family:var(--font-mono);color:var(--red)">${r.qOut||0}</td>
-    <td style="font-family:var(--font-mono);font-weight:700">${r.balance||0}</td>
+    <td style="font-family:var(--font-mono);color:var(--green)">${qInDisp}</td>
+    <td style="font-family:var(--font-mono);color:var(--red)">${qOutDisp}</td>
+    <td style="font-family:var(--font-mono);font-weight:700">${balDisp}</td>
     <td>${statBadge(r.balance>10?'GOOD':r.balance>3?'LOW':'CRITICAL')}</td>
     <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
     <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('campsite','${r.id}','${r.supply} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
-  </tr>`).join('');
+  </tr>`; }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2018,7 +2399,9 @@ function renderEmployees() {
             ${e.empId ? `<span>🪪 ${e.empId}</span>` : ''}
             ${e.contact ? `<span>📞 ${e.contact}</span>` : ''}
           </div>
-          <div class="card-del">${canEdit() ? `<button class="abtn del" onclick="confirmDel('emp','${e.id}','${e.name}')">🗑</button>` : '—'}</div>
+          <div class="card-del" style="display:flex;gap:4px">
+            ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditEmployee('${e.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('emp','${e.id}','${e.name}')">🗑</button>` : '—'}
+          </div>
         </div>`;
       }).join('');
 }
@@ -2292,9 +2675,19 @@ function openFuelModal() {
   document.getElementById('f-auth').innerHTML = empOpts;
   openM('m-fuel');
 }
-function openFuelDeliveryModal() { document.getElementById('fd-date').value = today(); openM('m-fuel-del'); }
+function openFuelDeliveryModal() {
+  document.getElementById('fd-date').value = today();
+  ['fd-qty','fd-supplier','fd-notes','fd-dip-before','fd-dip-after'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+  const v = document.getElementById('fd-verify'); if(v) v.style.display='none';
+  openM('m-fuel-del');
+}
 function openConcreteModal() { document.getElementById('c-date').value=today(); document.getElementById('c-auth').innerHTML=empOptions('',true); openM('m-concrete'); }
-function openCampsiteModal() { document.getElementById('cs-date').value = today(); openM('m-campsite'); }
+function openCampsiteModal() {
+  document.getElementById('cs-date').value = today();
+  ['cs-qin','cs-qout','cs-notes'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+  updateCampsiteUnit();
+  openM('m-campsite');
+}
 function openFleetModal() { document.getElementById('fl-driver').innerHTML=empOptions('',true); openM('m-fleet'); }
 function openEmpModal() { openM('m-emp'); }
 
@@ -2405,7 +2798,8 @@ function confirmDeleteGRN(id) {
 }
 function confirmDel(type, id, label) {
   confirmAction(`Delete this ${type} record?`, label, 'Delete', async () => {
-    if (type==='fuel') { await sbDelete('fuel_log', id); db.fuelLog = db.fuelLog.filter(r=>r.id!==id); renderFuel(); }
+    if (type==='dipstick') { await sbDelete('dipstick_log', id); db.dipstickLog = (db.dipstickLog||[]).filter(r=>r.id!==id); renderFuel(); }
+    else if (type==='fuel') { await sbDelete('fuel_log', id); db.fuelLog = db.fuelLog.filter(r=>r.id!==id); renderFuel(); }
     else if (type==='fuelDel') { await sbDelete('fuel_deliveries', id); db.fuelDeliveries = db.fuelDeliveries.filter(r=>r.id!==id); renderFuel(); }
     else if (type==='concrete') { await sbDelete('concrete_log', id); db.concreteLog = db.concreteLog.filter(r=>r.id!==id); renderConcrete(); }
     else if (type==='campsite') { await sbDelete('campsite_log', id); db.campsiteLog = db.campsiteLog.filter(r=>r.id!==id); renderCampsite(); }
@@ -2582,41 +2976,42 @@ async function doGRN() {
 }
 
 async function doFuelIssuance() {
-  const date = document.getElementById('f-date').value;
-  const time = document.getElementById('f-time').value;
-  const fuelType = document.getElementById('f-type').value;
-  const amount = parseFloat(document.getElementById('f-amount').value);
-  const vehicle = document.getElementById('f-vehicle').value;
-  const driverId = document.getElementById('f-driver').value;
-  const authId = document.getElementById('f-auth').value;
-  const purpose = document.getElementById('f-purpose').value.trim();
-  const odometer = document.getElementById('f-odometer').value.trim();
-  const dipBefore = document.getElementById('f-dip-before').value.trim();
-  const dipAfter = document.getElementById('f-dip-after').value.trim();
+  const date      = document.getElementById('f-date').value;
+  const time      = document.getElementById('f-time').value;
+  const fuelType  = document.getElementById('f-type').value;
+  const vehicle   = document.getElementById('f-vehicle').value;
+  const driverId  = document.getElementById('f-driver').value;
+  const authId    = document.getElementById('f-auth').value;
+  const purpose   = document.getElementById('f-purpose').value.trim();
+  const odometer  = document.getElementById('f-odometer').value.trim();
+  const flowmeter = parseFloat(document.getElementById('f-flowmeter').value) || 0;
   if (!date) return toast('Enter a date', 'err');
-  if (!amount || amount <= 0) return toast('Enter a valid amount (litres)', 'err');
+  if (!flowmeter || flowmeter <= 0) return toast('Enter flowmeter amount (litres)', 'err');
   if (!vehicle) return toast('Select a vehicle', 'err');
   const id = uid();
-  const rec = { id, date, time, fuel_type: fuelType, amount, vehicle, driver: empName(driverId), authorized_by: empName(authId), purpose, odometer, dip_before: dipBefore, dip_after: dipAfter, user: session.user };
+  const rec = { id, date, time, fuel_type: fuelType, amount: flowmeter, vehicle, driver: empName(driverId), authorized_by: empName(authId), purpose, odometer, flowmeter, user_name: session.user };
   await sbSave('fuel_log', rec);
-  db.fuelLog.push({ id, date, time, fuelType, amount, vehicle, driver: empName(driverId), authorizedBy: empName(authId), purpose, odometer, dipBefore, dipAfter, user_name: session.user });
+  db.fuelLog.push({ id, date, time, fuelType, amount: flowmeter, vehicle, driver: empName(driverId), authorizedBy: empName(authId), purpose, odometer, flowmeter });
   closeM('m-fuel');
-  ['f-amount','f-odometer','f-dip-before','f-dip-after','f-purpose'].forEach(f => document.getElementById(f).value = '');
-  toast(`✓ ${amount}L ${fuelType} logged for ${vehicle}`); renderFuel();
+  ['f-amount','f-odometer','f-flowmeter','f-purpose'].forEach(f => { const el = document.getElementById(f); if(el) el.value=''; });
+  toast(`✓ ${flowmeter}L ${fuelType} logged for ${vehicle}`); renderFuel();
 }
 
 async function doFuelDelivery() {
-  const date = document.getElementById('fd-date').value;
+  const date     = document.getElementById('fd-date').value;
   const fuelType = document.getElementById('fd-type').value;
-  const qty = parseFloat(document.getElementById('fd-qty').value);
+  const qty      = parseFloat(document.getElementById('fd-qty').value);
   const supplier = document.getElementById('fd-supplier').value.trim();
-  const notes = document.getElementById('fd-notes').value.trim();
+  const dipBefore = document.getElementById('fd-dip-before').value.trim();
+  const dipAfter  = document.getElementById('fd-dip-after').value.trim();
+  const notes    = document.getElementById('fd-notes').value.trim();
   if (!qty || qty <= 0) return toast('Enter a valid quantity', 'err');
   const id = uid();
-  await sbSave('fuel_deliveries', { id, date, fuel_type: fuelType, qty, supplier, notes, user_name: session.user });
-  db.fuelDeliveries.push({ id, date, fuelType, qty, supplier, notes, user_name: session.user });
+  await sbSave('fuel_deliveries', { id, date, fuel_type: fuelType, qty, supplier, dip_before: dipBefore, dip_after: dipAfter, notes, user_name: session.user });
+  db.fuelDeliveries.push({ id, date, fuelType, qty, supplier, dipBefore, dipAfter, notes });
   closeM('m-fuel-del');
-  ['fd-qty','fd-supplier','fd-notes'].forEach(f => document.getElementById(f).value = '');
+  ['fd-qty','fd-supplier','fd-notes','fd-dip-before','fd-dip-after'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('fd-verify').style.display = 'none';
   toast(`✓ Fuel delivery of ${qty}L recorded`); renderFuel();
 }
 
@@ -2671,20 +3066,33 @@ async function doAddVehicle() {
 }
 
 async function doAddEmployee() {
-  const name = document.getElementById('e-name').value.trim();
-  const empId = document.getElementById('e-id').value.trim();
-  const role = document.getElementById('e-role').value.trim();
-  const dept = document.getElementById('e-dept').value.trim();
+  const editId  = document.getElementById('e-edit-id').value;
+  const name    = document.getElementById('e-name').value.trim();
+  const empId   = document.getElementById('e-id').value.trim();
+  const role    = document.getElementById('e-role').value.trim();
+  const dept    = document.getElementById('e-dept').value.trim();
   const contact = document.getElementById('e-contact').value.trim();
-  const status = document.getElementById('e-status').value;
+  const status  = document.getElementById('e-status').value;
   if (!name) return toast('Enter employee name', 'err');
-  if (db.employees.find(e => e.name.toLowerCase() === name.toLowerCase())) return toast('Employee with this name already exists', 'err');
-  const id = uid();
-  await sbSave('employees', { id, name, emp_id: empId, role, dept, contact, status });
-  db.employees.push({ id, name, empId, role, dept, contact, status });
-  closeM('m-emp');
-  ['e-name','e-id','e-role','e-dept','e-contact'].forEach(f => document.getElementById(f).value = '');
-  toast(`✓ "${name}" added`); renderEmployees();
+
+  if (editId) {
+    // EDIT MODE
+    const emp = db.employees.find(e => e.id === editId);
+    if (!emp) return;
+    emp.name = name; emp.empId = empId; emp.role = role; emp.dept = dept; emp.contact = contact; emp.status = status;
+    await sbSave('employees', { id: editId, name, emp_id: empId, role, dept, contact, status });
+    closeM('m-emp');
+    toast(`✓ "${name}" updated`); renderEmployees();
+  } else {
+    // ADD MODE
+    if (db.employees.find(e => e.name.toLowerCase() === name.toLowerCase())) return toast('Employee with this name already exists', 'err');
+    const id = uid();
+    await sbSave('employees', { id, name, emp_id: empId, role, dept, contact, status });
+    db.employees.push({ id, name, empId, role, dept, contact, status });
+    closeM('m-emp');
+    ['e-name','e-id','e-role','e-dept','e-contact'].forEach(f => document.getElementById(f).value = '');
+    toast(`✓ "${name}" added`); renderEmployees();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2843,7 +3251,7 @@ let currentGRNId = null;
 function printGRN() {
   const grn = db.goodsReceived.find(g => g.id === currentGRNId);
   if (!grn) return;
-  const company = db.settings?.companyName || 'Bravura Stores';
+  const company = db.settings?.companyName || 'Bravura Kamativi';
   const grnIndex = db.goodsReceived.indexOf(grn) + 1;
   const printContent = `
     <div class="print-header">
@@ -2874,7 +3282,7 @@ function printGRN() {
       <div class="print-sig-line">Authorized By</div>
     </div>
     <div style="margin-top:24px;font-size:10px;color:#666;text-align:center">
-      Generated by Bravura Stores v4.0 · ${new Date().toLocaleString()} · Designed by Clement Mpala
+      Generated by Bravura Kamativi v4.0 · ${new Date().toLocaleString()} · Designed by Clement Mpala · Bravura Kamativi
     </div>`;
 
   const w = window.open('', '_blank', 'width=800,height=600');
@@ -2893,7 +3301,7 @@ function printGRN() {
 }
 
 function printFuelLog() {
-  const company = db.settings?.companyName || 'Bravura Stores';
+  const company = db.settings?.companyName || 'Bravura Kamativi';
   const fuelFrom = document.getElementById('fuel-from')?.value || '';
   const fuelTo   = document.getElementById('fuel-to')?.value   || '';
   let rows = [...db.fuelLog];
@@ -2917,7 +3325,7 @@ function printFuelLog() {
       <tr style="font-weight:bold;background:#f0f0f0"><td colspan="4">TOTAL</td><td>${totalL.toLocaleString()} L</td><td colspan="6"></td></tr></tbody>
     </table>
     <div style="margin-top:20px;font-size:10px;color:#666;text-align:center">
-      Generated by Bravura Stores v4.0 · ${new Date().toLocaleString()} · Designed by Clement Mpala
+      Generated by Bravura Kamativi v4.0 · ${new Date().toLocaleString()} · Designed by Clement Mpala · Bravura Kamativi
     </div>`;
 
   const w = window.open('', '_blank', 'width=1000,height=700');
