@@ -1,0 +1,2988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Bravura Stores — Operations</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#0b0f1a;--surface:#111927;--surface2:#18243a;--surface3:#1e2d45;
+  --border:#1f3050;--border2:#263d61;
+  --gold:#f4a261;--gold2:#e8874a;--teal:#2dd4bf;--red:#f87171;
+  --yellow:#fbbf24;--green:#34d399;--blue:#60a5fa;--purple:#a78bfa;
+  --text:#e2e8f0;--text-dim:#64748b;--text-mid:#94a3b8;
+  --font-head:'Syne',sans-serif;--font-mono:'Space Mono',monospace;
+  --sidebar-w:240px;--sidebar-icon:52px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-head);min-height:100vh;overflow-x:hidden;font-size:14px;}
+body::before{content:'';position:fixed;inset:0;opacity:.4;pointer-events:none;z-index:0;}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 32px;width:100%;max-width:400px;text-align:center;position:relative;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--teal));border-radius:20px 20px 0 0;}
+.login-logo{font-family:var(--font-mono);font-size:10px;color:var(--gold);letter-spacing:4px;text-transform:uppercase;margin-bottom:5px;}
+.login-title{font-size:26px;font-weight:800;margin-bottom:3px;}
+.login-title span{color:var(--gold);}
+.login-sub{font-size:12px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:28px;}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-head);font-size:15px;padding:13px 16px;outline:none;margin-bottom:10px;transition:border-color .2s;min-height:44px;}
+.login-input:focus{border-color:var(--gold);}
+.login-btn{width:100%;background:var(--gold);color:#0b0f1a;border:none;border-radius:10px;font-family:var(--font-head);font-size:15px;font-weight:800;padding:13px;cursor:pointer;transition:background .15s;margin-bottom:10px;min-height:44px;}
+.login-btn:hover,.login-btn:active{background:var(--gold2);}
+.login-view-btn{width:100%;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:10px;font-family:var(--font-head);font-size:13px;font-weight:600;padding:11px;cursor:pointer;transition:all .15s;min-height:44px;}
+.login-view-btn:hover{border-color:var(--border2);color:var(--text);}
+.login-error{color:var(--red);font-size:11px;font-family:var(--font-mono);margin-bottom:8px;display:none;padding:6px 10px;background:rgba(248,113,113,.08);border-radius:6px;}
+/* APP */
+#app{display:none;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:98;backdrop-filter:blur(2px);}
+.sidebar-overlay.show{display:block;}
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:99;overflow-y:auto;transition:transform .25s cubic-bezier(.4,0,.2,1),width .2s;}
+.logo{padding:20px 18px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.logo-mark{font-family:var(--font-mono);font-size:9px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;}
+.logo h1{font-size:17px;font-weight:800;line-height:1.15;}
+.logo h1 span{color:var(--gold);}
+.logo-sub{font-size:9px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px;}
+.nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
+.nav-sec{font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;padding:10px 10px 4px;white-space:nowrap;overflow:hidden;}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:10px;border-radius:7px;border:none;background:transparent;color:var(--text-mid);font-family:var(--font-head);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:left;width:100%;min-height:44px;white-space:nowrap;overflow:hidden;position:relative;}
+.nav-btn:hover{background:var(--surface2);color:var(--text);}
+.nav-btn.active{background:rgba(244,162,97,.12);color:var(--gold);}
+.nav-btn .ic{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-btn .nb{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-family:var(--font-mono);padding:1px 5px;border-radius:8px;font-weight:700;flex-shrink:0;}
+.nav-label{overflow:hidden;text-overflow:ellipsis;}
+.nav-btn .tt{display:none;position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text);white-space:nowrap;pointer-events:none;z-index:200;}
+.sidebar-user{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#0b0f1a;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{font-size:9px;color:var(--text-dim);font-family:var(--font-mono);}
+.user-logout{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:6px;min-height:44px;min-width:36px;}
+.user-logout:hover{color:var(--red);}
+.sidebar-footer{padding:8px 14px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:.5px;line-height:1.7;flex-shrink:0;}
+/* MAIN */
+.main{margin-left:var(--sidebar-w);min-height:100vh;position:relative;z-index:1;transition:margin-left .2s;}
+.topbar{position:sticky;top:0;background:rgba(11,15,26,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;z-index:50;flex-wrap:wrap;}
+.hamburger{display:none;background:transparent;border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;padding:6px 10px;min-height:40px;min-width:40px;align-items:center;justify-content:center;border-radius:7px;}
+.hamburger:hover{background:var(--surface2);}
+.topbar h2{font-size:15px;font-weight:800;flex:1;}
+.topbar-badge{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);background:var(--surface2);padding:3px 8px;border-radius:20px;border:1px solid var(--border);}
+.search-wrap{position:relative;}
+.search-wrap input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font-head);font-size:12px;padding:8px 12px 8px 30px;outline:none;width:160px;transition:border-color .2s;min-height:36px;}
+.search-wrap input:focus{border-color:var(--gold);}
+.search-wrap .si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:12px;}
+.content{padding:20px;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:7px;border:none;font-family:var(--font-head);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:36px;}
+.btn-gold{background:var(--gold);color:#0b0f1a;}.btn-gold:hover{background:var(--gold2);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-mid);}.btn-outline:hover{border-color:var(--gold);color:var(--text);}
+.btn-red{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.25);}.btn-red:hover{background:rgba(248,113,113,.22);}
+.btn-green{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25);}.btn-green:hover{background:rgba(52,211,153,.22);}
+.btn-blue{background:rgba(96,165,250,.12);color:var(--blue);border:1px solid rgba(96,165,250,.25);}.btn-blue:hover{background:rgba(96,165,250,.22);}
+.btn-purple{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.25);}.btn-purple:hover{background:rgba(167,139,250,.22);}
+.btn-teal{background:rgba(45,212,191,.12);color:var(--teal);border:1px solid rgba(45,212,191,.25);}.btn-teal:hover{background:rgba(45,212,191,.22);}
+.btn-sm{padding:5px 10px;font-size:11px;min-height:32px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+/* PAGES */
+.page{display:none;animation:fadeIn .15s ease;}.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .2s,box-shadow .2s;}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3);}
+.kpi-card.kactive{border-color:var(--gold);box-shadow:0 0 0 1px rgba(244,162,97,.2);}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:11px 11px 0 0;}
+.kpi-card.c-gold::after{background:var(--gold);}.kpi-card.c-green::after{background:var(--green);}.kpi-card.c-yellow::after{background:var(--yellow);}.kpi-card.c-red::after{background:var(--red);}.kpi-card.c-blue::after{background:var(--blue);}.kpi-card.c-teal::after{background:var(--teal);}.kpi-card.c-purple::after{background:var(--purple);}
+.kpi-label{font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.kpi-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px;}
+.kpi-card.c-gold .kpi-val{color:var(--gold);}.kpi-card.c-green .kpi-val{color:var(--green);}.kpi-card.c-yellow .kpi-val{color:var(--yellow);}.kpi-card.c-red .kpi-val{color:var(--red);}.kpi-card.c-blue .kpi-val{color:var(--blue);}.kpi-card.c-teal .kpi-val{color:var(--teal);}.kpi-card.c-purple .kpi-val{color:var(--purple);}
+.kpi-sub{font-size:9px;color:var(--text-dim);font-family:var(--font-mono);}
+/* TABLE */
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:16px;}
+.tcard-head{padding:11px 14px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.tcard-title{font-size:13px;font-weight:700;flex:1;}
+.ftabs{display:flex;gap:3px;flex-wrap:wrap;}
+.ftab{padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-family:var(--font-mono);font-size:8px;cursor:pointer;letter-spacing:1px;transition:all .15s;min-height:28px;}
+.ftab.active,.ftab:hover{background:rgba(244,162,97,.1);border-color:var(--gold);color:var(--gold);}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.page-btn{padding:5px 11px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-mid);font-family:var(--font-mono);font-size:10px;cursor:pointer;transition:all .15s;min-height:30px;}
+.page-btn:hover,.page-btn.active{background:rgba(244,162,97,.12);border-color:var(--gold);color:var(--gold);}
+.page-btn:disabled{opacity:.35;cursor:not-allowed;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:480px;}
+th{padding:8px 12px;text-align:left;font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:10px 12px;border-bottom:1px solid rgba(31,48,80,.4);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.015);}
+.iname{font-weight:600;}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:8px;font-family:var(--font-mono);font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+.bg-good{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2);}
+.bg-low{background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.2);}
+.bg-crit{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.25);}
+.bg-out{background:rgba(100,116,139,.1);color:var(--text-dim);border:1px solid rgba(100,116,139,.2);}
+.bg-blue{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+.bg-purple{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+.bg-adj{background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.2);}
+.bg-grn{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+.bg-orange{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.25);}
+.qty-pill{font-family:var(--font-mono);font-size:12px;font-weight:700;display:inline-block;min-width:30px;text-align:center;}
+/* DRILL */
+.drill-panel{background:var(--surface);border:1px solid var(--gold);border-radius:11px;padding:14px;margin-bottom:14px;animation:mIn .18s ease;position:relative;}
+.drill-title{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;}
+.drill-close{position:absolute;top:10px;right:12px;background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;line-height:1;min-height:32px;min-width:32px;}
+.drill-close:hover{color:var(--text);}
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);z-index:300;display:none;align-items:center;justify-content:center;padding:12px;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;width:520px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:mIn .18s ease;}
+.modal-lg{width:680px;}.modal-xl{width:860px;}.modal-sm{width:380px;}
+@keyframes mIn{from{opacity:0;transform:translateY(-12px) scale(.97)}to{opacity:1;transform:none}}
+.mtitle{font-size:16px;font-weight:800;margin-bottom:16px;}
+.mtitle span{color:var(--gold);}
+.fg{margin-bottom:11px;}
+.fg label{display:block;font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font-head);font-size:13px;padding:9px 12px;outline:none;transition:border-color .2s;min-height:40px;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);}
+.fg select option{background:var(--surface2);}
+.fg textarea{resize:vertical;min-height:60px;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.mactions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
+.warn-box{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.18);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--yellow);font-family:var(--font-mono);}
+.info-box{background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.18);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue);font-family:var(--font-mono);}
+/* CONFIRM MODAL */
+.confirm-icon{font-size:40px;text-align:center;margin-bottom:10px;}
+.confirm-msg{text-align:center;font-size:14px;color:var(--text-mid);margin-bottom:6px;line-height:1.5;}
+.confirm-item{text-align:center;font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;}
+/* TX */
+.tx-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(31,48,80,.4);transition:background .1s;}
+.tx-item:hover{background:rgba(255,255,255,.015);}
+.tx-item:last-child{border-bottom:none;}
+.tx-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.tx-dot.in{background:var(--green);box-shadow:0 0 4px rgba(52,211,153,.5);}
+.tx-dot.out{background:var(--red);box-shadow:0 0 4px rgba(248,113,113,.5);}
+.tx-info{flex:1;min-width:0;}
+.tx-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-meta{font-size:9px;color:var(--text-dim);font-family:var(--font-mono);margin-top:1px;}
+.tx-qty{font-family:var(--font-mono);font-size:12px;font-weight:700;flex-shrink:0;}
+.tx-qty.in{color:var(--green);}.tx-qty.out{color:var(--red);}
+/* CAT PILLS */
+.cat-pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}
+.cpill{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-family:var(--font-mono);font-size:9px;letter-spacing:.5px;cursor:pointer;transition:all .15s;min-height:30px;}
+.cpill.active{background:rgba(244,162,97,.12);border-color:var(--gold);color:var(--gold);}
+/* EMPTY */
+.empty{text-align:center;padding:40px 16px;color:var(--text-dim);}
+.empty .ei{font-size:36px;margin-bottom:8px;}
+.empty p{font-family:var(--font-mono);font-size:10px;}
+/* ABTN */
+.abtn{padding:5px 9px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;transition:all .15s;color:var(--text-mid);min-height:30px;}
+.abtn:hover{background:var(--surface2);}
+.abtn.del:hover{background:rgba(248,113,113,.1);color:var(--red);border-color:rgba(248,113,113,.25);}
+.abtn:disabled{opacity:.3;cursor:not-allowed;}
+/* TOAST */
+#toast-wrap{position:fixed;bottom:20px;right:16px;z-index:999;display:flex;flex-direction:column;gap:6px;max-width:320px;}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:0 6px 24px rgba(0,0,0,.4);animation:tIn .22s ease;transition:opacity .2s;}
+@keyframes tIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.toast.ok{border-color:rgba(52,211,153,.35);}.toast.err{border-color:rgba(248,113,113,.35);}.toast.info{border-color:rgba(96,165,250,.35);}
+/* MISC */
+.progress-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;border-radius:2px;transition:width .4s;}
+.section-label{font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;padding:6px 0 4px;}
+.date-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.date-row label{font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;}
+.date-row input[type=date]{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-mono);font-size:11px;padding:6px 9px;outline:none;min-height:36px;}
+.date-row input[type=date]:focus{border-color:var(--gold);}
+/* GRN */
+.grn-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 28px;gap:6px;align-items:end;margin-bottom:6px;}
+.grn-row input,.grn-row select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-head);font-size:12px;padding:7px 9px;outline:none;width:100%;min-height:36px;}
+.grn-row input:focus{border-color:var(--gold);}
+.grn-rm{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:4px;min-height:36px;min-width:28px;}
+.grn-rm:hover{color:var(--red);}
+.grn-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 28px;gap:6px;font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;padding:0 2px;}
+/* FLEET/EMP */
+.fleet-grid,.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px;}
+.fleet-card,.emp-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px;position:relative;}
+.emp-avatar-lg{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#0b0f1a;}
+.card-del{position:absolute;top:8px;right:8px;}
+/* FUEL */
+.fuel-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;}
+.fkpi{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.fkpi-label{font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+.fkpi-val{font-size:22px;font-weight:800;color:var(--blue);}
+.fkpi-sub{font-size:9px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px;}
+/* CHART */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:16px;}
+.chart-card canvas{max-height:220px;}
+.chart-title{font-size:12px;font-weight:700;margin-bottom:10px;}
+/* SETTINGS */
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px;margin-bottom:14px;}
+.settings-title{font-size:13px;font-weight:700;margin-bottom:12px;color:var(--gold);}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(31,48,80,.4);gap:12px;}
+.settings-row:last-child{border-bottom:none;}
+.settings-label{font-size:12px;font-weight:600;}
+.settings-sub{font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px;}
+/* RESPONSIVE */
+@media(max-width:1024px){
+  :root{--sidebar-w:var(--sidebar-icon);}
+  .sidebar .logo h1,.sidebar .logo-mark,.sidebar .logo-sub,.sidebar .nav-sec,
+  .sidebar .nav-label,.sidebar .nb,.sidebar .user-info,.sidebar .user-logout,.sidebar-footer{display:none;}
+  .sidebar .logo{padding:12px 0;display:flex;justify-content:center;}
+  .sidebar .nav-btn{justify-content:center;padding:10px;}
+  .sidebar .sidebar-user{justify-content:center;padding:10px 0;}
+  .sidebar .nav-btn:hover .tt{display:block;}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.mobile-open{transform:translateX(0);width:var(--sidebar-w) !important;}
+  .sidebar.mobile-open .logo h1,.sidebar.mobile-open .logo-mark,.sidebar.mobile-open .logo-sub,
+  .sidebar.mobile-open .nav-sec,.sidebar.mobile-open .nav-label,.sidebar.mobile-open .nb,
+  .sidebar.mobile-open .user-info,.sidebar.mobile-open .user-logout,.sidebar-footer{display:block !important;}
+  .sidebar.mobile-open .logo{padding:20px 18px 14px;display:block;}
+  .sidebar.mobile-open .nav-btn{justify-content:flex-start;padding:10px;}
+  .sidebar.mobile-open .sidebar-user{justify-content:flex-start;padding:10px 14px;}
+  .main{margin-left:0 !important;}
+  .hamburger{display:flex !important;}
+  /* Grids — single column on mobile */
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .fr{grid-template-columns:1fr;}
+  .fr3{grid-template-columns:1fr;}
+  .fr4{grid-template-columns:1fr 1fr;}
+  .content{padding:12px;}
+  /* GRN rows — 2 cols on mobile (item name + received) */
+  .grn-row{grid-template-columns:2fr 1fr;}
+  .grn-head{display:none;}
+  /* Cards */
+  .fleet-grid,.emp-grid{grid-template-columns:1fr 1fr;}
+  /* Topbar */
+  .search-wrap input{width:120px;}
+  .topbar h2{font-size:13px;}
+  .topbar-badge{display:none;}
+  /* Table cards */
+  .tcard-head{gap:6px;}
+  .ftabs{gap:2px;}
+  .ftab{padding:3px 7px;font-size:8px;}
+  /* Fuel KPIs */
+  .fuel-kpis{grid-template-columns:1fr 1fr;}
+  /* Date rows wrap nicely */
+  .date-row{gap:5px;}
+  .date-row input[type=date]{font-size:11px;padding:5px 7px;}
+  /* Modals */
+  .modal{padding:16px;}
+  .mtitle{font-size:14px;}
+  /* Settings rows stack */
+  .settings-row{flex-direction:column;align-items:flex-start;gap:8px;}
+  /* Reports */
+  .reports-grid{grid-template-columns:1fr !important;}
+  .reports-grid .chart-card[style*="grid-column"]{grid-column:1 !important;}
+  /* Drill panel */
+  .drill-panel{padding:12px;}
+  /* Login */
+  .login-box{padding:28px 20px;}
+  .login-title{font-size:22px;}
+}
+@media(max-width:400px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .fleet-grid,.emp-grid{grid-template-columns:1fr;}
+  .topbar{padding:8px 12px;gap:6px;}
+  .content{padding:8px;}
+  .btn{padding:7px 10px;font-size:11px;}
+  .btn-sm{padding:5px 8px;font-size:10px;}
+  .fr{grid-template-columns:1fr;}
+  .settings-section{padding:12px;}
+  .search-wrap{display:none;}
+}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+/* PRINT STYLES */
+@media print {
+  body { background:#fff !important; color:#000 !important; font-family:'Arial',sans-serif !important; }
+  .sidebar,.topbar,.overlay,.toast,#toast-wrap,.abtn,.btn,.hamburger,
+  .sidebar-overlay,.no-print { display:none !important; }
+  .main { margin-left:0 !important; }
+  .print-only { display:block !important; }
+  .print-header { border-bottom:2px solid #000; padding-bottom:12px; margin-bottom:16px; }
+  .print-header h1 { font-size:18px; font-weight:bold; }
+  .print-header .print-meta { font-size:11px; color:#444; margin-top:4px; }
+  table { width:100%; border-collapse:collapse; font-size:11px; }
+  th { background:#f0f0f0 !important; color:#000 !important; border:1px solid #ccc; padding:6px 8px; text-align:left; font-size:10px; }
+  td { border:1px solid #ccc; padding:6px 8px; }
+  .print-sig { display:flex; gap:60px; margin-top:40px; }
+  .print-sig-line { flex:1; border-top:1px solid #000; padding-top:4px; font-size:11px; }
+  .page { display:block !important; }
+  .tcard,.drill-panel { border:none !important; box-shadow:none !important; }
+  .badge { border:1px solid #999 !important; color:#000 !important; background:#eee !important; }
+}
+.print-only { display:none; }
+/* FIELD ERROR */
+.field-error { color:var(--red); font-size:9px; font-family:var(--font-mono); margin-top:3px; display:none; }
+.field-error.show { display:block; }
+/* CHART CARD extras */
+.chart-card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.chart-table { margin-top:12px; }
+.chart-table table { min-width:0; }
+/* Company name in topbar */
+.company-name-badge { font-family:var(--font-mono); font-size:9px; color:var(--gold); background:rgba(244,162,97,.1); padding:3px 9px; border-radius:20px; border:1px solid rgba(244,162,97,.2); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* Mobile: stack charts single column */
+@media(max-width:768px) {
+  .reports-grid { grid-template-columns:1fr !important; }
+}
+</style>
+</head>
+<body>
+<div id="toast-wrap"></div>
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Bravura Stores</div>
+    <div class="login-title">Operations<span>.</span></div>
+    <div class="login-sub">Inventory &amp; Operations Management System</div>
+    <input class="login-input" type="text" id="l-user" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('l-pass').focus()">
+    <input class="login-input" type="password" id="l-pass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-error" id="l-err">Incorrect username or password</div>
+    <button class="login-btn" onclick="doLogin()">Login</button>
+    <button class="login-view-btn" onclick="viewOnly()">&#128065; Continue as Viewer (Read Only)</button>
+  </div>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div id="app">
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Bravura Stores</div>
+    <h1>Operations<span>.</span></h1>
+    <div class="logo-sub">Inventory &amp; Ops Manager</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-sec">Overview</div>
+    <button class="nav-btn active" onclick="showPage('dashboard',this)"><span class="ic">&#128202;</span><span class="nav-label">Dashboard</span><span class="tt">Dashboard</span></button>
+    <div class="nav-sec">Inventory</div>
+    <button class="nav-btn" onclick="showPage('balance',this)"><span class="ic">&#9878;&#65039;</span><span class="nav-label">Stock Balance</span><span class="tt">Stock Balance</span></button>
+    <button class="nav-btn" onclick="showPage('stockin',this)"><span class="ic">&#128229;</span><span class="nav-label">Stock In</span><span class="tt">Stock In</span></button>
+    <button class="nav-btn" onclick="showPage('stockout',this)"><span class="ic">&#128228;</span><span class="nav-label">Stock Out</span><span class="tt">Stock Out</span></button>
+    <button class="nav-btn" onclick="showPage('transactions',this)"><span class="ic">&#128260;</span><span class="nav-label">Transactions</span><span class="tt">Transactions</span></button>
+    <button class="nav-btn" onclick="showPage('stocktake',this)"><span class="ic">&#128203;</span><span class="nav-label">Stock Taking</span><span class="tt">Stock Taking</span></button>
+    <div class="nav-sec">Logistics</div>
+    <button class="nav-btn" onclick="showPage('goodsreceived',this)"><span class="ic">&#128230;</span><span class="nav-label">Goods Received</span><span class="tt">Goods Received</span></button>
+    <button class="nav-btn" onclick="showPage('fuel',this)"><span class="ic">&#9981;</span><span class="nav-label">Fuel Management</span><span class="tt">Fuel Management</span></button>
+    <button class="nav-btn" onclick="showPage('concrete',this)"><span class="ic">&#127959;&#65039;</span><span class="nav-label">Concrete / Bulk</span><span class="tt">Concrete / Bulk</span></button>
+    <button class="nav-btn" onclick="showPage('campsite',this)"><span class="ic">&#127957;&#65039;</span><span class="nav-label">Campsite</span><span class="tt">Campsite</span></button>
+    <div class="nav-sec">Management</div>
+    <button class="nav-btn" onclick="showPage('fleet',this)"><span class="ic">&#128668;</span><span class="nav-label">Fleet</span><span class="tt">Fleet</span></button>
+    <button class="nav-btn" onclick="showPage('employees',this)"><span class="ic">&#128104;&#8205;&#128188;</span><span class="nav-label">Employees</span><span class="tt">Employees</span></button>
+    <button class="nav-btn" onclick="showPage('categories',this)"><span class="ic">&#128193;&#65039;</span><span class="nav-label">Categories</span><span class="tt">Categories</span></button>
+    <div class="nav-sec">Reports &amp; System</div>
+    <button class="nav-btn" onclick="showPage('alerts',this)"><span class="ic">&#128680;</span><span class="nav-label">Low Stock</span><span class="nb" id="alert-badge">0</span><span class="tt">Low Stock Alerts</span></button>
+    <button class="nav-btn" onclick="showPage('reports',this)"><span class="ic">&#128200;</span><span class="nav-label">Reports</span><span class="tt">Reports</span></button>
+    <button class="nav-btn" onclick="showPage('settings',this)"><span class="ic">&#9881;&#65039;</span><span class="nav-label">Settings</span><span class="tt">Settings</span></button>
+  </nav>
+  <div class="sidebar-user" id="sidebar-user"></div>
+  <div class="sidebar-footer">Designed by Clement Mpala<br>Junior Electrical Engineer<br>v4.0 &middot; Offline Capable</div>
+</aside>
+<main class="main" id="main-area">
+  <div class="topbar">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" style="display:none">&#9776;</button>
+    <h2 id="page-title">Dashboard</h2>
+    <span class="company-name-badge" id="topbar-company" style="display:none"></span>
+    <span class="topbar-badge" id="auth-badge">VIEWER</span>
+    <div class="search-wrap"><span class="si">&#128269;</span><input type="text" id="global-search" placeholder="Search..." oninput="handleSearch(this.value)"></div>
+    <button class="btn btn-outline btn-sm" onclick="exportToExcel()">&#11015; Excel</button>
+    <button class="btn btn-gold btn-sm" id="topbar-add-btn" style="display:none" onclick="topbarAddFn()">&#xff0b; Add</button>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px">PERIOD:</span>
+        <div class="ftabs" id="dash-period-tabs">
+          <button class="ftab active" onclick="setDashPeriod('all',this)">All Time</button>
+          <button class="ftab" onclick="setDashPeriod('today',this)">Today</button>
+          <button class="ftab" onclick="setDashPeriod('week',this)">This Week</button>
+          <button class="ftab" onclick="setDashPeriod('month',this)">This Month</button>
+        </div>
+      </div>
+      <div class="kpi-grid" id="dash-kpis"></div>
+      <div id="drill-panel" style="display:none" class="drill-panel">
+        <button class="drill-close" onclick="closeDrill()">&#x2715;</button>
+        <div class="drill-title" id="drill-title"></div>
+        <div class="table-scroll"><div id="drill-content"></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="tcard"><div class="tcard-head"><span class="tcard-title">Recent Activity (Last 10)</span></div><div id="recent-tx"></div></div>
+        <div class="tcard"><div class="tcard-head"><span class="tcard-title">Category Breakdown</span></div><div id="cat-breakdown" style="padding:14px"></div></div>
+      </div>
+    </div>
+
+    <!-- BALANCE -->
+    <div class="page" id="page-balance">
+      <div class="cat-pills" id="bal-cat-pills"></div>
+      <div class="tcard">
+        <div class="tcard-head">
+          <span class="tcard-title">Stock Balance</span>
+          <div class="ftabs">
+            <button class="ftab active" onclick="filterStat('ALL',this)">All</button>
+            <button class="ftab" onclick="filterStat('GOOD',this)">&#9989; Good</button>
+            <button class="ftab" onclick="filterStat('LOW',this)">&#9888;&#65039; Low</button>
+            <button class="ftab" onclick="filterStat('CRITICAL',this)">&#128308; Critical</button>
+            <button class="ftab" onclick="filterStat('OUT',this)">&#x2715; Out</button>
+          </div>
+          <button class="btn btn-green btn-sm" onclick="reqLogin(openStockInModal)">+ In</button>
+          <button class="btn btn-red btn-sm" onclick="reqLogin(openStockOutModal)">- Out</button>
+          <button class="btn btn-gold btn-sm" onclick="reqLogin(()=>{ document.getElementById('i-edit-id').value=''; document.getElementById('i-cat').innerHTML=catOptions(); openM('m-item'); })">+ Item</button>
+        </div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Item Name</th><th>Category</th><th>Unit</th><th>In</th><th>Out</th><th>Balance</th><th>Status</th><th>Threshold</th><th>Actions</th></tr></thead><tbody id="bal-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- STOCK IN -->
+    <div class="page" id="page-stockin">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-green" onclick="reqLogin(openStockInModal)">+ Add Stock In</button>
+      </div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Stock In Log</span></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Item</th><th>Category</th><th>Qty</th><th>Delivered By</th><th>Received By</th><th>Notes</th><th></th></tr></thead><tbody id="si-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- STOCK OUT -->
+    <div class="page" id="page-stockout">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-red" onclick="reqLogin(openStockOutModal)">- Remove Stock</button>
+      </div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Stock Out Log</span></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Item</th><th>Category</th><th>Qty</th><th>Issued To</th><th>Auth By</th><th>Purpose</th><th></th></tr></thead><tbody id="so-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="page" id="page-transactions">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div class="date-row" style="margin-bottom:0;flex:1">
+          <label>From</label><input type="date" id="tx-from" onchange="renderTX()">
+          <label>To</label><input type="date" id="tx-to" onchange="renderTX()">
+          <button class="btn btn-outline btn-sm" onclick="clearTXFilter()">Clear</button>
+        </div>
+        <div class="search-wrap" style="position:relative">
+          <span class="si">&#128269;</span>
+          <input type="text" id="tx-search" placeholder="Search item..." oninput="renderTX()" style="padding-left:30px;width:160px">
+        </div>
+      </div>
+      <div class="ftabs" style="margin-bottom:12px">
+        <button class="ftab active" id="txf-ALL"   onclick="setTXFilter('ALL',this)">All</button>
+        <button class="ftab"        id="txf-IN"    onclick="setTXFilter('IN',this)">&#128229; Stock In</button>
+        <button class="ftab"        id="txf-OUT"   onclick="setTXFilter('OUT',this)">&#128228; Stock Out</button>
+        <button class="ftab"        id="txf-ADJUSTMENT" onclick="setTXFilter('ADJUSTMENT',this)">&#128203; Adjustment</button>
+        <button class="ftab"        id="txf-GRN"   onclick="setTXFilter('GRN',this)">&#128230; GRN</button>
+      </div>
+      <div class="tcard">
+        <div class="tcard-head">
+          <span class="tcard-title">Transaction Audit Log</span>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim)" id="tx-count-label"></span>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim)">&#128272; Login required to delete</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>#</th><th>Date</th><th>Type</th><th>Item</th><th>Category</th><th>Qty</th><th>Reference</th><th>User</th><th>Notes</th><th></th></tr></thead>
+            <tbody id="tx-tbody"></tbody>
+          </table>
+        </div>
+        <div id="tx-pagination" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px"></div>
+      </div>
+    </div>
+
+    <!-- STOCK TAKE -->
+    <div class="page" id="page-stocktake">
+      <div class="warn-box" style="margin-bottom:12px">&#9888;&#65039; Stock Taking overrides the system balance with physically counted values.</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-teal" onclick="reqLogin(openStocktakeModal)">&#128203; New Stock Take</button>
+      </div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Stock Take History</span></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Item</th><th>System Qty</th><th>Counted</th><th>Variance</th><th>Adj. Tx</th><th>Done By</th><th>Notes</th></tr></thead><tbody id="st-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- GOODS RECEIVED -->
+    <div class="page" id="page-goodsreceived">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div class="date-row" style="margin-bottom:0;flex:1">
+          <label>From</label><input type="date" id="gr-from">
+          <label>To</label><input type="date" id="gr-to">
+          <button class="btn btn-outline btn-sm" onclick="applyGRFilter()">Filter</button>
+          <button class="btn btn-outline btn-sm" onclick="clearGRFilter()">Clear</button>
+        </div>
+        <button class="btn btn-purple" onclick="reqLogin(openGRModal)">+ New GRN</button>
+      </div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Goods Received Notes (GRN)</span><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">Tap row to see items</span></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Driver</th><th>Items</th><th>Received By</th><th>Notes</th><th></th></tr></thead><tbody id="gr-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- FUEL -->
+    <div class="page" id="page-fuel">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div class="date-row" style="margin-bottom:0;flex:1">
+          <label>From</label><input type="date" id="fuel-from">
+          <label>To</label><input type="date" id="fuel-to">
+          <button class="btn btn-outline btn-sm" onclick="applyFuelFilter()">Filter</button>
+          <button class="btn btn-outline btn-sm" onclick="clearFuelFilter()">Clear</button>
+        </div>
+        <button class="btn btn-blue" onclick="reqLogin(openFuelModal)">+ Issuance</button>
+        <button class="btn btn-teal btn-sm" onclick="reqLogin(openFuelDeliveryModal)">&#128665; Delivery</button>
+        <button class="btn btn-outline btn-sm" onclick="printFuelLog()">&#128424; Print</button>
+      </div>
+      <div class="fuel-kpis" id="fuel-kpis"></div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Fuel Issuance Log</span>
+        <div class="ftabs">
+          <button class="ftab active" onclick="filterFuelType('ALL',this)">All</button>
+          <button class="ftab" onclick="filterFuelType('DIESEL',this)">Diesel</button>
+          <button class="ftab" onclick="filterFuelType('PETROL',this)">Petrol</button>
+        </div>
+      </div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Time</th><th>Type</th><th>Amount(L)</th><th>Vehicle</th><th>Driver</th><th>Auth By</th><th>Purpose</th><th>Odometer</th><th>Dip Before/After</th><th></th></tr></thead><tbody id="fuel-tbody"></tbody></table></div>
+      </div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Fuel Deliveries</span></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Type</th><th>Qty(L)</th><th>Supplier</th><th>Notes</th><th></th></tr></thead><tbody id="fuel-del-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- CONCRETE -->
+    <div class="page" id="page-concrete">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-gold" onclick="reqLogin(openConcreteModal)">+ Log Batch</button>
+      </div>
+      <div class="kpi-grid" id="concrete-kpis"></div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Batch / Material Log</span>
+        <div class="ftabs">
+          <button class="ftab active" onclick="filterConcrete('ALL',this)">All</button>
+          <button class="ftab" onclick="filterConcrete('CEMENT',this)">Cement</button>
+          <button class="ftab" onclick="filterConcrete('STONE',this)">Stone</button>
+          <button class="ftab" onclick="filterConcrete('AGGREGATE',this)">Aggregate</button>
+          <button class="ftab" onclick="filterConcrete('SAND',this)">Sand</button>
+        </div>
+      </div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Material</th><th>Qty In</th><th>Qty Used</th><th>Balance</th><th>Supplier</th><th>Notes</th><th></th></tr></thead><tbody id="concrete-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- CAMPSITE -->
+    <div class="page" id="page-campsite">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-teal" onclick="reqLogin(openCampsiteModal)">+ Record Issue</button>
+      </div>
+      <div class="kpi-grid" id="campsite-kpis"></div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Campsite Supplies Log</span></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Date</th><th>Supply</th><th>Qty In</th><th>Qty Out</th><th>Balance</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody id="campsite-tbody"></tbody></table></div>
+      </div>
+    </div>
+    <!-- FLEET -->
+    <div class="page" id="page-fleet">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-gold" onclick="reqLogin(openFleetModal)">＋ Add Vehicle</button>
+      </div>
+      <div class="fleet-grid" id="fleet-grid"></div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">Fuel Issued per Vehicle</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Vehicle</th><th>Type</th><th>Total Fuel (L)</th><th>Fills</th><th>Last Issued</th></tr></thead><tbody id="fleet-fuel-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES -->
+    <div class="page" id="page-employees">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-gold" onclick="reqLogin(openEmpModal)">＋ Add Employee</button>
+      </div>
+      <div class="emp-grid" id="emp-grid"></div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="page" id="page-categories">
+      <div class="tcard" style="padding:16px;overflow:visible">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px">Add New Category</div>
+        <div class="fr" style="margin-bottom:10px">
+          <div class="fg" style="margin:0"><label>Category Name</label><input type="text" id="cat-name-input" placeholder="e.g. Plumbing Supplies"></div>
+          <div class="fg" style="margin:0"><label>Icon (emoji)</label><input type="text" id="cat-icon-input" placeholder="📦" maxlength="2"></div>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="reqLogin(addCategory)">＋ Add Category</button>
+      </div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">All Categories</span></div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Icon</th><th>Name</th><th>Items</th><th></th></tr></thead><tbody id="cat-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="page" id="page-alerts">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)" id="alerts-summary"></div>
+        <button class="btn btn-green btn-sm" onclick="reqLogin(restockAll)">&#9650; Restock All (Open Stock In)</button>
+      </div>
+      <div class="tcard"><div class="tcard-head"><span class="tcard-title">🚨 Low Stock & Out of Stock Alerts</span>
+        <span style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim)">Sorted: Out → Critical → Low</span>
+      </div>
+        <div class="table-scroll"><table><thead><tr><th>#</th><th>Item</th><th>Category</th><th>Unit</th><th>Balance</th><th>Status</th><th>Threshold</th><th>Action</th></tr></thead><tbody id="alerts-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <!-- Date filter -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px">
+        <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px">FILTER PERIOD:</span>
+        <div class="date-row" style="margin-bottom:0;flex:1">
+          <label>From</label><input type="date" id="rpt-from" onchange="renderReports()">
+          <label>To</label><input type="date" id="rpt-to" onchange="renderReports()">
+          <button class="btn btn-outline btn-sm" onclick="clearRptFilter()">Clear</button>
+        </div>
+        <div class="ftabs">
+          <button class="ftab active" onclick="setRptPeriod('all',this)">All</button>
+          <button class="ftab" onclick="setRptPeriod('month',this)">This Month</button>
+          <button class="ftab" onclick="setRptPeriod('week',this)">This Week</button>
+        </div>
+      </div>
+      <!-- Charts grid -->
+      <div class="reports-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <span class="chart-title">⛽ Fuel Usage by Vehicle</span>
+            <button class="btn btn-outline btn-sm" onclick="downloadChart('chart-fuel','fuel-usage')">&#128247; PNG</button>
+          </div>
+          <canvas id="chart-fuel"></canvas>
+          <div class="chart-table" id="tbl-fuel"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <span class="chart-title">📦 Stock In vs Out by Category</span>
+            <button class="btn btn-outline btn-sm" onclick="downloadChart('chart-stock','stock-in-out')">&#128247; PNG</button>
+          </div>
+          <canvas id="chart-stock"></canvas>
+          <div class="chart-table" id="tbl-stock"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <span class="chart-title">💰 Inventory Value by Category</span>
+            <button class="btn btn-outline btn-sm" onclick="downloadChart('chart-value','inventory-value')">&#128247; PNG</button>
+          </div>
+          <canvas id="chart-value"></canvas>
+          <div class="chart-table" id="tbl-value"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <span class="chart-title">🚨 Stock Status Overview</span>
+            <button class="btn btn-outline btn-sm" onclick="downloadChart('chart-status','stock-status')">&#128247; PNG</button>
+          </div>
+          <canvas id="chart-status"></canvas>
+          <div class="chart-table" id="tbl-status"></div>
+        </div>
+        <div class="chart-card" style="grid-column:1/-1">
+          <div class="chart-card-head">
+            <span class="chart-title">🏗️ Concrete / Bulk Usage Over Time</span>
+            <button class="btn btn-outline btn-sm" onclick="downloadChart('chart-concrete','concrete-usage')">&#128247; PNG</button>
+          </div>
+          <canvas id="chart-concrete"></canvas>
+          <div class="chart-table" id="tbl-concrete"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+
+      <!-- Company Name -->
+      <div class="settings-section">
+        <div class="settings-title">🏢 Company / Site</div>
+        <div class="settings-row">
+          <div><div class="settings-label">Company / Site Name</div><div class="settings-sub">Shown in topbar and on print headers</div></div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" id="setting-company" placeholder="e.g. Bravura Construction" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font-head);font-size:12px;padding:6px 10px;outline:none;width:200px" oninput="previewCompanyName(this.value)">
+            <button class="btn btn-gold btn-sm" onclick="saveCompanyName()">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="settings-section">
+        <div class="settings-title">🔐 Security</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div class="fg" style="margin:0"><label>Current Password</label><input type="password" id="pw-current" placeholder="Current password"></div>
+          <div class="fg" style="margin:0"><label>New Password</label><input type="password" id="pw-new" placeholder="New password (min 4 chars)"></div>
+          <div class="fg" style="margin:0"><label>Confirm New</label><input type="password" id="pw-confirm" placeholder="Repeat new password"></div>
+        </div>
+        <div id="pw-error" class="field-error"></div>
+        <button class="btn btn-gold btn-sm" onclick="changePassword()" style="margin-top:4px">Change Password</button>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-top:8px">Login: <strong style="color:var(--text)">Wendy</strong> · Password is stored as SHA-256 hash</div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="settings-section">
+        <div class="settings-title">⚙️ Data Management</div>
+        <div class="settings-row">
+          <div><div class="settings-label">Export JSON Backup</div><div class="settings-sub">Download all data as a .json file for safekeeping</div></div>
+          <button class="btn btn-blue btn-sm" onclick="exportJSON()">⬇ JSON</button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Import JSON Backup</div><div class="settings-sub">Restore data from a previously exported .json file</div></div>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('import-json-input').click()">⬆ Import JSON</button>
+          <input type="file" id="import-json-input" accept=".json" style="display:none" onchange="importJSON(this)">
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Export to Excel</div><div class="settings-sub">All 13 sheets — works offline</div></div>
+          <button class="btn btn-green btn-sm" onclick="exportToExcel()">⬇ Excel</button>
+        </div>
+        <div class="settings-row" style="border-color:rgba(248,113,113,.3)">
+          <div>
+            <div class="settings-label" style="color:var(--red)">⚠️ Clear All Data</div>
+            <div class="settings-sub">Permanently deletes everything. Type RESET to confirm.</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" id="reset-confirm-input" placeholder="Type RESET" style="background:var(--surface2);border:1px solid rgba(248,113,113,.3);border-radius:7px;color:var(--text);font-family:var(--font-mono);font-size:12px;padding:6px 10px;outline:none;width:110px;text-transform:uppercase">
+            <button class="btn btn-red btn-sm" onclick="clearAllData()">Delete All</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Storage</div><div class="settings-sub">Supabase Cloud Database</div></div>
+          <span id="storage-size" style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)"></span>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="settings-section">
+        <div class="settings-title">ℹ️ About</div>
+        <div class="settings-row">
+          <div><div class="settings-label">Application</div><div class="settings-sub">Bravura Stores — Inventory & Operations Management</div></div>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--gold)">v4.0</span>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Designed &amp; Built By</div><div class="settings-sub">Junior Electrical Engineer · Bravura Construction</div></div>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-mid)">Clement Mpala</span>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Framework</div><div class="settings-sub">Vanilla HTML/CSS/JS · No server required · Works offline</div></div>
+          <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">Single .html file</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div><!-- /app -->
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- CONFIRM DELETE -->
+<div class="overlay" id="m-confirm"><div class="modal modal-sm">
+  <div class="confirm-icon" id="confirm-icon">🗑️</div>
+  <div class="confirm-msg" id="confirm-msg">Are you sure you want to delete this item?</div>
+  <div class="confirm-item" id="confirm-item"></div>
+  <div class="mactions" style="justify-content:center">
+    <button class="btn btn-outline" onclick="closeM('m-confirm')">Cancel</button>
+    <button class="btn btn-red" id="confirm-ok-btn">Delete</button>
+  </div>
+</div></div>
+
+<!-- ADD / EDIT ITEM -->
+<div class="overlay" id="m-item"><div class="modal">
+  <div class="mtitle" id="item-modal-title">Add New <span>Item</span></div>
+  <div class="fg"><label>Item Name</label><input type="text" id="i-name" placeholder="e.g. Round Box 19mm"></div>
+  <div class="fr">
+    <div class="fg"><label>Category</label><select id="i-cat"></select></div>
+    <div class="fg"><label>Unit (pcs / m / kg…)</label><input type="text" id="i-unit" placeholder="pcs"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Opening Stock</label><input type="number" id="i-qty" placeholder="0" min="0"></div>
+    <div class="fg"><label>Unit Cost (USD)</label><input type="number" id="i-cost" placeholder="0.00" min="0" step="0.01"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Low Stock Threshold</label><input type="number" id="i-thresh" value="5" min="1"></div>
+    <div class="fg"><label>Delivered By (opening)</label><input type="text" id="i-deliv" placeholder="Supplier"></div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="i-notes" placeholder="Optional notes"></div>
+  <input type="hidden" id="i-edit-id">
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-item')">Cancel</button>
+    <button class="btn btn-gold" id="item-save-btn" onclick="saveItem()">Add Item</button>
+  </div>
+</div></div>
+
+<!-- STOCK IN -->
+<div class="overlay" id="m-si"><div class="modal">
+  <div class="mtitle">📥 Stock <span>In</span></div>
+  <div class="fg"><label>Item</label><select id="si-item"></select></div>
+  <div class="fr">
+    <div class="fg"><label>Quantity</label><input type="number" id="si-qty" placeholder="0" min="1"></div>
+    <div class="fg"><label>Date</label><input type="date" id="si-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Delivered By</label><input type="text" id="si-deliv" placeholder="Supplier / person"></div>
+    <div class="fg"><label>Received By (Employee)</label><select id="si-emp"></select></div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="si-notes" placeholder="Optional notes"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-si')">Cancel</button>
+    <button class="btn btn-green" onclick="doStockIn()">Confirm Stock In</button>
+  </div>
+</div></div>
+
+<!-- STOCK OUT -->
+<div class="overlay" id="m-so"><div class="modal">
+  <div class="mtitle">📤 Stock <span>Out</span></div>
+  <div class="fg"><label>Item</label><select id="so-item" onchange="updateAvail()"></select></div>
+  <div id="so-avail" style="font-family:var(--font-mono);font-size:11px;margin:-4px 0 8px;padding:5px 8px;border-radius:6px;"></div>
+  <div class="fr">
+    <div class="fg"><label>Quantity</label><input type="number" id="so-qty" placeholder="0" min="1"></div>
+    <div class="fg"><label>Date</label><input type="date" id="so-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Issued To (Employee)</label><select id="so-emp"></select></div>
+    <div class="fg"><label>Authorized By</label><select id="so-auth"></select></div>
+  </div>
+  <div class="fg"><label>Purpose / Notes</label><input type="text" id="so-purpose" placeholder="e.g. Site Use, Maintenance"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-so')">Cancel</button>
+    <button class="btn btn-red" onclick="doStockOut()">Confirm Stock Out</button>
+  </div>
+</div></div>
+
+<!-- STOCK TAKE -->
+<div class="overlay" id="m-st"><div class="modal">
+  <div class="mtitle">📋 Stock <span>Take</span></div>
+  <div class="warn-box" style="margin-bottom:12px;font-size:10px">This overrides the current system balance with your physically counted value.</div>
+  <div class="fg"><label>Item</label><select id="st-item" onchange="showSTCurrent()"></select></div>
+  <div id="st-current" style="font-family:var(--font-mono);font-size:11px;color:var(--teal);margin:-4px 0 8px"></div>
+  <div class="fr">
+    <div class="fg"><label>Counted Quantity</label><input type="number" id="st-qty" placeholder="0" min="0"></div>
+    <div class="fg"><label>Date</label><input type="date" id="st-date"></div>
+  </div>
+  <div class="fg"><label>Counted By</label><select id="st-emp"></select></div>
+  <div class="fg"><label>Notes</label><input type="text" id="st-notes" placeholder="Optional"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-st')">Cancel</button>
+    <button class="btn btn-teal" onclick="doStocktake()">Apply Count</button>
+  </div>
+</div></div>
+
+<!-- GRN -->
+<div class="overlay" id="m-gr"><div class="modal modal-xl">
+  <div class="mtitle">📦 New Goods Received <span>Note (GRN)</span></div>
+  <div class="fr">
+    <div class="fg"><label>Date</label><input type="date" id="gr-date"></div>
+    <div class="fg"><label>Vehicle (Reg)</label><select id="gr-vehicle"></select></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Driver Name</label><input type="text" id="gr-driver" placeholder="Driver name (if not in fleet)"></div>
+    <div class="fg"><label>Received By (Employee)</label><select id="gr-emp"></select></div>
+  </div>
+  <div class="fg"><label>Notes / Remarks</label><input type="text" id="gr-notes" placeholder="Optional"></div>
+  <div class="info-box" style="margin-bottom:12px;font-size:10px">✓ Items received will automatically update Stock In</div>
+  <div class="section-label">Items Received</div>
+  <div class="grn-head"><span>Item Name / Description</span><span>Category</span><span>Ordered</span><span>Received</span><span></span></div>
+  <div id="grn-rows"></div>
+  <button class="btn btn-outline btn-sm" onclick="addGRNRow()" style="margin-top:6px">＋ Add Row</button>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-gr')">Cancel</button>
+    <button class="btn btn-purple" onclick="doGRN()">Save GRN</button>
+  </div>
+</div></div>
+
+<!-- GRN DETAIL -->
+<div class="overlay" id="m-gr-detail"><div class="modal modal-lg">
+  <div class="mtitle">📦 GRN <span>Detail</span></div>
+  <div id="grn-detail-content"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="printGRN()" title="Print this GRN">&#128424; Print</button>
+    <button class="btn btn-outline" onclick="closeM('m-gr-detail')">Close</button>
+  </div>
+</div></div>
+
+<!-- FUEL ISSUANCE -->
+<div class="overlay" id="m-fuel"><div class="modal modal-lg">
+  <div class="mtitle">⛽ Fuel <span>Issuance</span></div>
+  <div class="fr">
+    <div class="fg"><label>Date</label><input type="date" id="f-date"></div>
+    <div class="fg"><label>Time</label><input type="time" id="f-time"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Fuel Type</label><select id="f-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
+    <div class="fg"><label>Amount (Litres)</label><input type="number" id="f-amount" placeholder="0" min="1"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Vehicle (Reg)</label><select id="f-vehicle"></select></div>
+    <div class="fg"><label>Driver / Operator</label><select id="f-driver"></select></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Authorized By</label><select id="f-auth"></select></div>
+    <div class="fg"><label>Purpose</label><input type="text" id="f-purpose" placeholder="e.g. Site Use, Trip"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Odometer Reading (km)</label><input type="number" id="f-odometer" placeholder="Optional"></div>
+    <div class="fg"><label>Dipstick Before (L)</label><input type="number" id="f-dip-before" placeholder="Tank level before"></div>
+  </div>
+  <div class="fg"><label>Dipstick After (L)</label><input type="number" id="f-dip-after" placeholder="Tank level after issuance"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-fuel')">Cancel</button>
+    <button class="btn btn-blue" onclick="doFuelIssuance()">Log Issuance</button>
+  </div>
+</div></div>
+
+<!-- FUEL DELIVERY -->
+<div class="overlay" id="m-fuel-del"><div class="modal">
+  <div class="mtitle">🚛 Fuel <span>Delivery</span></div>
+  <div class="fr">
+    <div class="fg"><label>Date</label><input type="date" id="fd-date"></div>
+    <div class="fg"><label>Fuel Type</label><select id="fd-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Quantity (Litres)</label><input type="number" id="fd-qty" placeholder="0" min="1"></div>
+    <div class="fg"><label>Supplier</label><input type="text" id="fd-supplier" placeholder="Supplier name"></div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="fd-notes" placeholder="Optional"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-fuel-del')">Cancel</button>
+    <button class="btn btn-teal" onclick="doFuelDelivery()">Record Delivery</button>
+  </div>
+</div></div>
+
+<!-- CONCRETE -->
+<div class="overlay" id="m-concrete"><div class="modal">
+  <div class="mtitle">🏗️ Concrete / Bulk <span>Material</span></div>
+  <div class="fr">
+    <div class="fg"><label>Material Type</label>
+      <select id="c-material"><option value="CEMENT">Cement (Bags)</option><option value="STONE">Quarry Stone (m³)</option><option value="AGGREGATE">Aggregate (m³)</option><option value="SAND">Sand (m³)</option><option value="WATER">Water (L)</option></select>
+    </div>
+    <div class="fg"><label>Date</label><input type="date" id="c-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Qty In (received)</label><input type="number" id="c-qin" placeholder="0" min="0"></div>
+    <div class="fg"><label>Qty Used (consumed)</label><input type="number" id="c-qout" placeholder="0" min="0"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Supplier / Source</label><input type="text" id="c-supplier" placeholder="Optional"></div>
+    <div class="fg"><label>Authorized By</label><select id="c-auth"></select></div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="c-notes" placeholder="Batch details, mix ratio, etc."></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-concrete')">Cancel</button>
+    <button class="btn btn-gold" onclick="doConcrete()">Save Record</button>
+  </div>
+</div></div>
+
+<!-- CAMPSITE -->
+<div class="overlay" id="m-campsite"><div class="modal">
+  <div class="mtitle">🏕️ Campsite <span>Supply</span></div>
+  <div class="fr">
+    <div class="fg"><label>Supply Item</label>
+      <select id="cs-item"><option>Water (L)</option><option>Soap (bars)</option><option>Washing Powder (kg)</option><option>Toilet Paper (rolls)</option><option>Cleaning Chemicals (L)</option><option>Food Supplies (kg)</option><option>Other</option></select>
+    </div>
+    <div class="fg"><label>Date</label><input type="date" id="cs-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Qty In</label><input type="number" id="cs-qin" placeholder="0" min="0"></div>
+    <div class="fg"><label>Qty Out / Used</label><input type="number" id="cs-qout" placeholder="0" min="0"></div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="cs-notes" placeholder="Optional"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-campsite')">Cancel</button>
+    <button class="btn btn-teal" onclick="doCampsite()">Save</button>
+  </div>
+</div></div>
+
+<!-- FLEET -->
+<div class="overlay" id="m-fleet"><div class="modal">
+  <div class="mtitle">🚜 Add <span>Vehicle</span></div>
+  <div class="fr">
+    <div class="fg"><label>Registration / ID</label><input type="text" id="fl-reg" placeholder="e.g. AGL3730"></div>
+    <div class="fg"><label>Vehicle Type</label>
+      <select id="fl-type"><option>Earth Mover</option><option>ADT (Articulated Dump Truck)</option><option>Bulldozer</option><option>Excavator</option><option>Grader</option><option>Loader</option><option>Bobcat</option><option>Pool Car</option><option>Bus</option><option>Water Bowser</option><option>Backhoe</option><option>Other</option></select>
+    </div>
+  </div>
+  <div class="fg"><label>Description / Model</label><input type="text" id="fl-desc" placeholder="e.g. D8R Bulldozer"></div>
+  <div class="fr">
+    <div class="fg"><label>Assigned Driver (Employee)</label><select id="fl-driver"></select></div>
+    <div class="fg"><label>Status</label><select id="fl-status"><option value="Active">Active</option><option value="Grounded">Grounded</option><option value="Maintenance">Under Maintenance</option></select></div>
+  </div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-fleet')">Cancel</button>
+    <button class="btn btn-gold" onclick="doAddVehicle()">Add Vehicle</button>
+  </div>
+</div></div>
+
+<!-- EMPLOYEE -->
+<div class="overlay" id="m-emp"><div class="modal">
+  <div class="mtitle">👨‍💼 Add <span>Employee</span></div>
+  <div class="fr">
+    <div class="fg"><label>Full Name</label><input type="text" id="e-name" placeholder="Full name"></div>
+    <div class="fg"><label>Employee ID</label><input type="text" id="e-id" placeholder="e.g. BRA001"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Role / Position</label><input type="text" id="e-role" placeholder="e.g. Storekeeper, Driver"></div>
+    <div class="fg"><label>Department</label><input type="text" id="e-dept" placeholder="e.g. Operations"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Phone Number</label><input type="text" id="e-contact" placeholder="Phone number"></div>
+    <div class="fg"><label>Status</label><select id="e-status"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
+  </div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-emp')">Cancel</button>
+    <button class="btn btn-gold" onclick="doAddEmployee()">Add Employee</button>
+  </div>
+</div></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://iliunjwpjtbhkqypzgkp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MarFoD9bre2hpidVFO0VaA_g-9dw3UY';
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+const ADMIN_USER = 'Wendy';
+const ADMIN_PASS = 'Wendy';
+
+async function doLogin() {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value.trim();
+  if (!u || !p) { showLoginErr('Enter username and password'); return; }
+  if (u !== ADMIN_USER || p !== ADMIN_PASS) {
+    showLoginErr('✕ Incorrect username or password');
+    return;
+  }
+  session = { loggedIn: true, user: 'Wendy T. Mpala' };
+  sessionStorage.setItem('bs_session', JSON.stringify(session));
+  hideLoginErr();
+  await loadDB();
+  startApp();
+}
+
+function showLoginErr(msg) {
+  const el = document.getElementById('l-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideLoginErr() { document.getElementById('l-err').style.display = 'none'; }
+
+function viewOnly() {
+  session = { loggedIn: false, user: 'Viewer' };
+  sessionStorage.setItem('bs_session', JSON.stringify(session));
+  loadDB().then(() => startApp());
+}
+
+function logout() {
+  session = { loggedIn: false, user: 'Viewer' };
+  sessionStorage.removeItem('bs_session');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
+  hideLoginErr();
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATE & SUPABASE STORAGE
+// ═══════════════════════════════════════════════════════════
+let session = { loggedIn: false, user: 'Viewer' };
+
+let db = {
+  categories: [
+    { name: 'Electrical Equipment', icon: '⚡' },
+    { name: 'Mechanical / Maintenance', icon: '⚙️' },
+    { name: 'PPE / Safety', icon: '🦺' },
+    { name: 'Construction Equipment', icon: '🏗️' },
+    { name: 'General', icon: '📦' }
+  ],
+  items: [], transactions: [],
+  goodsReceived: [], fuelLog: [], fuelDeliveries: [],
+  stockTakes: [], concreteLog: [], campsiteLog: [],
+  employees: [], fleet: [], settings: {}
+};
+
+// Load all data from Supabase into db object
+async function loadDB() {
+  try {
+    showLoadingOverlay(true);
+    const [
+      { data: items },
+      { data: transactions },
+      { data: goodsReceived },
+      { data: fuelLog },
+      { data: fuelDeliveries },
+      { data: stockTakes },
+      { data: concreteLog },
+      { data: campsiteLog },
+      { data: employees },
+      { data: fleet },
+      { data: categories },
+      { data: settings }
+    ] = await Promise.all([
+      SB.from('items').select('*').order('created_at'),
+      SB.from('transactions').select('*').order('created_at'),
+      SB.from('goods_received').select('*').order('created_at'),
+      SB.from('fuel_log').select('*').order('created_at'),
+      SB.from('fuel_deliveries').select('*').order('created_at'),
+      SB.from('stock_takes').select('*').order('created_at'),
+      SB.from('concrete_log').select('*').order('created_at'),
+      SB.from('campsite_log').select('*').order('created_at'),
+      SB.from('employees').select('*').order('created_at'),
+      SB.from('fleet').select('*').order('created_at'),
+      SB.from('categories').select('*').order('created_at'),
+      SB.from('settings').select('*').limit(1)
+    ]);
+
+    db.items        = (items || []).map(r => ({ ...r, totalIn: r.total_in||0, totalOut: r.total_out||0 }));
+    db.transactions = (transactions || []).map(r => ({ ...r, itemId: r.item_id, itemName: r.item_name, deliveredBy: r.delivered_by, receivedBy: r.received_by, issuedTo: r.issued_to, authorizedBy: r.authorized_by, doneBy: r.done_by, user: r.user_name, refId: r.ref_id }));
+    db.goodsReceived = (goodsReceived || []).map(r => ({ ...r, receivedBy: r.received_by, user: r.user_name, items: r.items || [] }));
+    db.fuelLog      = (fuelLog || []).map(r => ({ ...r, fuelType: r.fuel_type, authorizedBy: r.authorized_by, dipBefore: r.dip_before, dipAfter: r.dip_after, user: r.user_name }));
+    db.fuelDeliveries = (fuelDeliveries || []).map(r => ({ ...r, fuelType: r.fuel_type, user: r.user_name }));
+    db.stockTakes   = (stockTakes || []).map(r => ({ ...r, itemId: r.item_id, itemName: r.item_name, systemQty: r.system_qty, doneBy: r.done_by, user: r.user_name }));
+    db.concreteLog  = (concreteLog || []).map(r => ({ ...r, qIn: r.q_in||0, qOut: r.q_out||0, authorizedBy: r.authorized_by, user: r.user_name }));
+    db.campsiteLog  = (campsiteLog || []).map(r => ({ ...r, qIn: r.q_in||0, qOut: r.q_out||0, user: r.user_name }));
+    db.employees    = (employees || []).map(r => ({ ...r, empId: r.emp_id }));
+    db.fleet        = (fleet || []).map(r => ({ ...r, driverId: r.driver_id }));
+    db.settings     = (settings && settings[0]) ? { ...settings[0], companyName: settings[0].company_name } : { companyName: 'Bravura Stores' };
+
+    if (categories && categories.length > 0) {
+      db.categories = categories.map(c => ({ name: c.name, icon: c.icon }));
+    }
+  } catch(e) {
+    console.error('loadDB error:', e);
+    toast('⚠️ Could not load data from server: ' + e.message, 'err');
+  } finally {
+    showLoadingOverlay(false);
+  }
+}
+
+function showLoadingOverlay(show) {
+  let el = document.getElementById('loading-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(11,15,26,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;';
+    el.innerHTML = '<div style="font-size:32px">⏳</div><div style="font-family:var(--font-mono);font-size:11px;color:var(--gold);letter-spacing:2px">LOADING DATA...</div>';
+    document.body.appendChild(el);
+  }
+  el.style.display = show ? 'flex' : 'none';
+}
+
+// Save a single record — insert or update
+async function sbSave(table, record) {
+  const { error } = await SB.from(table).upsert(record, { onConflict: 'id' });
+  if (error) { console.error(`sbSave ${table}:`, error); toast('⚠️ Save error: ' + error.message, 'err'); }
+}
+
+// Delete a single record
+async function sbDelete(table, id) {
+  const { error } = await SB.from(table).delete().eq('id', id);
+  if (error) { console.error(`sbDelete ${table}:`, error); toast('⚠️ Delete error: ' + error.message, 'err'); }
+}
+
+// saveDB is now a no-op — all saves go directly to Supabase via sbSave
+function saveDB() { /* data saved directly to Supabase */ updateStorageSize(); }
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `BravuraStores_backup_${today()}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('✓ JSON backup downloaded', 'ok');
+}
+
+function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  confirmAction('⚠️ Import JSON?', 'This will REPLACE all current data with the backup file. This cannot be undone.', 'Restore Backup', () => {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        db = parsed;
+        toast('✓ Data restored from backup (in memory). Re-upload to sync.', 'ok');
+        refreshAll();
+      } catch {
+        toast('✕ Invalid JSON file', 'err');
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.value = '';
+}
+
+function updateStorageSize() {
+  const el = document.getElementById('storage-size');
+  if (el) el.textContent = 'Supabase Cloud';
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function nowTime() { return new Date().toTimeString().slice(0, 5); }
+function fmtDate(d) {
+  if (!d) return '—';
+  const p = d.split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+}
+function catIcon(name) {
+  const c = db.categories.find(c => c.name === name);
+  return c ? c.icon : '📦';
+}
+function getStat(bal, thr) {
+  if (bal <= 0) return 'OUT';
+  if (bal <= Math.max(1, Math.floor(thr * 0.2))) return 'CRITICAL';
+  if (bal < thr) return 'LOW';
+  return 'GOOD';
+}
+function statBadge(s) {
+  const m = { GOOD: ['bg-good','✅ Good'], LOW: ['bg-low','⚠️ Low'], CRITICAL: ['bg-crit','🔴 Critical'], OUT: ['bg-out','✕ Out'] };
+  const [cls, lbl] = m[s] || m.GOOD;
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+function empName(id) {
+  if (!id) return '—';
+  const e = db.employees.find(e => e.id === id);
+  return e ? e.name : id;
+}
+function empOptions(sel = '', activeOnly = false) {
+  let emps = db.employees;
+  if (activeOnly) emps = emps.filter(e => (e.status||'Active') === 'Active');
+  return `<option value="">— Select —</option>` + emps.map(e =>
+    `<option value="${e.id}" ${e.id === sel ? 'selected' : ''}>${e.name}${e.role ? ' · ' + e.role : ''}</option>`
+  ).join('');
+}
+function catOptions(sel = '') {
+  return db.categories.map(c =>
+    `<option value="${c.name}" ${c.name === sel ? 'selected' : ''}>${c.icon} ${c.name}</option>`
+  ).join('');
+}
+function itemOptions(sel = '') {
+  return db.items.map(i =>
+    `<option value="${i.id}" ${i.id === sel ? 'selected' : ''}>${i.name} (${i.category})</option>`
+  ).join('');
+}
+function fleetOptions(sel = '') {
+  if (!db.fleet.length) return '<option value="">— No Vehicles Added —</option>';
+  const active = db.fleet.filter(f => (f.status||'Active') === 'Active');
+  const other = db.fleet.filter(f => (f.status||'Active') !== 'Active');
+  return '<option value="">— Select Vehicle —</option>' +
+    (active.length ? '<optgroup label="Active">' + active.map(f=>`<option value="${f.reg}" ${f.reg===sel?'selected':''}>${f.reg} — ${f.desc}</option>`).join('') + '</optgroup>' : '') +
+    (other.length ? '<optgroup label="Grounded / Maintenance">' + other.map(f=>`<option value="${f.reg}" ${f.reg===sel?'selected':''}>${f.reg} — ${f.desc} (${f.status})</option>`).join('') + '</optgroup>' : '');
+}
+function canEdit() { return session.loggedIn; }
+function reqLogin(fn) {
+  if (!canEdit()) { toast('Please login to perform this action', 'err'); return; }
+  fn();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR / MOBILE NAV
+// ═══════════════════════════════════════════════════════════
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.toggle('mobile-open');
+  ov.classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════
+// APP START
+// ═══════════════════════════════════════════════════════════
+function startApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  updateAuthUI();
+  applyCompanyName();
+  renderDashboard();
+  renderBalance();
+  updateAlertBadge();
+  updateStorageSize();
+  // Pre-fill settings company input
+  const inp = document.getElementById('setting-company');
+  const _cn = db.settings?.companyName || db.settings?.company_name || '';
+  if (inp && _cn) inp.value = _cn;
+}
+
+function updateAuthUI() {
+  const b = document.getElementById('auth-badge');
+  b.textContent = session.loggedIn ? '✓ LOGGED IN' : '👁 VIEWER';
+  b.style.color = session.loggedIn ? 'var(--green)' : 'var(--text-dim)';
+  document.getElementById('topbar-add-btn').style.display = session.loggedIn ? 'flex' : 'none';
+  document.getElementById('sidebar-user').innerHTML = `
+    <div class="user-avatar">${session.loggedIn ? 'W' : '?'}</div>
+    <div class="user-info">
+      <div class="user-name">${session.user}</div>
+      <div class="user-role">${session.loggedIn ? 'Administrator' : 'Read Only'}</div>
+    </div>
+    ${session.loggedIn ? '<button class="user-logout" onclick="logout()" title="Logout">⏻</button>' : ''}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════════
+const pageTitles = {
+  dashboard:'Dashboard', balance:'Stock Balance', stockin:'Stock In', stockout:'Stock Out',
+  transactions:'All Transactions', stocktake:'Stock Taking', goodsreceived:'Goods Received',
+  fuel:'Fuel Management', concrete:'Concrete / Bulk', campsite:'Campsite',
+  fleet:'Fleet Management', employees:'Employees', categories:'Categories',
+  alerts:'Low Stock Alerts', reports:'Reports', settings:'Settings'
+};
+const pageAddMap = {
+  balance: () => reqLogin(() => openM('m-item')),
+  stockin: () => reqLogin(openStockInModal),
+  stockout: () => reqLogin(openStockOutModal),
+  employees: () => reqLogin(openEmpModal),
+  fleet: () => reqLogin(openFleetModal),
+  goodsreceived: () => reqLogin(openGRModal),
+  fuel: () => reqLogin(openFuelModal),
+  concrete: () => reqLogin(openConcreteModal),
+  campsite: () => reqLogin(openCampsiteModal),
+  stocktake: () => reqLogin(openStocktakeModal),
+  categories: () => reqLogin(addCategory),
+};
+let topbarAddFn = () => {};
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('page-title').textContent = pageTitles[name] || name;
+  closeDrill();
+  closeSidebar();
+  const ab = document.getElementById('topbar-add-btn');
+  if (pageAddMap[name] && session.loggedIn) {
+    topbarAddFn = pageAddMap[name];
+    ab.style.display = 'flex';
+  } else {
+    ab.style.display = 'none';
+  }
+  renderPage(name);
+}
+function renderPage(n) {
+  const map = {
+    dashboard: renderDashboard, balance: renderBalance, stockin: renderSI,
+    stockout: renderSO, transactions: renderTX, stocktake: renderST,
+    goodsreceived: renderGR, fuel: renderFuel, concrete: renderConcrete,
+    campsite: renderCampsite, fleet: renderFleet, employees: renderEmployees,
+    categories: renderCategories, alerts: renderAlerts, reports: renderReports,
+    settings: () => { updateStorageSize(); applyCompanyName(); const inp=document.getElementById('setting-company'); const cn=db.settings?.companyName||db.settings?.company_name||''; if(inp&&cn) inp.value=cn; }
+  };
+  if (map[n]) map[n]();
+}
+function refreshAll() {
+  const a = document.querySelector('.page.active');
+  if (a) renderPage(a.id.replace('page-', ''));
+  updateAlertBadge();
+}
+function updateAlertBadge() {
+  const n = db.items.filter(i => ['LOW','CRITICAL','OUT'].includes(getStat(i.balance, i.threshold))).length;
+  document.getElementById('alert-badge').textContent = n;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+let drillActive = null;
+// Dashboard period state
+let dashPeriod = 'all';
+function setDashPeriod(period, btn) {
+  dashPeriod = period;
+  document.querySelectorAll('#dash-period-tabs .ftab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderDashboard();
+}
+function getDashDateRange() {
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  if (dashPeriod === 'today') return { from: todayStr, to: todayStr };
+  if (dashPeriod === 'week') {
+    const d = new Date(now); d.setDate(d.getDate() - 6);
+    return { from: d.toISOString().split('T')[0], to: todayStr };
+  }
+  if (dashPeriod === 'month') {
+    const d = new Date(now); d.setDate(1);
+    return { from: d.toISOString().split('T')[0], to: todayStr };
+  }
+  return { from: '', to: '' };
+}
+
+function renderDashboard() {
+  const items = db.items;
+  const { from, to } = getDashDateRange();
+
+  // For period-sensitive KPIs: filter transactions
+  let periodTxs = db.transactions;
+  let periodFuel = db.fuelLog;
+  if (from) periodTxs = periodTxs.filter(t => t.date >= from && (!to || t.date <= to));
+  if (from) periodFuel = periodFuel.filter(r => r.date >= from && (!to || r.date <= to));
+
+  const inPeriod = periodTxs.filter(t => t.type === 'IN').reduce((s,t) => s+t.qty, 0);
+  const outPeriod = periodTxs.filter(t => t.type === 'OUT').reduce((s,t) => s+t.qty, 0);
+  const fuelPeriod = periodFuel.reduce((s,r) => s + parseFloat(r.amount||0), 0);
+
+  // Static KPIs (always full inventory)
+  const good = items.filter(i => getStat(i.balance,i.threshold) === 'GOOD').length;
+  const low  = items.filter(i => getStat(i.balance,i.threshold) === 'LOW').length;
+  const crit = items.filter(i => getStat(i.balance,i.threshold) === 'CRITICAL').length;
+  const out  = items.filter(i => getStat(i.balance,i.threshold) === 'OUT').length;
+  const totalVal = items.reduce((s,i) => s + (i.balance * (i.cost || 0)), 0);
+
+  const periodLabel = dashPeriod === 'all' ? 'all time'
+    : dashPeriod === 'today' ? 'today'
+    : dashPeriod === 'week'  ? 'this week'
+    : 'this month';
+
+  document.getElementById('dash-kpis').innerHTML = [
+    kpiCard('kpi-total','c-gold','Total Items',    items.length,        'tracked SKUs',             'total'),
+    kpiCard('kpi-good', 'c-green','✅ In Stock',   good,                'sufficient qty',           'good'),
+    kpiCard('kpi-low',  'c-yellow','⚠️ Low / Crit',low+crit,           'near/at threshold',        'low'),
+    kpiCard('kpi-out',  'c-red','✕ Out of Stock',  out,                 'zero balance',             'out'),
+    kpiCard('kpi-in',   'c-teal','Stock In',       inPeriod,            `units received ${periodLabel}`, 'total'),
+    kpiCard('kpi-fuel', 'c-blue','Fuel Issued',    fuelPeriod.toLocaleString()+'L', `${periodFuel.length} fills ${periodLabel}`, 'fuel'),
+  ].join('');
+
+  const recent = [...db.transactions].reverse().slice(0, 10);
+  document.getElementById('recent-tx').innerHTML = recent.length === 0
+    ? '<div class="empty"><div class="ei">🔄</div><p>No activity yet</p></div>'
+    : recent.map(tx => {
+        const dotCls = tx.type === 'IN' || tx.type === 'GRN' ? 'in'
+          : tx.type === 'ADJUSTMENT' ? 'fuel'
+          : 'out';
+        const sign = tx.type === 'OUT' ? '−' : tx.type === 'ADJUSTMENT' ? '±' : '+';
+        const qtyCls = tx.type === 'OUT' ? 'out' : 'in';
+        const typeLabel = tx.type === 'GRN' ? '📦 GRN'
+          : tx.type === 'ADJUSTMENT' ? '📋 Adj'
+          : tx.type === 'IN' ? '📥 In'
+          : '📤 Out';
+        return `<div class="tx-item">
+          <div class="tx-dot ${dotCls}"></div>
+          <div class="tx-info">
+            <div class="tx-name">${tx.itemName||'—'}</div>
+            <div class="tx-meta">${typeLabel} · ${fmtDate(tx.date)} · ${tx.user||'—'}</div>
+          </div>
+          <div class="tx-qty ${qtyCls}">${sign}${tx.qty}</div>
+        </div>`;
+      }).join('');
+
+  const cats = {};
+  items.forEach(i => {
+    if (!cats[i.category]) cats[i.category] = { total:0, good:0, low:0, out:0 };
+    const s = getStat(i.balance, i.threshold);
+    cats[i.category].total++;
+    if (s === 'GOOD') cats[i.category].good++;
+    else if (s === 'OUT') cats[i.category].out++;
+    else cats[i.category].low++;
+  });
+  document.getElementById('cat-breakdown').innerHTML = Object.entries(cats).map(([c,s]) => `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span>${catIcon(c)}</span><span style="font-size:11px;font-weight:700;flex:1">${c}</span>
+        <span style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim)">${s.total} SKUs</span>
+      </div>
+      <div style="display:flex;gap:8px;font-family:var(--font-mono);font-size:9px;margin-bottom:4px">
+        <span style="color:var(--green)">✅ ${s.good}</span>
+        <span style="color:var(--yellow)">⚠ ${s.low}</span>
+        <span style="color:var(--red)">✕ ${s.out}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${s.total?Math.round(s.good/s.total*100):0}%;background:var(--green)"></div></div>
+    </div>`).join('') || '<p style="color:var(--text-dim);font-family:var(--font-mono);font-size:10px">No items yet</p>';
+
+  updateAlertBadge();
+}
+
+function kpiCard(id, cls, label, val, sub, drill) {
+  return `<div class="kpi-card ${cls}" id="${id}" onclick="kpiDrill('${drill}')">
+    <div class="kpi-label">${label}</div>
+    <div class="kpi-val">${val}</div>
+    <div class="kpi-sub">${sub}</div>
+  </div>`;
+}
+
+function kpiDrill(type) {
+  if (drillActive === type) { closeDrill(); return; }
+  drillActive = type;
+  document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('kactive'));
+  const el = document.getElementById('kpi-' + type);
+  if (el) el.classList.add('kactive');
+  document.getElementById('drill-panel').style.display = 'block';
+  const titles = {
+    total:'All Inventory Items', good:'In Stock — Sufficient Levels',
+    low:'Low & Critical — Needs Attention', out:'Out of Stock — Requires Restocking',
+    val:'Item Value Breakdown', fuel:'Recent Fuel Issuances'
+  };
+  document.getElementById('drill-title').textContent = titles[type] || '';
+  const dc = document.getElementById('drill-content');
+
+  if (type === 'fuel') {
+    const rows = db.fuelLog.slice(-10).reverse();
+    dc.innerHTML = `<table><thead><tr><th>Date</th><th>Vehicle</th><th>Driver</th><th>Amount(L)</th><th>Type</th></tr></thead><tbody>` +
+      rows.map(r => `<tr><td>${fmtDate(r.date)}</td><td>${r.vehicle||'—'}</td><td>${r.driver||'—'}</td>
+        <td style="font-family:var(--font-mono);color:var(--blue)">${parseFloat(r.amount).toLocaleString()}L</td>
+        <td><span class="badge bg-blue">${r.fuelType}</span></td></tr>`).join('') + `</tbody></table>`;
+    return;
+  }
+  if (type === 'val') {
+    const sorted = [...db.items].filter(i=>i.cost>0).sort((a,b)=>(b.balance*b.cost)-(a.balance*a.cost)).slice(0,15);
+    dc.innerHTML = `<table><thead><tr><th>Item</th><th>Balance</th><th>Unit Cost</th><th>Total Value</th></tr></thead><tbody>` +
+      sorted.map(i => `<tr><td class="iname">${i.name}</td>
+        <td style="font-family:var(--font-mono)">${i.balance} ${i.unit||''}</td>
+        <td style="font-family:var(--font-mono)">$${i.cost}</td>
+        <td style="font-family:var(--font-mono);font-weight:700;color:var(--blue)">$${(i.balance*i.cost).toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`).join('') +
+      `</tbody></table>`;
+    return;
+  }
+  let items = db.items;
+  if (type === 'good') items = items.filter(i => getStat(i.balance,i.threshold) === 'GOOD');
+  else if (type === 'low') items = items.filter(i => ['LOW','CRITICAL'].includes(getStat(i.balance,i.threshold)));
+  else if (type === 'out') items = items.filter(i => getStat(i.balance,i.threshold) === 'OUT');
+  items = [...items].sort((a,b) => a.balance - b.balance);
+
+  if (!items.length) { dc.innerHTML = '<div class="empty"><div class="ei">✅</div><p>No items here</p></div>'; return; }
+  dc.innerHTML = `<table><thead><tr><th>#</th><th>Item</th><th>Category</th><th>Balance</th><th>Status</th><th></th></tr></thead><tbody>` +
+    items.map((item,i) => `<tr>
+      <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+      <td class="iname">${item.name}</td>
+      <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${item.category}</td>
+      <td style="font-family:var(--font-mono);font-weight:700">${item.balance} ${item.unit||''}</td>
+      <td>${statBadge(getStat(item.balance,item.threshold))}</td>
+      <td>${canEdit()?`<button class="abtn" onclick="openSIFor('${item.id}')">+ Stock In</button>`:'—'}</td>
+    </tr>`).join('') + `</tbody></table>`;
+}
+function closeDrill() {
+  drillActive = null;
+  document.getElementById('drill-panel').style.display = 'none';
+  document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('kactive'));
+}
+
+// ═══════════════════════════════════════════════════════════
+// BALANCE
+// ═══════════════════════════════════════════════════════════
+let balCat = 'ALL', balStat = 'ALL', searchQ = '';
+
+function buildCatPills() {
+  const cats = ['ALL', ...new Set(db.items.map(i => i.category))];
+  document.getElementById('bal-cat-pills').innerHTML = cats.map(c =>
+    `<button class="cpill ${c === balCat ? 'active' : ''}" onclick="setBCat('${c}',this)">${c === 'ALL' ? 'All' : catIcon(c)+' '+c}</button>`
+  ).join('');
+}
+function setBCat(c, btn) {
+  balCat = c;
+  document.querySelectorAll('.cpill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBalance();
+}
+function filterStat(s, btn) {
+  balStat = s;
+  document.querySelectorAll('#page-balance .ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBalance();
+}
+function handleSearch(v) { searchQ = v; if (document.getElementById('page-balance').classList.contains('active')) renderBalance(); }
+
+function renderBalance() {
+  buildCatPills();
+  let items = db.items;
+  if (balCat !== 'ALL') items = items.filter(i => i.category === balCat);
+  if (balStat !== 'ALL') items = items.filter(i => getStat(i.balance,i.threshold) === balStat);
+  if (searchQ) items = items.filter(i => i.name.toLowerCase().includes(searchQ.toLowerCase()));
+  const tb = document.getElementById('bal-tbody');
+  if (!items.length) { tb.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="ei">📦</div><p>No items match</p></div></td></tr>`; return; }
+  tb.innerHTML = items.map((item,i) => {
+    const s = getStat(item.balance,item.threshold);
+    const qc = s==='GOOD'?'var(--green)':s==='LOW'?'var(--yellow)':s==='CRITICAL'?'var(--red)':'var(--text-dim)';
+    return `<tr>
+      <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+      <td class="iname">${item.name}</td>
+      <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${catIcon(item.category)} ${item.category}</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${item.unit||'pcs'}</td>
+      <td style="font-family:var(--font-mono);color:var(--green)">${item.totalIn}</td>
+      <td style="font-family:var(--font-mono);color:var(--red)">${item.totalOut}</td>
+      <td><span class="qty-pill" style="color:${qc}">${item.balance}</span></td>
+      <td>${statBadge(s)}</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${item.threshold}</td>
+      <td><div style="display:flex;gap:4px">
+        ${canEdit()?`<button class="abtn" onclick="openSIFor('${item.id}')">+</button>
+          <button class="abtn" onclick="openSOFor('${item.id}')">−</button>
+          <button class="abtn" onclick="openEditItem('${item.id}')">✏️</button>
+          <button class="abtn del" onclick="confirmDeleteItem('${item.id}')">🗑</button>`:'<span style="color:var(--text-dim);font-size:10px">—</span>'}
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// STOCK IN / OUT LOGS
+// ═══════════════════════════════════════════════════════════
+function renderSI() {
+  const txs = db.transactions.filter(t => t.type === 'IN').reverse();
+  const tb = document.getElementById('si-tbody');
+  if (!txs.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">📥</div><p>No stock in yet</p></div></td></tr>`; return; }
+  tb.innerHTML = txs.map((tx,i) => `<tr>
+    <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(tx.date)}</td>
+    <td class="iname">${tx.itemName}</td>
+    <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.category}</td>
+    <td style="font-family:var(--font-mono);color:var(--green);font-weight:700">+${tx.qty}</td>
+    <td>${tx.deliveredBy||'—'}</td>
+    <td>${tx.receivedBy||'—'}</td>
+    <td style="color:var(--text-dim);font-size:11px">${tx.notes||'—'}</td>
+    <td>${canEdit()?`<button class="abtn del" onclick="confirmDeleteTX('${tx.id}')">🗑</button>`:'—'}</td>
+  </tr>`).join('');
+}
+
+function renderSO() {
+  const txs = db.transactions.filter(t => t.type === 'OUT').reverse();
+  const tb = document.getElementById('so-tbody');
+  if (!txs.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">📤</div><p>No stock out yet</p></div></td></tr>`; return; }
+  tb.innerHTML = txs.map((tx,i) => `<tr>
+    <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(tx.date)}</td>
+    <td class="iname">${tx.itemName}</td>
+    <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.category}</td>
+    <td style="font-family:var(--font-mono);color:var(--red);font-weight:700">−${tx.qty}</td>
+    <td>${tx.issuedTo||'—'}</td>
+    <td>${tx.authorizedBy||'—'}</td>
+    <td style="color:var(--text-dim);font-size:11px">${tx.notes||'—'}</td>
+    <td>${canEdit()?`<button class="abtn del" onclick="confirmDeleteTX('${tx.id}')">🗑</button>`:'—'}</td>
+  </tr>`).join('');
+}
+
+// TX state
+let txTypeF = 'ALL', txPage = 0;
+const TX_PAGE_SIZE = 50;
+
+function setTXFilter(type, btn) {
+  txTypeF = type;
+  txPage = 0;
+  document.querySelectorAll('#page-transactions .ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTX();
+}
+function clearTXFilter() {
+  document.getElementById('tx-from').value = '';
+  document.getElementById('tx-to').value = '';
+  document.getElementById('tx-search').value = '';
+  txTypeF = 'ALL'; txPage = 0;
+  document.querySelectorAll('#page-transactions .ftab').forEach(b => b.classList.remove('active'));
+  const allBtn = document.getElementById('txf-ALL');
+  if (allBtn) allBtn.classList.add('active');
+  renderTX();
+}
+
+function txTypeBadge(type) {
+  const m = {
+    'IN':         ['bg-in',     '📥 Stock In'],
+    'OUT':        ['bg-out-tx', '📤 Stock Out'],
+    'ADJUSTMENT': ['bg-adj',    '📋 Adjustment'],
+    'GRN':        ['bg-grn',    '📦 GRN'],
+  };
+  const [cls, lbl] = m[type] || ['bg-blue', type];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+
+function renderTX() {
+  const fromV = document.getElementById('tx-from')?.value || '';
+  const toV   = document.getElementById('tx-to')?.value   || '';
+  const srch  = (document.getElementById('tx-search')?.value || '').toLowerCase();
+
+  let txs = [...db.transactions].reverse();
+  if (txTypeF !== 'ALL') txs = txs.filter(t => t.type === txTypeF);
+  if (fromV) txs = txs.filter(t => t.date >= fromV);
+  if (toV)   txs = txs.filter(t => t.date <= toV);
+  if (srch)  txs = txs.filter(t => (t.itemName||'').toLowerCase().includes(srch));
+
+  const total = txs.length;
+  const pages = Math.max(1, Math.ceil(total / TX_PAGE_SIZE));
+  if (txPage >= pages) txPage = pages - 1;
+  const pageRows = txs.slice(txPage * TX_PAGE_SIZE, (txPage + 1) * TX_PAGE_SIZE);
+
+  const lbl = document.getElementById('tx-count-label');
+  if (lbl) lbl.textContent = `${total} record${total!==1?'s':''} · page ${txPage+1}/${pages}`;
+
+  const tb = document.getElementById('tx-tbody');
+  if (!tb) return;
+
+  if (!pageRows.length) {
+    tb.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="ei">🔄</div><p>No transactions match</p></div></td></tr>`;
+  } else {
+    const offset = txPage * TX_PAGE_SIZE;
+    tb.innerHTML = pageRows.map((tx, i) => {
+      const ref = tx.issuedTo || tx.deliveredBy || tx.receivedBy || tx.doneBy || '—';
+      const sign = tx.type === 'OUT' ? '−' : tx.type === 'ADJUSTMENT' ? '±' : '+';
+      const qColor = tx.type === 'OUT' ? 'var(--red)' : tx.type === 'ADJUSTMENT' ? 'var(--teal)' : 'var(--green)';
+      return `<tr>
+        <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${offset+i+1}</td>
+        <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(tx.date)}</td>
+        <td>${txTypeBadge(tx.type)}</td>
+        <td class="iname">${tx.itemName||'—'}</td>
+        <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.category||'—'}</td>
+        <td style="font-family:var(--font-mono);font-weight:700;color:${qColor}">${sign}${tx.qty}</td>
+        <td style="font-size:11px">${ref}</td>
+        <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.user||'—'}</td>
+        <td style="color:var(--text-dim);font-size:11px">${tx.notes||'—'}</td>
+        <td>${canEdit()?`<button class="abtn del" onclick="confirmDeleteTX('${tx.id}')">🗑</button>`:'—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Pagination controls
+  const pag = document.getElementById('tx-pagination');
+  if (!pag) return;
+  if (pages <= 1) { pag.innerHTML = ''; return; }
+
+  let btns = `<button class="page-btn" onclick="txGoPage(${txPage-1})" ${txPage===0?'disabled':''}>&#8592; Prev</button>`;
+  btns += `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">Page ${txPage+1} of ${pages}</span>`;
+  // page number buttons (show up to 7)
+  const start = Math.max(0, txPage - 3);
+  const end   = Math.min(pages, start + 7);
+  for (let p = start; p < end; p++) {
+    btns += `<button class="page-btn ${p===txPage?'active':''}" onclick="txGoPage(${p})">${p+1}</button>`;
+  }
+  btns += `<button class="page-btn" onclick="txGoPage(${txPage+1})" ${txPage>=pages-1?'disabled':''}>Next &#8594;</button>`;
+  pag.innerHTML = btns;
+}
+
+function txGoPage(p) { txPage = p; renderTX(); }
+
+// ═══════════════════════════════════════════════════════════
+// STOCK TAKE
+// ═══════════════════════════════════════════════════════════
+function renderST() {
+  const rows = [...db.stockTakes].reverse();
+  const tb = document.getElementById('st-tbody');
+  if (!rows.length) {
+    tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">📋</div><p>No stock takes yet</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = rows.map((r, i) => {
+    const v = r.counted - r.systemQty;
+    // Variance colour: green=0, yellow=small, red=large (>10% of system or >5 units)
+    const absV = Math.abs(v);
+    const vColor = v === 0
+      ? 'var(--green)'
+      : absV > Math.max(5, (r.systemQty || 1) * 0.1)
+        ? 'var(--red)'
+        : 'var(--yellow)';
+    const vLabel = v === 0 ? '✓ 0' : `${v > 0 ? '+' : ''}${v}`;
+    // Find linked ADJUSTMENT transaction
+    const adjTx = db.transactions.find(t => t.type === 'ADJUSTMENT' && t.refId === r.id);
+    return `<tr>
+      <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+      <td class="iname">${r.itemName}</td>
+      <td style="font-family:var(--font-mono)">${r.systemQty}</td>
+      <td style="font-family:var(--font-mono);font-weight:700;color:var(--teal)">${r.counted}</td>
+      <td style="font-family:var(--font-mono);font-weight:700;color:${vColor}">${vLabel}</td>
+      <td>${adjTx ? '<span class="badge bg-adj">ADJ</span>' : '<span style="color:var(--text-dim);font-size:10px">—</span>'}</td>
+      <td>${r.doneBy || '—'}</td>
+      <td style="color:var(--text-dim);font-size:11px">${r.notes || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// GOODS RECEIVED
+// ═══════════════════════════════════════════════════════════
+let grFromF = '', grToF = '';
+function applyGRFilter() { grFromF = document.getElementById('gr-from').value; grToF = document.getElementById('gr-to').value; renderGR(); }
+function clearGRFilter() { grFromF = ''; grToF = ''; document.getElementById('gr-from').value = ''; document.getElementById('gr-to').value = ''; renderGR(); }
+
+function renderGR() {
+  let rows = [...db.goodsReceived].reverse();
+  if (grFromF) rows = rows.filter(r => r.date >= grFromF);
+  if (grToF) rows = rows.filter(r => r.date <= grToF);
+  const tb = document.getElementById('gr-tbody');
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">📦</div><p>No GRNs</p></div></td></tr>`; return; }
+  tb.innerHTML = rows.map((r,i) => `<tr style="cursor:pointer" onclick="showGRNDetail('${r.id}')">
+    <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+    <td style="font-family:var(--font-mono);font-weight:700;color:var(--gold)">${r.vehicle||'—'}</td>
+    <td>${r.driver||'—'}</td>
+    <td><span class="badge bg-purple">${r.items.length} items</span></td>
+    <td>${r.receivedBy||'—'}</td>
+    <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
+    <td onclick="event.stopPropagation()">${canEdit()?`<button class="abtn del" onclick="confirmDeleteGRN('${r.id}')">🗑</button>`:'—'}</td>
+  </tr>`).join('');
+}
+
+function showGRNDetail(grnId) {
+  currentGRNId = grnId;
+  const grn = db.goodsReceived.find(g => g.id === grnId);
+  if (!grn) return;
+  document.getElementById('grn-detail-content').innerHTML = `
+    <div class="fr3" style="margin-bottom:14px">
+      <div><div class="section-label">Date</div><strong>${fmtDate(grn.date)}</strong></div>
+      <div><div class="section-label">Vehicle</div><strong>${grn.vehicle||'—'}</strong></div>
+      <div><div class="section-label">Driver</div><strong>${grn.driver||'—'}</strong></div>
+    </div>
+    <div class="fr" style="margin-bottom:14px">
+      <div><div class="section-label">Received By</div><strong>${grn.receivedBy||'—'}</strong></div>
+      <div><div class="section-label">Notes</div><strong>${grn.notes||'—'}</strong></div>
+    </div>
+    <div class="section-label" style="margin-bottom:8px">Items Received</div>
+    ${grn.items.map(it => `
+      <div style="background:var(--surface2);border-radius:7px;padding:8px 12px;margin-bottom:6px;display:flex;gap:12px;align-items:center;font-size:12px">
+        <span style="flex:2;font-weight:600">${it.name}</span>
+        <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${it.category||'—'}</span>
+        <span style="font-family:var(--font-mono)">Ordered: ${it.ordered||'—'}</span>
+        <span style="font-family:var(--font-mono);color:var(--green);font-weight:700">Received: ${it.received}</span>
+      </div>`).join('')}`;
+  openM('m-gr-detail');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FUEL
+// ═══════════════════════════════════════════════════════════
+let fuelFromF = '', fuelToF = '', fuelTypeF = 'ALL';
+function applyFuelFilter() { fuelFromF = document.getElementById('fuel-from').value; fuelToF = document.getElementById('fuel-to').value; renderFuel(); }
+function clearFuelFilter() { fuelFromF = ''; fuelToF = ''; document.getElementById('fuel-from').value = ''; document.getElementById('fuel-to').value = ''; renderFuel(); }
+function filterFuelType(t, btn) { fuelTypeF = t; document.querySelectorAll('#page-fuel .ftab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderFuel(); }
+
+function renderFuel() {
+  let rows = [...db.fuelLog].reverse();
+  if (fuelFromF) rows = rows.filter(r => r.date >= fuelFromF);
+  if (fuelToF) rows = rows.filter(r => r.date <= fuelToF);
+  if (fuelTypeF !== 'ALL') rows = rows.filter(r => r.fuelType === fuelTypeF);
+  const totalL = rows.reduce((s,r) => s+parseFloat(r.amount||0), 0);
+  const avg = rows.length ? totalL/rows.length : 0;
+  const totalDelivered = db.fuelDeliveries.reduce((s,r) => s+parseFloat(r.qty||0), 0);
+  const allIssued = db.fuelLog.reduce((s,r) => s+parseFloat(r.amount||0), 0);
+  const balance = Math.max(0, totalDelivered - allIssued);
+  const dieselL = db.fuelLog.filter(r=>r.fuelType==='DIESEL').reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  document.getElementById('fuel-kpis').innerHTML = `
+    <div class="fkpi"><div class="fkpi-label">Total Issued (filtered)</div><div class="fkpi-val">${totalL.toLocaleString()} L</div><div class="fkpi-sub">${rows.length} transactions</div></div>
+    <div class="fkpi"><div class="fkpi-label">Total Delivered</div><div class="fkpi-val" style="color:var(--green)">${totalDelivered.toLocaleString()} L</div><div class="fkpi-sub">${db.fuelDeliveries.length} deliveries</div></div>
+    <div class="fkpi" style="border-color:rgba(45,212,191,.2)"><div class="fkpi-label">Est. Tank Balance</div><div class="fkpi-val" style="color:var(--teal)">${balance.toLocaleString()} L</div><div class="fkpi-sub">Delivered − All Issued</div></div>
+    <div class="fkpi"><div class="fkpi-label">Avg per Transaction</div><div class="fkpi-val" style="color:var(--purple)">${avg.toFixed(0)} L</div><div class="fkpi-sub">Diesel: ${dieselL.toLocaleString()}L total</div></div>`;
+  const tb = document.getElementById('fuel-tbody');
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="12"><div class="empty"><div class="ei">⛽</div><p>No fuel records</p></div></td></tr>`; return; }
+  tb.innerHTML = rows.map((r,i) => `<tr>
+    <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${r.time||'—'}</td>
+    <td><span class="badge bg-blue">${r.fuelType}</span></td>
+    <td style="font-family:var(--font-mono);font-weight:700;color:var(--blue)">${parseFloat(r.amount).toLocaleString()} L</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${r.vehicle||'—'}</td>
+    <td>${r.driver||'—'}</td>
+    <td>${r.authorizedBy||'—'}</td>
+    <td style="color:var(--text-dim);font-size:11px">${r.purpose||'—'}</td>
+    <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">${r.odometer||'—'}</td>
+    <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">${r.dipBefore||'—'} / ${r.dipAfter||'—'}</td>
+    <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('fuel','${r.id}','${r.amount}L ${r.fuelType} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
+  </tr>`).join('');
+  const dtb = document.getElementById('fuel-del-tbody');
+  const drows = [...db.fuelDeliveries].reverse();
+  dtb.innerHTML = !drows.length ? `<tr><td colspan="7"><div class="empty"><div class="ei">🚛</div><p>No deliveries</p></div></td></tr>`
+    : drows.map((r,i) => `<tr>
+      <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+      <td><span class="badge bg-blue">${r.fuelType}</span></td>
+      <td style="font-family:var(--font-mono);font-weight:700;color:var(--teal)">${parseFloat(r.qty).toLocaleString()} L</td>
+      <td>${r.supplier||'—'}</td>
+      <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
+      <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('fuelDel','${r.id}','Fuel delivery: ${r.qty}L')">🗑</button>`:'—'}</td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONCRETE
+// ═══════════════════════════════════════════════════════════
+let concreteTypeF = 'ALL';
+function filterConcrete(t,btn) { concreteTypeF=t; document.querySelectorAll('#page-concrete .ftab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderConcrete(); }
+function renderConcrete() {
+  let rows = db.concreteLog.filter(r => concreteTypeF === 'ALL' || r.material === concreteTypeF);
+  const mats = {};
+  db.concreteLog.forEach(r => { if(!mats[r.material]) mats[r.material]={in:0,out:0}; mats[r.material].in+=r.qIn||0; mats[r.material].out+=r.qOut||0; });
+  document.getElementById('concrete-kpis').innerHTML = Object.entries(mats).map(([m,v]) =>
+    `<div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">${m}</div><div class="kpi-val" style="font-size:20px">${(v.in-v.out).toLocaleString()}</div><div class="kpi-sub">In:${v.in} Used:${v.out}</div></div>`).join('');
+  const tb = document.getElementById('concrete-tbody');
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">🏗️</div><p>No records</p></div></td></tr>`; return; }
+  tb.innerHTML = [...rows].reverse().map((r,i) => `<tr>
+    <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+    <td style="font-weight:700">${r.material}</td>
+    <td style="font-family:var(--font-mono);color:var(--green)">${r.qIn||0}</td>
+    <td style="font-family:var(--font-mono);color:var(--red)">${r.qOut||0}</td>
+    <td style="font-family:var(--font-mono);font-weight:700">${r.balance||0}</td>
+    <td>${r.supplier||'—'}</td>
+    <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
+    <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('concrete','${r.id}','${r.material} batch on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
+  </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// CAMPSITE
+// ═══════════════════════════════════════════════════════════
+function renderCampsite() {
+  const balances = {};
+  db.campsiteLog.forEach(r => { if(!balances[r.supply]) balances[r.supply]={in:0,out:0}; balances[r.supply].in+=r.qIn||0; balances[r.supply].out+=r.qOut||0; });
+  document.getElementById('campsite-kpis').innerHTML = Object.entries(balances).map(([s,v]) =>
+    `<div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">${s}</div><div class="kpi-val" style="font-size:20px">${v.in-v.out}</div><div class="kpi-sub">In:${v.in} Out:${v.out}</div></div>`).join('');
+  const rows = [...db.campsiteLog].reverse();
+  const tb = document.getElementById('campsite-tbody');
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">🏕️</div><p>No records</p></div></td></tr>`; return; }
+  tb.innerHTML = rows.map((r,i) => `<tr>
+    <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+    <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+    <td style="font-weight:600">${r.supply}</td>
+    <td style="font-family:var(--font-mono);color:var(--green)">${r.qIn||0}</td>
+    <td style="font-family:var(--font-mono);color:var(--red)">${r.qOut||0}</td>
+    <td style="font-family:var(--font-mono);font-weight:700">${r.balance||0}</td>
+    <td>${statBadge(r.balance>10?'GOOD':r.balance>3?'LOW':'CRITICAL')}</td>
+    <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
+    <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('campsite','${r.id}','${r.supply} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
+  </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FLEET
+// ═══════════════════════════════════════════════════════════
+const fleetEmoji = {'Earth Mover':'🚜','ADT (Articulated Dump Truck)':'🚛','Bulldozer':'⚙️','Excavator':'🏗','Grader':'🛣️','Loader':'🏋️','Bobcat':'🐱','Pool Car':'🚗','Bus':'🚌','Water Bowser':'💧','Backhoe':'⛏️','Other':'🚜'};
+function renderFleet() {
+  const fg = document.getElementById('fleet-grid');
+  const statusBadgeFleet = s => s === 'Active'
+    ? '<span class="badge bg-good">Active</span>'
+    : s === 'Grounded'
+    ? '<span class="badge bg-crit">Grounded</span>'
+    : '<span class="badge bg-low">Maintenance</span>';
+
+  fg.innerHTML = !db.fleet.length
+    ? '<div class="empty"><div class="ei">🚜</div><p>No vehicles added</p></div>'
+    : db.fleet.map(f => {
+        const assignedEmp = db.employees.find(e => e.id === f.driverId);
+        return `<div class="fleet-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="font-size:28px">${fleetEmoji[f.type]||'🚜'}</div>
+            ${statusBadgeFleet(f.status||'Active')}
+          </div>
+          <div style="font-family:var(--font-mono);font-weight:800;font-size:14px;color:var(--gold);margin-top:6px">${f.reg}</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:2px">${f.desc||''}</div>
+          <div style="margin-top:5px"><span class="badge bg-blue">${f.type}</span></div>
+          ${assignedEmp ? `<div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:5px">👤 ${assignedEmp.name}</div>` : ''}
+          <div class="card-del">${canEdit()?`<button class="abtn del" onclick="confirmDel('fleet','${f.id}','${f.reg} — ${f.desc}')">🗑</button>`:'—'}</div>
+        </div>`;
+      }).join('');
+
+  const fuelByV = {};
+  db.fuelLog.forEach(r => {
+    if (!fuelByV[r.vehicle]) fuelByV[r.vehicle] = { total:0, last:'', count:0 };
+    fuelByV[r.vehicle].total += parseFloat(r.amount||0);
+    fuelByV[r.vehicle].count++;
+    if (r.date > fuelByV[r.vehicle].last) fuelByV[r.vehicle].last = r.date;
+  });
+  const ftb = document.getElementById('fleet-fuel-tbody');
+  const entries = Object.entries(fuelByV).sort((a,b) => b[1].total - a[1].total);
+  ftb.innerHTML = !entries.length
+    ? `<tr><td colspan="5"><div class="empty"><div class="ei">⛽</div><p>No fuel data</p></div></td></tr>`
+    : entries.map(([v,d]) => {
+        const fleetEntry = db.fleet.find(f => f.reg === v);
+        return `<tr>
+          <td style="font-family:var(--font-mono);font-weight:700;color:var(--gold)">${v}</td>
+          <td><span class="badge bg-blue">${fleetEntry?.type||'—'}</span></td>
+          <td style="font-family:var(--font-mono);color:var(--blue);font-weight:700">${d.total.toLocaleString()} L</td>
+          <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">${d.count} fills</td>
+          <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(d.last)}</td>
+        </tr>`;
+      }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// EMPLOYEES
+// ═══════════════════════════════════════════════════════════
+function renderEmployees() {
+  const g = document.getElementById('emp-grid');
+  const roleColors = {
+    'Storekeeper':'var(--gold)','Driver':'var(--blue)','Supervisor':'var(--purple)',
+    'Engineer':'var(--teal)','Mechanic':'var(--orange,#fb923c)','Operator':'var(--green)'
+  };
+  g.innerHTML = !db.employees.length
+    ? '<div class="empty"><div class="ei">👨‍💼</div><p>No employees added</p></div>'
+    : db.employees.map(e => {
+        const statusActive = (e.status || 'Active') === 'Active';
+        const avatarColor = roleColors[e.role] || 'var(--gold)';
+        return `<div class="emp-card" style="border-color:${statusActive ? 'var(--border)' : 'rgba(248,113,113,.3)'}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+            <div class="emp-avatar-lg" style="background:linear-gradient(135deg,${avatarColor},var(--teal))">${e.name.charAt(0).toUpperCase()}</div>
+            <span class="badge ${statusActive ? 'bg-good' : 'bg-crit'}">${e.status||'Active'}</span>
+          </div>
+          <div style="font-size:13px;font-weight:700">${e.name}</div>
+          <div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px">${e.role||'—'}</div>
+          <div style="font-size:9px;color:var(--text-dim);font-family:var(--font-mono);margin-top:4px;display:flex;flex-direction:column;gap:2px">
+            ${e.dept ? `<span>📁 ${e.dept}</span>` : ''}
+            ${e.empId ? `<span>🪪 ${e.empId}</span>` : ''}
+            ${e.contact ? `<span>📞 ${e.contact}</span>` : ''}
+          </div>
+          <div class="card-del">${canEdit() ? `<button class="abtn del" onclick="confirmDel('emp','${e.id}','${e.name}')">🗑</button>` : '—'}</div>
+        </div>`;
+      }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// CATEGORIES
+// ═══════════════════════════════════════════════════════════
+function renderCategories() {
+  const tb = document.getElementById('cat-tbody');
+  tb.innerHTML = db.categories.map((c,i) => `<tr>
+    <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+    <td style="font-size:18px">${c.icon}</td>
+    <td style="font-weight:700">${c.name}</td>
+    <td style="font-family:var(--font-mono)">${db.items.filter(it=>it.category===c.name).length}</td>
+    <td>${i>=5?canEdit()?`<button class="abtn del" onclick="confirmDel('cat','${c.name}','Category: ${c.name}')">🗑</button>`:'—':'<span style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim)">default</span>'}</td>
+  </tr>`).join('');
+}
+
+async function addCategory() {
+  const name = document.getElementById('cat-name-input').value.trim();
+  const icon = document.getElementById('cat-icon-input').value.trim() || '📦';
+  if (!name) return toast('Enter a category name', 'err');
+  if (db.categories.find(c => c.name === name)) return toast('Category already exists', 'err');
+  const { error } = await SB.from('categories').insert({ name, icon });
+  if (error) return toast('⚠️ Failed to save category: ' + error.message, 'err');
+  db.categories.push({ name, icon });
+  document.getElementById('cat-name-input').value = '';
+  document.getElementById('cat-icon-input').value = '';
+  toast(`✓ Category "${name}" added`);
+  renderCategories();
+}
+
+// ═══════════════════════════════════════════════════════════
+// ALERTS
+// ═══════════════════════════════════════════════════════════
+function renderAlerts() {
+  const statOrder = { OUT:0, CRITICAL:1, LOW:2, GOOD:3 };
+  const items = db.items.filter(i => ['LOW','CRITICAL','OUT'].includes(getStat(i.balance,i.threshold)))
+    .sort((a,b) => statOrder[getStat(a.balance,a.threshold)] - statOrder[getStat(b.balance,b.threshold)]);
+
+  const tb = document.getElementById('alerts-tbody');
+  const sumEl = document.getElementById('alerts-summary');
+
+  if (!items.length) {
+    if (sumEl) sumEl.textContent = '';
+    tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">✅</div><p>All items are sufficiently stocked</p></div></td></tr>`;
+    return;
+  }
+
+  const outCount  = items.filter(i => getStat(i.balance,i.threshold) === 'OUT').length;
+  const critCount = items.filter(i => getStat(i.balance,i.threshold) === 'CRITICAL').length;
+  const lowCount  = items.filter(i => getStat(i.balance,i.threshold) === 'LOW').length;
+  if (sumEl) sumEl.textContent = `${items.length} items need attention · ✕ Out: ${outCount} · 🔴 Critical: ${critCount} · ⚠️ Low: ${lowCount}`;
+
+  tb.innerHTML = items.map((item,i) => {
+    const s = getStat(item.balance,item.threshold);
+    const qc = s==='OUT'?'var(--text-dim)':s==='CRITICAL'?'var(--red)':'var(--yellow)';
+    return `<tr>
+      <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
+      <td class="iname">${item.name}</td>
+      <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${catIcon(item.category)} ${item.category}</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${item.unit||'pcs'}</td>
+      <td style="font-family:var(--font-mono);font-weight:700;color:${qc}">${item.balance}</td>
+      <td>${statBadge(s)}</td>
+      <td style="font-family:var(--font-mono);font-size:10px">${item.threshold}</td>
+      <td>${canEdit()?`<button class="btn btn-green btn-sm" onclick="openSIFor('${item.id}')">+ Restock</button>`:'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Restock All: open Stock In modal cycling through all alert items
+let _restockQueue = [], _restockIdx = 0;
+function restockAll() {
+  const statOrder = { OUT:0, CRITICAL:1, LOW:2, GOOD:3 };
+  _restockQueue = db.items
+    .filter(i => ['LOW','CRITICAL','OUT'].includes(getStat(i.balance,i.threshold)))
+    .sort((a,b) => statOrder[getStat(a.balance,a.threshold)] - statOrder[getStat(b.balance,b.threshold)]);
+  if (!_restockQueue.length) return toast('No items need restocking', 'info');
+  _restockIdx = 0;
+  toast(`Opening Stock In for ${_restockQueue.length} items — complete each one`, 'info');
+  openSIFor(_restockQueue[0].id);
+}
+
+// ═══════════════════════════════════════════════════════════
+// REPORTS / CHARTS
+// ═══════════════════════════════════════════════════════════
+let charts = {};
+let _chartsReady = typeof Chart !== 'undefined';
+// Reports state
+let rptFrom = '', rptTo = '';
+function setRptPeriod(p, btn) {
+  const now = new Date(), ts = now.toISOString().split('T')[0];
+  document.querySelectorAll('#page-reports .ftab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (p === 'month') { const d=new Date(now); d.setDate(1); rptFrom=d.toISOString().split('T')[0]; rptTo=ts; }
+  else if (p === 'week') { const d=new Date(now); d.setDate(d.getDate()-6); rptFrom=d.toISOString().split('T')[0]; rptTo=ts; }
+  else { rptFrom=''; rptTo=''; }
+  document.getElementById('rpt-from').value = rptFrom;
+  document.getElementById('rpt-to').value = rptTo;
+  renderReports();
+}
+function clearRptFilter() {
+  rptFrom=''; rptTo='';
+  document.getElementById('rpt-from').value='';
+  document.getElementById('rpt-to').value='';
+  document.querySelectorAll('#page-reports .ftab').forEach(b=>b.classList.remove('active'));
+  const allBtn=document.querySelector('#page-reports .ftab');
+  if(allBtn) allBtn.classList.add('active');
+  renderReports();
+}
+function downloadChart(canvasId, filename) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.download = `${filename}_${today()}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  toast('✓ Chart downloaded as PNG', 'ok');
+}
+function chartTable(elId, headers, rows) {
+  const el = document.getElementById(elId);
+  if (!el || !rows.length) { if(el) el.innerHTML=''; return; }
+  el.innerHTML = `<div style="margin-top:10px;overflow-x:auto">
+    <table style="min-width:0;font-size:11px">
+      <thead><tr>${headers.map(h=>`<th style="padding:5px 8px">${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td style="padding:5px 8px">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+function renderReports() {
+  if (typeof Chart === 'undefined') {
+    toast('Chart.js not loaded — check internet connection', 'err');
+    return;
+  }
+  Object.values(charts).forEach(c => { try { c.destroy(); } catch(e){} });
+  charts = {};
+
+  const from = document.getElementById('rpt-from')?.value || rptFrom;
+  const to   = document.getElementById('rpt-to')?.value   || rptTo;
+
+  const filterDate = arr => arr.filter(r => (!from || r.date >= from) && (!to || r.date <= to));
+
+  const co = {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { labels: { color:'#94a3b8', font:{size:9} } } },
+    scales: { x:{ticks:{color:'#64748b',font:{size:9}}}, y:{ticks:{color:'#64748b',font:{size:9}}} }
+  };
+  const coNoScale = { responsive:true, maintainAspectRatio:true,
+    plugins:{ legend:{ labels:{color:'#94a3b8',font:{size:9}} } } };
+
+  // ── 1. Fuel usage by vehicle ──────────────────────────────────────────
+  const filtFuel = filterDate(db.fuelLog);
+  const fuelByV = {};
+  filtFuel.forEach(r => { fuelByV[r.vehicle||'Unknown'] = (fuelByV[r.vehicle||'Unknown']||0) + parseFloat(r.amount||0); });
+  const fuelVehicles = Object.keys(fuelByV).sort((a,b)=>fuelByV[b]-fuelByV[a]);
+  const fuelAmts = fuelVehicles.map(v => fuelByV[v]);
+  charts.fuel = new Chart(document.getElementById('chart-fuel'), {
+    type:'bar',
+    data:{ labels:fuelVehicles, datasets:[{label:'Litres',data:fuelAmts,
+      backgroundColor:fuelVehicles.map((_,i)=>`hsla(${210+i*25},80%,65%,.7)`),borderWidth:0,borderRadius:4}]},
+    options:{...co, plugins:{legend:{display:false}}} });
+  chartTable('tbl-fuel', ['Vehicle','Litres Issued'],
+    fuelVehicles.map(v=>[v, fuelByV[v].toLocaleString()+' L']));
+
+  // ── 2. Stock In vs Out by category ───────────────────────────────────
+  const filtTx = filterDate(db.transactions);
+  const cats = db.categories.map(c => c.name).filter(c => db.items.some(i=>i.category===c));
+  const inD  = cats.map(c => filtTx.filter(t=>(t.type==='IN'||t.type==='GRN')&&t.category===c).reduce((s,t)=>s+t.qty,0));
+  const outD = cats.map(c => filtTx.filter(t=>t.type==='OUT'&&t.category===c).reduce((s,t)=>s+t.qty,0));
+  charts.stock = new Chart(document.getElementById('chart-stock'), {
+    type:'bar',
+    data:{ labels:cats.map(c=>c.length>12?c.substring(0,12)+'…':c),
+      datasets:[
+        {label:'Stock In',data:inD,backgroundColor:'rgba(52,211,153,.65)',borderRadius:3,borderWidth:0},
+        {label:'Stock Out',data:outD,backgroundColor:'rgba(248,113,113,.65)',borderRadius:3,borderWidth:0}
+      ]},
+    options:co });
+  chartTable('tbl-stock', ['Category','Stock In','Stock Out','Net'],
+    cats.map((c,i)=>[c, inD[i], outD[i], (inD[i]-outD[i]).toLocaleString()]));
+
+  // ── 3. Inventory value by category (doughnut) ────────────────────────
+  const valByCat = {};
+  db.items.forEach(i => { const v=i.balance*(i.cost||0); if(v>0) valByCat[i.category]=(valByCat[i.category]||0)+v; });
+  const valCats = Object.keys(valByCat);
+  const valAmts = valCats.map(c=>valByCat[c]);
+  const hues = [38,160,200,270,320,80,10,190];
+  charts.value = new Chart(document.getElementById('chart-value'), {
+    type:'doughnut',
+    data:{ labels:valCats,
+      datasets:[{data:valAmts,
+        backgroundColor:valCats.map((_,i)=>`hsla(${hues[i%hues.length]},75%,60%,.75)`),
+        borderWidth:0,hoverOffset:8}]},
+    options:{...coNoScale, cutout:'55%'} });
+  const totalVal = valAmts.reduce((s,v)=>s+v,0);
+  chartTable('tbl-value', ['Category','Est. Value (USD)','% of Total'],
+    valCats.map((c,i)=>[c,'$'+valAmts[i].toLocaleString(undefined,{maximumFractionDigits:0}),totalVal?((valAmts[i]/totalVal*100).toFixed(1)+'%'):'—']));
+
+  // ── 4. Stock status pie ───────────────────────────────────────────────
+  const good=db.items.filter(i=>getStat(i.balance,i.threshold)==='GOOD').length;
+  const low =db.items.filter(i=>getStat(i.balance,i.threshold)==='LOW').length;
+  const crit=db.items.filter(i=>getStat(i.balance,i.threshold)==='CRITICAL').length;
+  const out =db.items.filter(i=>getStat(i.balance,i.threshold)==='OUT').length;
+  charts.status = new Chart(document.getElementById('chart-status'), {
+    type:'doughnut',
+    data:{ labels:['Good','Low','Critical','Out'],
+      datasets:[{data:[good,low,crit,out],
+        backgroundColor:['rgba(52,211,153,.75)','rgba(251,191,36,.75)','rgba(248,113,113,.75)','rgba(100,116,139,.6)'],
+        borderWidth:0,hoverOffset:8}]},
+    options:{...coNoScale, cutout:'50%'} });
+  chartTable('tbl-status', ['Status','Count','%'],
+    [['✅ Good',good],['⚠️ Low',low],['🔴 Critical',crit],['✕ Out',out]]
+      .map(([l,n])=>[l,n,db.items.length?((n/db.items.length*100).toFixed(1)+'%'):'—']));
+
+  // ── 5. Concrete over time (line) ─────────────────────────────────────
+  const filtConcrete = filterDate(db.concreteLog).sort((a,b)=>a.date.localeCompare(b.date));
+  const mats = [...new Set(filtConcrete.map(r=>r.material))];
+  const concreteDates = [...new Set(filtConcrete.map(r=>r.date))].sort();
+  const matColors = { CEMENT:'rgba(244,162,97,.8)',STONE:'rgba(96,165,250,.8)',
+    AGGREGATE:'rgba(167,139,250,.8)',SAND:'rgba(251,191,36,.8)',WATER:'rgba(45,212,191,.8)' };
+  charts.concrete = new Chart(document.getElementById('chart-concrete'), {
+    type:'line',
+    data:{ labels:concreteDates.map(fmtDate),
+      datasets: mats.map(m=>({
+        label:m, borderColor:matColors[m]||'rgba(200,200,200,.8)',
+        backgroundColor:(matColors[m]||'rgba(200,200,200,.8)').replace('.8','.15'),
+        data:concreteDates.map(d=>filtConcrete.filter(r=>r.material===m&&r.date===d).reduce((s,r)=>s+(r.qIn||0),0)),
+        tension:.3, fill:true, pointRadius:4, borderWidth:2
+      }))},
+    options:{...co, scales:{...co.scales, y:{...co.scales.y, beginAtZero:true}}} });
+  chartTable('tbl-concrete', ['Material','Total Received','Total Used','Balance'],
+    mats.map(m=>[m,
+      filtConcrete.filter(r=>r.material===m).reduce((s,r)=>s+(r.qIn||0),0),
+      filtConcrete.filter(r=>r.material===m).reduce((s,r)=>s+(r.qOut||0),0),
+      filtConcrete.filter(r=>r.material===m).reduce((s,r)=>s+(r.qIn||0)-(r.qOut||0),0)
+    ]));
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL OPEN / CLOSE
+// ═══════════════════════════════════════════════════════════
+function openM(id) { document.getElementById(id).classList.add('open'); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(m => m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); }));
+
+function openStockInModal() { populateSI(); document.getElementById('si-date').value = today(); openM('m-si'); }
+function openStockOutModal() { populateSO(); document.getElementById('so-date').value = today(); openM('m-so'); }
+function openSIFor(itemId) { populateSI(itemId); document.getElementById('si-date').value = today(); openM('m-si'); }
+function openSOFor(itemId) { populateSO(itemId); document.getElementById('so-date').value = today(); updateAvail(); openM('m-so'); }
+function openStocktakeModal() { document.getElementById('st-item').innerHTML = itemOptions(); document.getElementById('st-emp').innerHTML = empOptions('', true); document.getElementById('st-date').value = today(); showSTCurrent(); openM('m-st'); }
+function openGRModal() {
+  document.getElementById('gr-date').value = today();
+  document.getElementById('gr-vehicle').innerHTML = fleetOptions();
+  document.getElementById('gr-emp').innerHTML = empOptions('', true);
+  initGRNRows();
+  openM('m-gr');
+}
+function openFuelModal() {
+  document.getElementById('f-date').value = today();
+  document.getElementById('f-time').value = nowTime();
+  // Populate vehicle dropdown with Active vehicles first
+  const activeFleet = db.fleet.filter(f => (f.status||'Active') === 'Active');
+  const groundedFleet = db.fleet.filter(f => (f.status||'Active') !== 'Active');
+  document.getElementById('f-vehicle').innerHTML =
+    '<option value="">— Select Vehicle —</option>' +
+    (activeFleet.length ? '<optgroup label="Active">' + activeFleet.map(f=>`<option value="${f.reg}">${f.reg} — ${f.desc}</option>`).join('') + '</optgroup>' : '') +
+    (groundedFleet.length ? '<optgroup label="Grounded / Maintenance">' + groundedFleet.map(f=>`<option value="${f.reg}" style="color:var(--red)">${f.reg} — ${f.desc} (${f.status})</option>`).join('') + '</optgroup>' : '');
+  // Populate driver dropdown with Active employees
+  const activeEmps = db.employees.filter(e => (e.status||'Active') === 'Active');
+  const empOpts = '<option value="">— Select —</option>' + activeEmps.map(e=>`<option value="${e.id}">${e.name} · ${e.role||''}</option>`).join('');
+  document.getElementById('f-driver').innerHTML = empOpts;
+  document.getElementById('f-auth').innerHTML = empOpts;
+  openM('m-fuel');
+}
+function openFuelDeliveryModal() { document.getElementById('fd-date').value = today(); openM('m-fuel-del'); }
+function openConcreteModal() { document.getElementById('c-date').value=today(); document.getElementById('c-auth').innerHTML=empOptions('',true); openM('m-concrete'); }
+function openCampsiteModal() { document.getElementById('cs-date').value = today(); openM('m-campsite'); }
+function openFleetModal() { document.getElementById('fl-driver').innerHTML=empOptions('',true); openM('m-fleet'); }
+function openEmpModal() { openM('m-emp'); }
+
+function openEditItem(itemId) {
+  const item = db.items.find(i => i.id === itemId);
+  if (!item) return;
+  document.getElementById('item-modal-title').innerHTML = 'Edit <span>Item</span>';
+  document.getElementById('item-save-btn').textContent = 'Save Changes';
+  document.getElementById('i-cat').innerHTML = catOptions(item.category);
+  document.getElementById('i-name').value = item.name;
+  document.getElementById('i-unit').value = item.unit || 'pcs';
+  document.getElementById('i-qty').value = '';
+  document.getElementById('i-cost').value = item.cost || '';
+  document.getElementById('i-thresh').value = item.threshold;
+  document.getElementById('i-deliv').value = '';
+  document.getElementById('i-notes').value = item.notes || '';
+  document.getElementById('i-edit-id').value = itemId;
+  openM('m-item');
+}
+
+function populateSI(pre = '') { document.getElementById('si-item').innerHTML = itemOptions(pre); document.getElementById('si-emp').innerHTML = empOptions('', true); }
+function populateSO(pre = '') { document.getElementById('so-item').innerHTML = itemOptions(pre); document.getElementById('so-emp').innerHTML = empOptions('', true); document.getElementById('so-auth').innerHTML = empOptions('', true); updateAvail(); }
+
+function updateAvail() {
+  const item = db.items.find(i => i.id === document.getElementById('so-item').value);
+  const el = document.getElementById('so-avail');
+  if (item) {
+    el.textContent = `Available: ${item.balance} ${item.unit||'pcs'}`;
+    el.style.background = item.balance > 0 ? 'rgba(45,212,191,.08)' : 'rgba(248,113,113,.08)';
+    el.style.color = item.balance > 0 ? 'var(--teal)' : 'var(--red)';
+  }
+}
+function showSTCurrent() {
+  const item = db.items.find(i => i.id === document.getElementById('st-item').value);
+  const el = document.getElementById('st-current');
+  if (item && el) {
+    el.textContent = `System balance: ${item.balance} ${item.unit||'pcs'} · Threshold: ${item.threshold}`;
+    el.style.color = getStat(item.balance, item.threshold) === 'GOOD' ? 'var(--green)' : getStat(item.balance, item.threshold) === 'OUT' ? 'var(--red)' : 'var(--yellow)';
+  }
+}
+
+let grnRowCount = 0;
+function initGRNRows() { document.getElementById('grn-rows').innerHTML = ''; grnRowCount = 0; addGRNRow(); addGRNRow(); }
+function addGRNRow() {
+  grnRowCount++;
+  const id = `grn-r${grnRowCount}`;
+  const d = document.createElement('div');
+  d.className = 'grn-row'; d.id = id;
+  d.innerHTML = `<input type="text" placeholder="Item name / description">
+    <select>${catOptions()}</select>
+    <input type="number" placeholder="Ordered" min="0">
+    <input type="number" placeholder="Received" min="0">
+    <button class="grn-rm" onclick="document.getElementById('${id}').remove()">✕</button>`;
+  document.getElementById('grn-rows').appendChild(d);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CUSTOM CONFIRM MODAL
+// ═══════════════════════════════════════════════════════════
+let pendingConfirmFn = null;
+
+function confirmAction(msg, itemText, btnLabel, fn, icon = '🗑️') {
+  pendingConfirmFn = fn;
+  document.getElementById('confirm-icon').textContent = icon;
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-item').textContent = itemText;
+  const btn = document.getElementById('confirm-ok-btn');
+  btn.textContent = btnLabel || 'Confirm';
+  btn.onclick = () => { closeM('m-confirm'); if (pendingConfirmFn) pendingConfirmFn(); pendingConfirmFn = null; };
+  openM('m-confirm');
+}
+
+function confirmDeleteItem(itemId) {
+  const item = db.items.find(i => i.id === itemId);
+  confirmAction('Delete this item? This will also remove all its transactions.', item?.name || '—', 'Delete Item', async () => {
+    const txToDelete = db.transactions.filter(t => t.itemId === itemId);
+    for (const tx of txToDelete) await sbDelete('transactions', tx.id);
+    await sbDelete('items', itemId);
+    db.items = db.items.filter(i => i.id !== itemId);
+    db.transactions = db.transactions.filter(t => t.itemId !== itemId);
+    toast(`"${item?.name}" deleted`); refreshAll();
+  });
+}
+function confirmDeleteTX(txId) {
+  const tx = db.transactions.find(t => t.id === txId);
+  if (!tx) return;
+  const sign = tx.type === 'OUT' ? '−' : tx.type === 'ADJUSTMENT' ? '±' : '+';
+  confirmAction('Delete this transaction? The item balance will be reversed.', `${sign}${tx.qty} · ${tx.itemName} · ${tx.type}`, 'Delete Transaction', async () => {
+    const item = db.items.find(i => i.id === tx.itemId);
+    if (item) {
+      if (tx.type === 'IN' || tx.type === 'GRN') { item.balance -= tx.qty; item.totalIn  = Math.max(0, item.totalIn  - tx.qty); }
+      else if (tx.type === 'OUT')                 { item.balance += tx.qty; item.totalOut = Math.max(0, item.totalOut - tx.qty); }
+      else if (tx.type === 'ADJUSTMENT')          { item.balance -= (tx.variance || 0); }
+      await sbSave('items', { id: item.id, name: item.name, category: item.category, balance: item.balance, threshold: item.threshold, total_in: item.totalIn, total_out: item.totalOut, unit: item.unit, cost: item.cost, notes: item.notes || '' });
+    }
+    await sbDelete('transactions', txId);
+    db.transactions = db.transactions.filter(t => t.id !== txId);
+    toast('Transaction deleted & balance updated'); refreshAll();
+  });
+}
+function confirmDeleteGRN(id) {
+  const grn = db.goodsReceived.find(r => r.id === id);
+  confirmAction('Delete this GRN?', `${grn?.items?.length||0} items received on ${fmtDate(grn?.date)}`, 'Delete GRN', async () => {
+    await sbDelete('goods_received', id);
+    db.goodsReceived = db.goodsReceived.filter(r => r.id !== id);
+    toast('GRN deleted'); renderGR();
+  });
+}
+function confirmDel(type, id, label) {
+  confirmAction(`Delete this ${type} record?`, label, 'Delete', async () => {
+    if (type==='fuel') { await sbDelete('fuel_log', id); db.fuelLog = db.fuelLog.filter(r=>r.id!==id); renderFuel(); }
+    else if (type==='fuelDel') { await sbDelete('fuel_deliveries', id); db.fuelDeliveries = db.fuelDeliveries.filter(r=>r.id!==id); renderFuel(); }
+    else if (type==='concrete') { await sbDelete('concrete_log', id); db.concreteLog = db.concreteLog.filter(r=>r.id!==id); renderConcrete(); }
+    else if (type==='campsite') { await sbDelete('campsite_log', id); db.campsiteLog = db.campsiteLog.filter(r=>r.id!==id); renderCampsite(); }
+    else if (type==='fleet') { await sbDelete('fleet', id); db.fleet = db.fleet.filter(f=>f.id!==id); renderFleet(); }
+    else if (type==='emp') { await sbDelete('employees', id); db.employees = db.employees.filter(e=>e.id!==id); renderEmployees(); }
+    else if (type==='cat') {
+      if (db.items.some(i=>i.category===id)) return toast('Cannot delete — items use this category','err');
+      const { error } = await SB.from('categories').delete().eq('name', id);
+      if (!error) db.categories = db.categories.filter(c=>c.name!==id);
+      renderCategories();
+    }
+    toast('Record deleted');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// CRUD ACTIONS
+// ═══════════════════════════════════════════════════════════
+async function saveItem() {
+  const editId = document.getElementById('i-edit-id').value;
+  const name = document.getElementById('i-name').value.trim();
+  const cat = document.getElementById('i-cat').value;
+  const qty = parseInt(document.getElementById('i-qty').value) || 0;
+  const cost = parseFloat(document.getElementById('i-cost').value) || 0;
+  const unit = document.getElementById('i-unit').value.trim() || 'pcs';
+  const thresh = parseInt(document.getElementById('i-thresh').value) || 5;
+  const deliv = document.getElementById('i-deliv').value.trim();
+  const notes = document.getElementById('i-notes').value.trim();
+  if (!name) return toast('Enter an item name', 'err');
+
+  if (editId) {
+    const item = db.items.find(i => i.id === editId);
+    if (!item) return;
+    if (db.items.find(i => i.id !== editId && i.name.toLowerCase() === name.toLowerCase() && i.category === cat))
+      return toast('Another item with this name already exists in this category', 'err');
+    item.name = name; item.category = cat; item.unit = unit;
+    item.cost = cost; item.threshold = thresh; item.notes = notes;
+    await sbSave('items', { id: item.id, name, category: cat, unit, cost, threshold: thresh, notes, balance: item.balance, total_in: item.totalIn, total_out: item.totalOut });
+    closeM('m-item'); document.getElementById('i-edit-id').value = '';
+    document.getElementById('item-modal-title').innerHTML = 'Add New <span>Item</span>';
+    document.getElementById('item-save-btn').textContent = 'Add Item';
+    toast(`✓ "${name}" updated`); refreshAll();
+  } else {
+    if (db.items.find(i => i.name.toLowerCase() === name.toLowerCase() && i.category === cat))
+      return toast('An item with this name already exists in this category', 'err');
+    const id = uid();
+    const newItem = { id, name, category: cat, balance: qty, threshold: thresh, total_in: qty, total_out: 0, unit, cost, notes };
+    await sbSave('items', newItem);
+    db.items.push({ id, name, category: cat, balance: qty, threshold: thresh, totalIn: qty, totalOut: 0, unit, cost, notes });
+    if (qty > 0) {
+      const txId = uid();
+      const tx = { id: txId, type: 'IN', item_id: id, item_name: name, category: cat, qty, date: today(), delivered_by: deliv, received_by: session.user, notes: 'Opening stock', user: session.user };
+      await sbSave('transactions', tx);
+      db.transactions.push({ id: txId, type: 'IN', itemId: id, itemName: name, category: cat, qty, date: today(), deliveredBy: deliv, receivedBy: session.user, notes: 'Opening stock', user_name: session.user });
+    }
+    closeM('m-item');
+    ['i-name','i-qty','i-deliv','i-notes','i-unit','i-cost'].forEach(f => document.getElementById(f).value = '');
+    toast(`✓ "${name}" added`); refreshAll();
+  }
+}
+
+async function doStockIn() {
+  const itemId = document.getElementById('si-item').value;
+  const qty = parseInt(document.getElementById('si-qty').value);
+  const date = document.getElementById('si-date').value;
+  const deliv = document.getElementById('si-deliv').value.trim();
+  const empId = document.getElementById('si-emp').value;
+  const notes = document.getElementById('si-notes').value.trim();
+  if (!itemId) return toast('Select an item', 'err');
+  if (!qty || qty <= 0) return toast('Enter a valid quantity', 'err');
+  if (!date) return toast('Enter a date', 'err');
+  const item = db.items.find(i => i.id === itemId); if (!item) return;
+  item.balance += qty; item.totalIn += qty;
+  const txId = uid();
+  await sbSave('transactions', { id: txId, type: 'IN', item_id: itemId, item_name: item.name, category: item.category, qty, date, delivered_by: deliv, received_by: empName(empId), notes, user_name: session.user });
+  await sbSave('items', { id: item.id, name: item.name, category: item.category, balance: item.balance, threshold: item.threshold, total_in: item.totalIn, total_out: item.totalOut, unit: item.unit, cost: item.cost, notes: item.notes || '' });
+  db.transactions.push({ id: txId, type: 'IN', itemId, itemName: item.name, category: item.category, qty, date, deliveredBy: deliv, receivedBy: empName(empId), notes, user_name: session.user });
+  closeM('m-si');
+  ['si-qty','si-deliv','si-notes'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ +${qty} ${item.unit||'pcs'} "${item.name}" stocked in`); refreshAll();
+}
+
+async function doStockOut() {
+  const itemId = document.getElementById('so-item').value;
+  const qty = parseInt(document.getElementById('so-qty').value);
+  const date = document.getElementById('so-date').value;
+  const empId = document.getElementById('so-emp').value;
+  const authId = document.getElementById('so-auth').value;
+  const notes = document.getElementById('so-purpose').value.trim();
+  if (!qty || qty <= 0) return toast('Enter a valid quantity', 'err');
+  if (date > today()) return toast('✕ Stock Out date cannot be in the future', 'err');
+  const item = db.items.find(i => i.id === itemId); if (!item) return;
+  if (qty > item.balance) return toast(`✕ Exceeds available stock (${item.balance} ${item.unit||'pcs'})`, 'err');
+  item.balance -= qty; item.totalOut += qty;
+  const txId = uid();
+  await sbSave('transactions', { id: txId, type: 'OUT', item_id: itemId, item_name: item.name, category: item.category, qty, date, issued_to: empName(empId), authorized_by: empName(authId), notes, user_name: session.user });
+  await sbSave('items', { id: item.id, name: item.name, category: item.category, balance: item.balance, threshold: item.threshold, total_in: item.totalIn, total_out: item.totalOut, unit: item.unit, cost: item.cost, notes: item.notes || '' });
+  db.transactions.push({ id: txId, type: 'OUT', itemId, itemName: item.name, category: item.category, qty, date, issuedTo: empName(empId), authorizedBy: empName(authId), notes, user_name: session.user });
+  closeM('m-so');
+  ['so-qty','so-purpose'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ −${qty} ${item.unit||'pcs'} "${item.name}" issued`); refreshAll();
+}
+
+async function doStocktake() {
+  const itemId = document.getElementById('st-item').value;
+  const counted = parseInt(document.getElementById('st-qty').value);
+  const date = document.getElementById('st-date').value;
+  const empId = document.getElementById('st-emp').value;
+  const notes = document.getElementById('st-notes').value.trim();
+  if (isNaN(counted) || counted < 0) return toast('Enter a valid counted qty', 'err');
+  const item = db.items.find(i => i.id === itemId); if (!item) return;
+
+  const variance = counted - item.balance;
+  const stId = uid();
+  const adjTxId = uid();
+  const noteStr = `Stock Take: system ${item.balance} → counted ${counted} (${variance >= 0 ? '+' : ''}${variance})${notes ? ' · ' + notes : ''}`;
+
+  await sbSave('stock_takes', { id: stId, date, item_id: itemId, item_name: item.name, system_qty: item.balance, counted, variance, done_by: empName(empId), notes, user_name: session.user });
+  await sbSave('transactions', { id: adjTxId, type: 'ADJUSTMENT', item_id: itemId, item_name: item.name, category: item.category, qty: Math.abs(variance), date, done_by: empName(empId), notes: noteStr, user_name: session.user, ref_id: stId });
+
+  db.stockTakes.push({ id: stId, date, itemId, itemName: item.name, systemQty: item.balance, counted, variance, doneBy: empName(empId), notes, user_name: session.user });
+  db.transactions.push({ id: adjTxId, type: 'ADJUSTMENT', itemId, itemName: item.name, category: item.category, qty: Math.abs(variance), date, doneBy: empName(empId), notes: noteStr, user: session.user, refId: stId });
+
+  if (variance > 0) { item.totalIn += variance; }
+  else if (variance < 0) { item.totalOut += Math.abs(variance); }
+  item.balance = counted;
+  await sbSave('items', { id: item.id, name: item.name, category: item.category, balance: item.balance, threshold: item.threshold, total_in: item.totalIn, total_out: item.totalOut, unit: item.unit, cost: item.cost, notes: item.notes || '' });
+
+  closeM('m-st');
+  ['st-qty','st-notes'].forEach(f => document.getElementById(f).value = '');
+  const varStr = variance === 0 ? 'no variance' : `variance ${variance >= 0 ? '+' : ''}${variance}`;
+  toast(`✓ Stock take applied — ${varStr}`); refreshAll();
+}
+
+async function doGRN() {
+  const date = document.getElementById('gr-date').value;
+  const vehicleSel = document.getElementById('gr-vehicle');
+  const vehicle = vehicleSel.value || vehicleSel.options[vehicleSel.selectedIndex]?.text || '';
+  const driver = document.getElementById('gr-driver').value.trim();
+  const empId = document.getElementById('gr-emp').value;
+  const notes = document.getElementById('gr-notes').value.trim();
+  const rowEls = document.querySelectorAll('#grn-rows .grn-row');
+  const items = [];
+  rowEls.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const selects = row.querySelectorAll('select');
+    const name = inputs[0].value.trim();
+    const cat = selects[0].value;
+    const ordered = parseInt(inputs[1].value) || 0;
+    const received = parseInt(inputs[2].value) || 0;
+    if (name && received > 0) items.push({ name, category:cat, ordered, received });
+  });
+  if (!date) return toast('Enter a delivery date', 'err');
+  if (!items.length) return toast('Add at least one received item with a received qty > 0', 'err');
+  const grnId = uid();
+  await sbSave('goods_received', { id: grnId, date, vehicle, driver, received_by: empName(empId), notes, items, user_name: session.user });
+  db.goodsReceived.push({ id: grnId, date, vehicle, driver, receivedBy: empName(empId), notes, items, user_name: session.user });
+  for (const it of items) {
+    let inv = db.items.find(i => i.name.toLowerCase() === it.name.toLowerCase() && i.category === it.category);
+    if (!inv) {
+      const nid = uid();
+      inv = { id: nid, name: it.name, category: it.category, balance: 0, threshold: 5, totalIn: 0, totalOut: 0, unit: 'pcs', cost: 0 };
+      db.items.push(inv);
+    }
+    inv.balance += it.received; inv.totalIn += it.received;
+    await sbSave('items', { id: inv.id, name: inv.name, category: inv.category, balance: inv.balance, threshold: inv.threshold, total_in: inv.totalIn, total_out: inv.totalOut, unit: inv.unit, cost: inv.cost, notes: inv.notes || '' });
+    const txId = uid();
+    await sbSave('transactions', { id: txId, type: 'GRN', item_id: inv.id, item_name: inv.name, category: inv.category, qty: it.received, date, delivered_by: driver||vehicle, received_by: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
+    db.transactions.push({ id: txId, type: 'GRN', itemId: inv.id, itemName: inv.name, category: inv.category, qty: it.received, date, deliveredBy: driver||vehicle, receivedBy: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
+  }
+  closeM('m-gr');
+  ['gr-vehicle','gr-driver','gr-notes'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ GRN saved — ${items.length} item(s) stocked in`); refreshAll();
+}
+
+async function doFuelIssuance() {
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const fuelType = document.getElementById('f-type').value;
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const vehicle = document.getElementById('f-vehicle').value;
+  const driverId = document.getElementById('f-driver').value;
+  const authId = document.getElementById('f-auth').value;
+  const purpose = document.getElementById('f-purpose').value.trim();
+  const odometer = document.getElementById('f-odometer').value.trim();
+  const dipBefore = document.getElementById('f-dip-before').value.trim();
+  const dipAfter = document.getElementById('f-dip-after').value.trim();
+  if (!date) return toast('Enter a date', 'err');
+  if (!amount || amount <= 0) return toast('Enter a valid amount (litres)', 'err');
+  if (!vehicle) return toast('Select a vehicle', 'err');
+  const id = uid();
+  const rec = { id, date, time, fuel_type: fuelType, amount, vehicle, driver: empName(driverId), authorized_by: empName(authId), purpose, odometer, dip_before: dipBefore, dip_after: dipAfter, user: session.user };
+  await sbSave('fuel_log', rec);
+  db.fuelLog.push({ id, date, time, fuelType, amount, vehicle, driver: empName(driverId), authorizedBy: empName(authId), purpose, odometer, dipBefore, dipAfter, user_name: session.user });
+  closeM('m-fuel');
+  ['f-amount','f-odometer','f-dip-before','f-dip-after','f-purpose'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ ${amount}L ${fuelType} logged for ${vehicle}`); renderFuel();
+}
+
+async function doFuelDelivery() {
+  const date = document.getElementById('fd-date').value;
+  const fuelType = document.getElementById('fd-type').value;
+  const qty = parseFloat(document.getElementById('fd-qty').value);
+  const supplier = document.getElementById('fd-supplier').value.trim();
+  const notes = document.getElementById('fd-notes').value.trim();
+  if (!qty || qty <= 0) return toast('Enter a valid quantity', 'err');
+  const id = uid();
+  await sbSave('fuel_deliveries', { id, date, fuel_type: fuelType, qty, supplier, notes, user_name: session.user });
+  db.fuelDeliveries.push({ id, date, fuelType, qty, supplier, notes, user_name: session.user });
+  closeM('m-fuel-del');
+  ['fd-qty','fd-supplier','fd-notes'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ Fuel delivery of ${qty}L recorded`); renderFuel();
+}
+
+async function doConcrete() {
+  const material = document.getElementById('c-material').value;
+  const date = document.getElementById('c-date').value;
+  const qIn = parseFloat(document.getElementById('c-qin').value) || 0;
+  const qOut = parseFloat(document.getElementById('c-qout').value) || 0;
+  const supplier = document.getElementById('c-supplier').value.trim();
+  const authId = document.getElementById('c-auth').value;
+  const notes = document.getElementById('c-notes').value.trim();
+  const prev = db.concreteLog.filter(r=>r.material===material).reduce((s,r)=>s+(r.qIn||0)-(r.qOut||0), 0);
+  const id = uid();
+  const balance = prev + qIn - qOut;
+  await sbSave('concrete_log', { id, date, material, q_in: qIn, q_out: qOut, balance, supplier, authorized_by: empName(authId), notes, user_name: session.user });
+  db.concreteLog.push({ id, date, material, qIn, qOut, balance, supplier, authorizedBy: empName(authId), notes, user_name: session.user });
+  closeM('m-concrete');
+  ['c-qin','c-qout','c-supplier','c-notes'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ ${material} batch recorded`); renderConcrete();
+}
+
+async function doCampsite() {
+  const supply = document.getElementById('cs-item').value;
+  const date = document.getElementById('cs-date').value;
+  const qIn = parseFloat(document.getElementById('cs-qin').value) || 0;
+  const qOut = parseFloat(document.getElementById('cs-qout').value) || 0;
+  const notes = document.getElementById('cs-notes').value.trim();
+  const prev = db.campsiteLog.filter(r=>r.supply===supply).reduce((s,r)=>s+(r.qIn||0)-(r.qOut||0), 0);
+  const id = uid();
+  const balance = prev + qIn - qOut;
+  await sbSave('campsite_log', { id, date, supply, q_in: qIn, q_out: qOut, balance, notes, user_name: session.user });
+  db.campsiteLog.push({ id, date, supply, qIn, qOut, balance, notes, user_name: session.user });
+  closeM('m-campsite');
+  ['cs-qin','cs-qout','cs-notes'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ ${supply} recorded`); renderCampsite();
+}
+
+async function doAddVehicle() {
+  const reg = document.getElementById('fl-reg').value.trim().toUpperCase();
+  const type = document.getElementById('fl-type').value;
+  const desc = document.getElementById('fl-desc').value.trim();
+  const driverId = document.getElementById('fl-driver').value;
+  const status = document.getElementById('fl-status').value;
+  if (!reg) return toast('Enter registration/ID', 'err');
+  if (db.fleet.find(f => f.reg === reg)) return toast('Vehicle with this registration already exists', 'err');
+  const id = uid();
+  await sbSave('fleet', { id, reg, type, description: desc, driver_id: driverId, status });
+  db.fleet.push({ id, reg, type, desc, driverId, status });
+  closeM('m-fleet');
+  ['fl-reg','fl-desc'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ Vehicle "${reg}" added`); renderFleet();
+}
+
+async function doAddEmployee() {
+  const name = document.getElementById('e-name').value.trim();
+  const empId = document.getElementById('e-id').value.trim();
+  const role = document.getElementById('e-role').value.trim();
+  const dept = document.getElementById('e-dept').value.trim();
+  const contact = document.getElementById('e-contact').value.trim();
+  const status = document.getElementById('e-status').value;
+  if (!name) return toast('Enter employee name', 'err');
+  if (db.employees.find(e => e.name.toLowerCase() === name.toLowerCase())) return toast('Employee with this name already exists', 'err');
+  const id = uid();
+  await sbSave('employees', { id, name, emp_id: empId, role, dept, contact, status });
+  db.employees.push({ id, name, empId, role, dept, contact, status });
+  closeM('m-emp');
+  ['e-name','e-id','e-role','e-dept','e-contact'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ "${name}" added`); renderEmployees();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function toast(msg, type = 'ok') {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${type==='ok'?'✓':type==='err'?'✕':'ℹ'}</span> ${msg}`;
+  wrap.appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; setTimeout(()=>el.remove(),250); }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXCEL EXPORT
+// ═══════════════════════════════════════════════════════════
+function exportToExcel() {
+  const wb = XLSX.utils.book_new();
+  const ws = (data, cols) => { const s = XLSX.utils.aoa_to_sheet(data); s['!cols'] = cols.map(w=>({wch:w})); return s; };
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Item','Category','Unit','Cost(USD)','Total In','Total Out','Balance','Status','Threshold','Notes'],
+     ...db.items.map((item,i)=>[i+1,item.name,item.category,item.unit||'pcs',item.cost||0,item.totalIn,item.totalOut,item.balance,getStat(item.balance,item.threshold),item.threshold,item.notes||''])],
+    [4,36,22,8,10,10,10,10,12,10,28]), 'Stock Balance');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Item','Category','Qty','Delivered By','Received By','Notes','Logged By'],
+     ...db.transactions.filter(t=>t.type==='IN'||t.type==='GRN').map((tx,i)=>[i+1,tx.date,tx.itemName,tx.category,tx.qty,tx.deliveredBy||'',tx.receivedBy||'',tx.notes||'',tx.user||''])],
+    [4,12,36,22,8,22,22,28,16]), 'Stock In');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Item','Category','Qty','Issued To','Authorized By','Purpose','Logged By'],
+     ...db.transactions.filter(t=>t.type==='OUT').map((tx,i)=>[i+1,tx.date,tx.itemName,tx.category,tx.qty,tx.issuedTo||'',tx.authorizedBy||'',tx.notes||'',tx.user||''])],
+    [4,12,36,22,8,22,22,28,16]), 'Stock Out');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Vehicle','Driver','Items Count','Received By','Notes'],
+     ...db.goodsReceived.map((r,i)=>[i+1,r.date,r.vehicle||'',r.driver||'',r.items.length,r.receivedBy||'',r.notes||''])],
+    [4,12,16,20,10,22,28]), 'GRNs');
+  const grnItems = [['GRN Date','Vehicle','Item','Category','Ordered','Received']];
+  db.goodsReceived.forEach(g=>g.items.forEach(it=>grnItems.push([g.date,g.vehicle||'',it.name,it.category||'',it.ordered||'',it.received])));
+  XLSX.utils.book_append_sheet(wb, ws(grnItems,[12,16,36,22,10,10]),'GRN Items Detail');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Time','Type','Amount(L)','Vehicle','Driver','Authorized By','Purpose','Odometer(km)','Dip Before(L)','Dip After(L)'],
+     ...db.fuelLog.map((r,i)=>[i+1,r.date,r.time||'',r.fuelType,r.amount,r.vehicle||'',r.driver||'',r.authorizedBy||'',r.purpose||'',r.odometer||'',r.dipBefore||'',r.dipAfter||''])],
+    [4,12,10,10,12,18,20,20,20,12,12,12]), 'Fuel Issuance');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Type','Qty(L)','Supplier','Notes'],
+     ...db.fuelDeliveries.map((r,i)=>[i+1,r.date,r.fuelType,r.qty,r.supplier||'',r.notes||''])],
+    [4,12,12,12,22,28]), 'Fuel Deliveries');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Material','Qty In','Qty Used','Balance','Supplier','Notes'],
+     ...db.concreteLog.map((r,i)=>[i+1,r.date,r.material,r.qIn||0,r.qOut||0,r.balance||0,r.supplier||'',r.notes||''])],
+    [4,12,14,10,10,10,22,28]), 'Concrete & Bulk');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Supply','Qty In','Qty Out','Balance','Notes'],
+     ...db.campsiteLog.map((r,i)=>[i+1,r.date,r.supply,r.qIn||0,r.qOut||0,r.balance||0,r.notes||''])],
+    [4,12,22,10,10,10,28]), 'Campsite');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Date','Item','System Qty','Counted Qty','Variance','Done By','Notes','Has Adj Tx'],
+     ...db.stockTakes.map((r,i)=>{
+       const adj=db.transactions.find(t=>t.type==='ADJUSTMENT'&&t.refId===r.id);
+       return [i+1,r.date,r.itemName,r.systemQty,r.counted,r.counted-r.systemQty,r.doneBy||'',r.notes||'',adj?'Yes':'No'];
+     })],
+    [4,12,36,12,12,12,22,28,10]), 'Stock Takes');
+  const statOrder={OUT:0,CRITICAL:1,LOW:2,GOOD:3};
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Item','Category','Unit','Balance','Status','Threshold'],
+     ...db.items.filter(i=>['LOW','CRITICAL','OUT'].includes(getStat(i.balance,i.threshold))).sort((a,b)=>statOrder[getStat(a.balance,a.threshold)]-statOrder[getStat(b.balance,b.threshold)]).map((item,i)=>[i+1,item.name,item.category,item.unit||'pcs',item.balance,getStat(item.balance,item.threshold),item.threshold])],
+    [4,36,22,8,10,12,10]), 'Low Stock Alerts');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Name','Employee ID','Role','Department','Phone','Status'],
+     ...db.employees.map((e,i)=>[i+1,e.name,e.empId||'',e.role||'',e.dept||'',e.contact||'',e.status||'Active'])],
+    [4,28,12,22,18,18,10]), 'Employees');
+  XLSX.utils.book_append_sheet(wb, ws(
+    [['#','Registration','Type','Description','Assigned Driver','Status'],
+     ...db.fleet.map((f,i)=>{const drv=db.employees.find(e=>e.id===f.driverId); return [i+1,f.reg,f.type,f.desc||'',drv?drv.name:'—',f.status||'Active'];})],
+    [4,16,28,28,24,12]), 'Fleet Vehicles');
+  XLSX.writeFile(wb, `BravuraStores_${today()}.xlsx`);
+  toast(`✓ Exported: BravuraStores_${today()}.xlsx`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// DEMO DATA
+// ═══════════════════════════════════════════════════════════
+function seedDemo() { /* disabled — data lives in Supabase */ }
+
+
+// ═══════════════════════════════════════════════════════════
+// SETTINGS — PASSWORD, COMPANY, CLEAR DATA
+// ═══════════════════════════════════════════════════════════
+async function saveCompanyName() {
+  const val = document.getElementById('setting-company').value.trim();
+  db.settings = db.settings || {};
+  db.settings.companyName = val;
+  db.settings.company_name = val;
+  await SB.from('settings').upsert({ id: 1, company_name: val });
+  applyCompanyName();
+  toast(val ? `✓ Company name saved: ${val}` : '✓ Company name cleared', 'ok');
+}
+function previewCompanyName(val) {
+  const el = document.getElementById('topbar-company');
+  if (el) { el.textContent = val || ''; el.style.display = val ? 'inline-flex' : 'none'; }
+}
+function applyCompanyName() {
+  const name = db.settings?.companyName || db.settings?.company_name || '';
+  const el = document.getElementById('topbar-company');
+  if (el) { el.textContent = name; el.style.display = name ? 'inline-flex' : 'none'; }
+  const inp = document.getElementById('setting-company');
+  if (inp && !inp.value) inp.value = name;
+}
+
+async function changePassword() {
+  const errEl = document.getElementById('pw-error');
+  const showPwErr = msg => { errEl.textContent = msg; errEl.classList.add('show'); };
+  // Password is hardcoded — changes require editing the file directly
+  showPwErr('Password management is handled by the system administrator.');
+  return;
+  // (stub kept for compatibility)
+  const nw = '';
+  db.settings = db.settings || {};
+  ['pw-current','pw-new','pw-confirm'].forEach(id => document.getElementById(id).value = '');
+  toast('✓ Password changed successfully', 'ok');
+}
+
+function clearAllData() {
+  const inp = document.getElementById('reset-confirm-input');
+  if (!inp || inp.value.toUpperCase() !== 'RESET') {
+    toast('Type RESET in the field to confirm', 'err');
+    if (inp) inp.style.borderColor = 'var(--red)';
+    return;
+  }
+  confirmAction(
+    'This will permanently delete ALL data including inventory, transactions, employees, fleet and fuel records.',
+    'This action CANNOT be undone.',
+    'Delete Everything',
+    async () => {
+      // Delete all records from all Supabase tables
+      const tables = ['transactions','items','fuel_log','fuel_deliveries','concrete_log','campsite_log','goods_received','stock_takes','employees','fleet'];
+      for (const t of tables) await SB.from(t).delete().neq('id','__none__');
+      // Reset categories to defaults
+      await SB.from('categories').delete().neq('id',0);
+      await SB.from('categories').insert([
+        {name:'Electrical Equipment',icon:'⚡'},{name:'Mechanical / Maintenance',icon:'⚙️'},
+        {name:'PPE / Safety',icon:'🦺'},{name:'Construction Equipment',icon:'🏗️'},{name:'General',icon:'📦'}
+      ]);
+      sessionStorage.removeItem('bs_session');
+      toast('All data cleared. Reloading...', 'info');
+      setTimeout(() => location.reload(), 1500);
+    },
+    '⚠️'
+  );
+  inp.value = '';
+  inp.style.borderColor = '';
+}
+
+// ─── PRINT FUNCTIONS ─────────────────────────────────────────────────────
+let currentGRNId = null;
+function printGRN() {
+  const grn = db.goodsReceived.find(g => g.id === currentGRNId);
+  if (!grn) return;
+  const company = db.settings?.companyName || 'Bravura Stores';
+  const grnIndex = db.goodsReceived.indexOf(grn) + 1;
+  const printContent = `
+    <div class="print-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <h1 style="font-size:22px;font-weight:bold;margin-bottom:4px">${company}</h1>
+          <div class="print-meta">GOODS RECEIVED NOTE (GRN)</div>
+        </div>
+        <div style="text-align:right;font-size:12px">
+          <div><strong>GRN #:</strong> GRN-${String(grnIndex).padStart(4,'0')}</div>
+          <div><strong>Date:</strong> ${fmtDate(grn.date)}</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;font-size:12px">
+      <div><strong>Vehicle Reg:</strong> ${grn.vehicle||'—'}</div>
+      <div><strong>Driver:</strong> ${grn.driver||'—'}</div>
+      <div><strong>Received By:</strong> ${grn.receivedBy||'—'}</div>
+      <div><strong>Notes:</strong> ${grn.notes||'—'}</div>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Item / Description</th><th>Category</th><th>Qty Ordered</th><th>Qty Received</th><th>Outstanding</th></tr></thead>
+      <tbody>${grn.items.map((it,i)=>`<tr><td>${i+1}</td><td>${it.name}</td><td>${it.category||'—'}</td><td>${it.ordered||'—'}</td><td><strong>${it.received}</strong></td><td>${Math.max(0,(it.ordered||0)-it.received)}</td></tr>`).join('')}</tbody>
+    </table>
+    <div class="print-sig">
+      <div class="print-sig-line">Received By (Signature)</div>
+      <div class="print-sig-line">Driver / Supplier Signature</div>
+      <div class="print-sig-line">Authorized By</div>
+    </div>
+    <div style="margin-top:24px;font-size:10px;color:#666;text-align:center">
+      Generated by Bravura Stores v4.0 · ${new Date().toLocaleString()} · Designed by Clement Mpala
+    </div>`;
+
+  const w = window.open('', '_blank', 'width=800,height=600');
+  w.document.write(`<!DOCTYPE html><html><head><title>GRN ${String(grnIndex).padStart(4,'0')}</title>
+    <style>body{font-family:Arial,sans-serif;padding:24px;color:#000;max-width:800px;margin:0 auto}
+    table{width:100%;border-collapse:collapse;font-size:11px;margin:16px 0}
+    th{background:#f0f0f0;border:1px solid #ccc;padding:6px 8px;text-align:left;font-size:10px}
+    td{border:1px solid #ccc;padding:6px 8px}
+    .print-header{border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:16px}
+    .print-meta{font-size:11px;color:#444;margin-top:2px;letter-spacing:2px}
+    .print-sig{display:flex;gap:60px;margin-top:40px}
+    .print-sig-line{flex:1;border-top:1px solid #000;padding-top:4px;font-size:11px}
+    @media print{@page{margin:15mm}}</style>
+    </head><body>${printContent}<script>setTimeout(()=>{window.print();window.close();},400);<\/script></body></html>`);
+  w.document.close();
+}
+
+function printFuelLog() {
+  const company = db.settings?.companyName || 'Bravura Stores';
+  const fuelFrom = document.getElementById('fuel-from')?.value || '';
+  const fuelTo   = document.getElementById('fuel-to')?.value   || '';
+  let rows = [...db.fuelLog];
+  if (fuelFrom) rows = rows.filter(r => r.date >= fuelFrom);
+  if (fuelTo)   rows = rows.filter(r => r.date <= fuelTo);
+  const totalL = rows.reduce((s,r)=>s+parseFloat(r.amount||0),0);
+
+  const printContent = `
+    <div class="print-header">
+      <div style="display:flex;justify-content:space-between">
+        <div><h1>${company}</h1><div class="print-meta">FUEL ISSUANCE REPORT</div></div>
+        <div style="font-size:12px;text-align:right">
+          ${fuelFrom||fuelTo?`<div>Period: ${fuelFrom?fmtDate(fuelFrom):''} — ${fuelTo?fmtDate(fuelTo):''}</div>`:'<div>All Records</div>'}
+          <div><strong>Total: ${totalL.toLocaleString()} L</strong> (${rows.length} transactions)</div>
+        </div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Date</th><th>Time</th><th>Type</th><th>Amount(L)</th><th>Vehicle</th><th>Driver</th><th>Authorized By</th><th>Purpose</th><th>Odometer</th><th>Dip Before/After</th></tr></thead>
+      <tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${fmtDate(r.date)}</td><td>${r.time||'—'}</td><td>${r.fuelType}</td><td><strong>${parseFloat(r.amount).toLocaleString()}</strong></td><td>${r.vehicle||'—'}</td><td>${r.driver||'—'}</td><td>${r.authorizedBy||'—'}</td><td>${r.purpose||'—'}</td><td>${r.odometer||'—'}</td><td>${r.dipBefore||'—'} / ${r.dipAfter||'—'}</td></tr>`).join('')}
+      <tr style="font-weight:bold;background:#f0f0f0"><td colspan="4">TOTAL</td><td>${totalL.toLocaleString()} L</td><td colspan="6"></td></tr></tbody>
+    </table>
+    <div style="margin-top:20px;font-size:10px;color:#666;text-align:center">
+      Generated by Bravura Stores v4.0 · ${new Date().toLocaleString()} · Designed by Clement Mpala
+    </div>`;
+
+  const w = window.open('', '_blank', 'width=1000,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><title>Fuel Report</title>
+    <style>body{font-family:Arial,sans-serif;padding:20px;color:#000}
+    table{width:100%;border-collapse:collapse;font-size:10px;margin:12px 0}
+    th{background:#f0f0f0;border:1px solid #ccc;padding:5px 7px;text-align:left;font-size:9px}
+    td{border:1px solid #ccc;padding:5px 7px}
+    .print-header{border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:14px}
+    .print-meta{font-size:11px;color:#444;letter-spacing:2px}
+    @media print{@page{size:landscape;margin:10mm}}</style>
+    </head><body>${printContent}<script>setTimeout(()=>{window.print();window.close();},400);<\/script></body></html>`);
+  w.document.close();
+}
+
+// ─── FORM VALIDATION HELPERS ─────────────────────────────────────────────
+function showErr(inputId, msg) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.style.borderColor = 'var(--red)';
+  let errEl = inp.nextElementSibling;
+  if (!errEl || !errEl.classList.contains('field-error')) {
+    errEl = document.createElement('div');
+    errEl.className = 'field-error';
+    inp.parentNode.insertBefore(errEl, inp.nextSibling);
+  }
+  errEl.textContent = msg;
+  errEl.classList.add('show');
+}
+function clearErr(inputId) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.style.borderColor = '';
+  const errEl = inp.nextElementSibling;
+  if (errEl && errEl.classList.contains('field-error')) errEl.classList.remove('show');
+}
+function clearAllErrs(...ids) { ids.forEach(clearErr); }
+
+// Storage is now managed via Supabase — saveDB is a no-op
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+// Restore session if exists — load from Supabase then start
+const savedSession = sessionStorage.getItem('bs_session');
+if (savedSession) {
+  try {
+    session = JSON.parse(savedSession);
+    loadDB().then(() => startApp());
+  } catch(e) {
+    console.warn('Session restore failed:', e);
+    sessionStorage.removeItem('bs_session');
+  }
+}
+// Wire up item modal — populate category on open
+document.getElementById('m-item').addEventListener('click', e => {
+  if (e.target.closest('.modal') && !document.getElementById('i-cat').options.length) {
+    document.getElementById('i-cat').innerHTML = catOptions();
+  }
+});
+document.getElementById('m-item').querySelector('.modal').addEventListener('click', () => {
+  if (!document.getElementById('i-edit-id').value) {
+    document.getElementById('i-cat').innerHTML = catOptions();
+  }
+});
+</script>
+</body>
+</html>
