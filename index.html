@@ -356,27 +356,68 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="logo-sub">Inventory &amp; Ops Manager</div>
   </div>
   <nav class="nav">
-    <div class="nav-sec">Overview</div>
-    <button class="nav-btn active" onclick="showPage('dashboard',this)"><span class="ic">&#128202;</span><span class="nav-label">Dashboard</span><span class="tt">Dashboard</span></button>
-    <div class="nav-sec">Inventory</div>
-    <button class="nav-btn" onclick="showPage('balance',this)"><span class="ic">&#9878;&#65039;</span><span class="nav-label">Stock Balance</span><span class="tt">Stock Balance</span></button>
-    <button class="nav-btn" onclick="showPage('stockin',this)"><span class="ic">&#128229;</span><span class="nav-label">Stock In</span><span class="tt">Stock In</span></button>
-    <button class="nav-btn" onclick="showPage('stockout',this)"><span class="ic">&#128228;</span><span class="nav-label">Stock Out</span><span class="tt">Stock Out</span></button>
-    <button class="nav-btn" onclick="showPage('transactions',this)"><span class="ic">&#128260;</span><span class="nav-label">Transactions</span><span class="tt">Transactions</span></button>
-    <button class="nav-btn" onclick="showPage('stocktake',this)"><span class="ic">&#128203;</span><span class="nav-label">Stock Taking</span><span class="tt">Stock Taking</span></button>
-    <div class="nav-sec">Logistics</div>
-    <button class="nav-btn" onclick="showPage('goodsreceived',this)"><span class="ic">&#128230;</span><span class="nav-label">Goods Received</span><span class="tt">Goods Received</span></button>
-    <button class="nav-btn" onclick="showPage('fuel',this)"><span class="ic">&#9981;</span><span class="nav-label">Fuel Management</span><span class="tt">Fuel Management</span></button>
-    <button class="nav-btn" onclick="showPage('concrete',this)"><span class="ic">&#127959;&#65039;</span><span class="nav-label">Batch Plant</span><span class="tt">Batch Plant</span></button>
-    <button class="nav-btn" onclick="showPage('campsite',this)"><span class="ic">&#127957;&#65039;</span><span class="nav-label">Campsite</span><span class="tt">Campsite</span></button>
-    <div class="nav-sec">Management</div>
-    <button class="nav-btn" onclick="showPage('fleet',this)"><span class="ic">&#128668;</span><span class="nav-label">Fleet</span><span class="tt">Fleet</span></button>
-    <button class="nav-btn" onclick="showPage('employees',this)"><span class="ic">&#128104;&#8205;&#128188;</span><span class="nav-label">Employees</span><span class="tt">Employees</span></button>
-    <button class="nav-btn" onclick="showPage('categories',this)"><span class="ic">&#128193;&#65039;</span><span class="nav-label">Categories</span><span class="tt">Categories</span></button>
-    <div class="nav-sec">Reports &amp; System</div>
-    <button class="nav-btn" onclick="showPage('alerts',this)"><span class="ic">&#128680;</span><span class="nav-label">Low Stock</span><span class="nb" id="alert-badge">0</span><span class="tt">Low Stock Alerts</span></button>
-    <button class="nav-btn" onclick="showPage('reports',this)"><span class="ic">&#128200;</span><span class="nav-label">Reports</span><span class="tt">Reports</span></button>
-    <button class="nav-btn" onclick="showPage('settings',this)"><span class="ic">&#9881;&#65039;</span><span class="nav-label">Settings</span><span class="tt">Settings</span></button>
+    <!-- DASHBOARD -->
+    <button class="nav-btn active" id="nav-dashboard" onclick="showPage('dashboard',this)"><span class="ic">📊</span><span class="nav-label">Dashboard</span></button>
+
+    <!-- INVENTORY -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('inventory')"><span class="ic">📦</span><span class="nav-label">Inventory</span><span class="nav-arrow" id="arr-inventory">▼</span></button>
+      <div class="nav-group-body" id="grp-inventory">
+        <button class="nav-btn nav-sub" onclick="showPage('balance',this)"><span class="ic">⚖️</span><span class="nav-label">Stock Balance</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('stockin',this)"><span class="ic">📥</span><span class="nav-label">Stock In</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('stockout',this)"><span class="ic">📤</span><span class="nav-label">Stock Out</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('transactions',this)"><span class="ic">🔄</span><span class="nav-label">Transactions</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('stocktake',this)"><span class="ic">📋</span><span class="nav-label">Stock Taking</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('alerts',this)"><span class="ic">🚨</span><span class="nav-label">Low Stock</span><span class="nb" id="alert-badge">0</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('categories',this)"><span class="ic">🗂️</span><span class="nav-label">Categories</span></button>
+      </div>
+    </div>
+
+    <!-- LOGISTICS -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('logistics')"><span class="ic">🚛</span><span class="nav-label">Logistics</span><span class="nav-arrow" id="arr-logistics">▼</span></button>
+      <div class="nav-group-body" id="grp-logistics">
+        <button class="nav-btn nav-sub" onclick="showPage('goodsreceived',this)"><span class="ic">📦</span><span class="nav-label">Goods Received</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('concrete',this)"><span class="ic">🏗️</span><span class="nav-label">Batch Plant</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('campsite',this)"><span class="ic">🏕️</span><span class="nav-label">Campsite</span></button>
+      </div>
+    </div>
+
+    <!-- FUEL -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('fuel')"><span class="ic">⛽</span><span class="nav-label">Fuel Management</span><span class="nav-arrow" id="arr-fuel">▼</span></button>
+      <div class="nav-group-body" id="grp-fuel">
+        <button class="nav-btn nav-sub" onclick="showPage('fuel',this)"><span class="ic">📏</span><span class="nav-label">Fuel & Dipstick</span></button>
+      </div>
+    </div>
+
+    <!-- FLEET -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('fleet')"><span class="ic">🚜</span><span class="nav-label">Fleet Management</span><span class="nav-arrow" id="arr-fleet">▼</span></button>
+      <div class="nav-group-body" id="grp-fleet">
+        <button class="nav-btn nav-sub" onclick="showPage('fleet',this)"><span class="ic">🚗</span><span class="nav-label">Vehicles</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('generators',this)"><span class="ic">⚡</span><span class="nav-label">Generators</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('earthmovers',this)"><span class="ic">🏋️</span><span class="nav-label">Heavy Plant</span></button>
+      </div>
+    </div>
+
+    <!-- HUMAN RESOURCES -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('hr')"><span class="ic">👥</span><span class="nav-label">Human Resources</span><span class="nav-arrow" id="arr-hr">▼</span></button>
+      <div class="nav-group-body" id="grp-hr">
+        <button class="nav-btn nav-sub" onclick="showPage('employees',this)"><span class="ic">👨‍💼</span><span class="nav-label">Employees</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('timesheets',this)"><span class="ic">🕐</span><span class="nav-label">Timesheets</span></button>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('reports')"><span class="ic">📈</span><span class="nav-label">Reports</span><span class="nav-arrow" id="arr-reports">▼</span></button>
+      <div class="nav-group-body" id="grp-reports">
+        <button class="nav-btn nav-sub" onclick="showPage('reports',this)"><span class="ic">📊</span><span class="nav-label">Analytics</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('settings',this)"><span class="ic">⚙️</span><span class="nav-label">Settings</span></button>
+      </div>
+    </div>
   </nav>
   <div class="sidebar-user" id="sidebar-user"></div>
   <div class="sidebar-footer">Designed by Clement Mpala · Bravura Kamativi<br>Junior Electrical Engineer<br>v4.0 &middot; Offline Capable</div>
@@ -789,6 +830,58 @@ tr:hover td{background:rgba(255,255,255,.015);}
 </main>
 </div><!-- /app -->
 
+    <!-- GENERATORS -->
+    <div class="page" id="page-generators">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div id="gen-status-kpis" class="kpi-grid" style="flex:1;min-width:0;margin-bottom:0"></div>
+        <button class="btn btn-gold" onclick="reqLogin(openGenModal)">＋ Add Generator</button>
+      </div>
+      <div class="emp-grid" id="gen-grid"></div>
+      <div class="tcard" style="margin-top:14px">
+        <div class="tcard-head">
+          <span class="tcard-title">⚡ Run Log</span>
+          <button class="btn btn-teal btn-sm" onclick="reqLogin(openGenRunModal)">+ Log Run</button>
+        </div>
+        <div class="table-scroll"><table><thead><tr><th>Date</th><th>Generator</th><th>Start</th><th>End</th><th>Hours</th><th>Fuel (L)</th><th>Notes</th><th></th></tr></thead><tbody id="gen-run-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- HEAVY PLANT / EARTH MOVERS -->
+    <div class="page" id="page-earthmovers">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-gold" onclick="reqLogin(openEarthMoverModal)">＋ Add Equipment</button>
+      </div>
+      <div class="emp-grid" id="earthmover-grid"></div>
+      <div class="tcard" style="margin-top:14px">
+        <div class="tcard-head"><span class="tcard-title">🏋️ Heavy Plant Fuel Consumption</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Equipment</th><th>Type</th><th>Total Fuel (L)</th><th>Last Fuelled</th></tr></thead><tbody id="earthmover-fuel-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- TIMESHEETS -->
+    <div class="page" id="page-timesheets">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div class="ftabs">
+          <button class="ftab active" onclick="setTSView('daily',this)">Daily</button>
+          <button class="ftab" onclick="setTSView('weekly',this)">Weekly</button>
+          <button class="ftab" onclick="setTSView('monthly',this)">Monthly</button>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="reqLogin(openTSModal)" style="margin-left:auto">＋ Log Hours</button>
+        <button class="btn btn-outline btn-sm" onclick="exportTimesheets()">⬇ Excel</button>
+      </div>
+      <div class="kpi-grid" id="ts-kpis" style="margin-bottom:14px"></div>
+      <div class="tcard">
+        <div class="tcard-head">
+          <span class="tcard-title">🕐 Timesheet Log</span>
+          <div class="date-row" style="margin:0">
+            <label>From</label><input type="date" id="ts-from" onchange="renderTimesheets()">
+            <label>To</label><input type="date" id="ts-to" onchange="renderTimesheets()">
+          </div>
+        </div>
+        <div class="table-scroll"><table><thead><tr><th>Date</th><th>Employee</th><th>Site</th><th>Start</th><th>End</th><th>Hrs</th><th>OT</th><th>Type</th><th>Task</th><th>Status</th><th></th></tr></thead><tbody id="ts-tbody"></tbody></table></div>
+      </div>
+    </div>
+
 <!-- ═══════════ MODALS ═══════════ -->
 
 <!-- CONFIRM DELETE -->
@@ -841,7 +934,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="fr">
     <div class="fg"><label>Delivered By</label><input type="text" id="si-deliv" placeholder="Supplier / person"></div>
-    <div class="fg"><label>Received By (Employee)</label><select id="si-emp"></select></div>
+    <div class="fg"><label>Received By (Employee)</label><div id="si-emp-ss"></div></div>
   </div>
   <div class="fg"><label>Notes</label><input type="text" id="si-notes" placeholder="Optional notes"></div>
   <div class="mactions">
@@ -860,8 +953,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Date</label><input type="date" id="so-date"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Issued To (Employee)</label><select id="so-emp"></select></div>
-    <div class="fg"><label>Authorized By</label><select id="so-auth"></select></div>
+    <div class="fg"><label>Issued To (Employee)</label><div id="so-emp-ss"></div></div>
+    <div class="fg"><label>Authorized By</label><div id="so-auth-ss"></div></div>
   </div>
   <div class="fg"><label>Purpose / Notes</label><input type="text" id="so-purpose" placeholder="e.g. Site Use, Maintenance"></div>
   <div class="mactions">
@@ -885,7 +978,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Counted Quantity</label><input type="number" id="st-qty" placeholder="0" min="0"></div>
     <div class="fg"><label>Date</label><input type="date" id="st-date"></div>
   </div>
-  <div class="fg"><label>Counted By</label><select id="st-emp"></select></div>
+  <div class="fg"><label>Counted By</label><div id="st-emp-ss"></div></div>
   <div class="fg"><label>Notes</label><input type="text" id="st-notes" placeholder="Optional"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-st')">Cancel</button>
@@ -902,7 +995,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="fr">
     <div class="fg"><label>Driver Name</label><input type="text" id="gr-driver" placeholder="Driver name (if not in fleet)"></div>
-    <div class="fg"><label>Received By (Employee)</label><select id="gr-emp"></select></div>
+    <div class="fg"><label>Received By (Employee)</label><div id="gr-emp-ss"></div></div>
   </div>
   <div class="fg"><label>Notes / Remarks</label><input type="text" id="gr-notes" placeholder="Optional"></div>
   <div class="info-box" style="margin-bottom:12px;font-size:10px">✓ Items received will automatically update Stock In</div>
@@ -937,9 +1030,19 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Fuel Type</label><select id="f-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
     <div class="fg"><label>Amount (Litres)</label><input type="number" id="f-amount" placeholder="0" min="1"></div>
   </div>
+  <div class="fg" style="margin-bottom:8px">
+    <label>Equipment Type</label>
+    <div class="ftabs" id="f-equip-tabs" style="margin-top:4px">
+      <button class="ftab active" onclick="setFuelEquipType('vehicle',this)">🚗 Vehicle</button>
+      <button class="ftab" onclick="setFuelEquipType('generator',this)">⚡ Generator</button>
+      <button class="ftab" onclick="setFuelEquipType('earthmover',this)">🏋️ Heavy Plant</button>
+    </div>
+  </div>
   <div class="fr">
-    <div class="fg"><label>Vehicle (Reg)</label><select id="f-vehicle"></select></div>
-    <div class="fg"><label>Driver / Operator</label><select id="f-driver"></select></div>
+    <div class="fg" id="f-vehicle-wrap"><label>Vehicle (Reg)</label><select id="f-vehicle"></select></div>
+    <div class="fg" id="f-gen-wrap" style="display:none"><label>Generator</label><select id="f-gen-select"></select></div>
+    <div class="fg" id="f-em-wrap" style="display:none"><label>Heavy Plant</label><select id="f-em-select"></select></div>
+    <div class="fg"><label>Driver / Operator</label><div id="f-driver-wrap"></div></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Authorized By</label><select id="f-auth"></select></div>
@@ -983,7 +1086,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">📏 Daily Dipstick <span>Record</span></div>
   <div class="fr">
     <div class="fg"><label>Date</label><input type="date" id="dip-date"></div>
-    <div class="fg"><label>Recorded By</label><select id="dip-emp"></select></div>
+    <div class="fg"><label>Recorded By</label><div id="dip-emp-ss"></div></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Dipstick — Start of Day (m)</label><input type="number" id="dip-start" placeholder="e.g. 1.20" step="0.01" oninput="calcDipstickLive()"></div>
@@ -1045,7 +1148,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="fr">
     <div class="fg"><label>Supplier / Source</label><input type="text" id="c-supplier" placeholder="Optional"></div>
-    <div class="fg"><label>Authorized By</label><select id="c-auth"></select></div>
+    <div class="fg"><label>Authorized By</label><div id="c-auth-ss"></div></div>
   </div>
   <div class="fg"><label>Notes</label><input type="text" id="c-notes" placeholder="Batch details, mix ratio, etc."></div>
   <div class="mactions">
@@ -1087,7 +1190,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="fg"><label>Description / Model</label><input type="text" id="fl-desc" placeholder="e.g. D8R Bulldozer"></div>
   <div class="fr">
-    <div class="fg"><label>Assigned Driver (Employee)</label><select id="fl-driver"></select></div>
+    <div class="fg"><label>Assigned Driver (Employee)</label><div id="fl-driver-ss"></div></div>
     <div class="fg"><label>Status</label><select id="fl-status"><option value="Active">Active</option><option value="Grounded">Grounded</option><option value="Maintenance">Under Maintenance</option></select></div>
   </div>
   <div class="mactions">
@@ -1115,6 +1218,101 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-emp')">Cancel</button>
     <button class="btn btn-gold" id="emp-save-btn" onclick="doAddEmployee()">Add Employee</button>
+  </div>
+</div></div>
+
+<!-- GENERATOR -->
+<div class="overlay" id="m-gen"><div class="modal modal-lg">
+  <input type="hidden" id="gen-edit-id">
+  <div class="mtitle" id="gen-modal-title">⚡ Add <span>Generator</span></div>
+  <div class="fr">
+    <div class="fg"><label>Generator ID</label><input type="text" id="gen-code" placeholder="e.g. GEN-001"></div>
+    <div class="fg"><label>Name / Description</label><input type="text" id="gen-name" placeholder="e.g. CAT 3516 - Workshop"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Location</label><input type="text" id="gen-location" placeholder="e.g. Workshop, Admin Block"></div>
+    <div class="fg"><label>Capacity (kVA)</label><input type="number" id="gen-capacity" placeholder="e.g. 500" min="0"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Status</label><select id="gen-status"><option value="Running">Running</option><option value="Stopped">Stopped</option><option value="Maintenance">Under Maintenance</option><option value="Offline">Offline</option></select></div>
+    <div class="fg"><label>Last Service Date</label><input type="date" id="gen-service-date"></div>
+  </div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-gen')">Cancel</button>
+    <button class="btn btn-gold" id="gen-save-btn" onclick="doSaveGenerator()">Add Generator</button>
+  </div>
+</div></div>
+
+<!-- GENERATOR RUN LOG -->
+<div class="overlay" id="m-gen-run"><div class="modal">
+  <div class="mtitle">⚡ Log Generator <span>Run</span></div>
+  <div class="fr">
+    <div class="fg"><label>Generator</label><select id="gr2-gen"></select></div>
+    <div class="fg"><label>Date</label><input type="date" id="gr2-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Start Time</label><input type="time" id="gr2-start"></div>
+    <div class="fg"><label>End Time</label><input type="time" id="gr2-end"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Engine Hours (total on meter)</label><input type="number" id="gr2-hours" placeholder="0" step="0.1" min="0"></div>
+    <div class="fg"><label>Fuel Used (L)</label><input type="number" id="gr2-fuel" placeholder="0" step="0.1" min="0"></div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="gr2-notes" placeholder="Optional"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-gen-run')">Cancel</button>
+    <button class="btn btn-teal" onclick="doGenRun()">Save Run Log</button>
+  </div>
+</div></div>
+
+<!-- EARTH MOVER -->
+<div class="overlay" id="m-earthmover"><div class="modal modal-lg">
+  <input type="hidden" id="em-edit-id">
+  <div class="mtitle" id="em-modal-title">🏋️ Add <span>Heavy Plant</span></div>
+  <div class="fr">
+    <div class="fg"><label>Equipment ID / Reg</label><input type="text" id="em-reg" placeholder="e.g. ADT-001"></div>
+    <div class="fg"><label>Equipment Type</label>
+      <select id="em-type"><option>Articulated Dump Truck</option><option>Excavator</option><option>Bulldozer</option><option>Grader</option><option>Loader</option><option>Compactor</option><option>Scraper</option><option>Crane</option><option>Other</option></select>
+    </div>
+  </div>
+  <div class="fg"><label>Description / Model</label><input type="text" id="em-desc" placeholder="e.g. Bell B40D ADT"></div>
+  <div class="fr">
+    <div class="fg"><label>Assigned Operator</label><div id="em-operator-wrap"></div></div>
+    <div class="fg"><label>Status</label><select id="em-status"><option value="Active">Active</option><option value="Grounded">Grounded</option><option value="Maintenance">Under Maintenance</option></select></div>
+  </div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-earthmover')">Cancel</button>
+    <button class="btn btn-gold" id="em-save-btn" onclick="doSaveEarthMover()">Add Equipment</button>
+  </div>
+</div></div>
+
+<!-- TIMESHEET -->
+<div class="overlay" id="m-ts"><div class="modal modal-lg">
+  <input type="hidden" id="ts-edit-id">
+  <div class="mtitle">🕐 Log <span>Hours</span></div>
+  <div class="fr">
+    <div class="fg"><label>Employee</label><div id="ts-emp-wrap"></div></div>
+    <div class="fg"><label>Date</label><input type="date" id="ts-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Site / Project</label><select id="ts-site"><option>Main Site</option><option>Batch Plant</option><option>Workshop</option><option>Admin Block</option><option>Campsite</option><option>Other</option></select></div>
+    <div class="fg"><label>Work Type</label><select id="ts-type"><option value="Normal">Normal</option><option value="Overtime">Overtime</option><option value="Holiday">Holiday</option></select></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Start Time</label><input type="time" id="ts-start" oninput="calcTSHours()"></div>
+    <div class="fg"><label>End Time</label><input type="time" id="ts-end" oninput="calcTSHours()"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Break (minutes)</label><input type="number" id="ts-break" placeholder="0" min="0" value="0" oninput="calcTSHours()"></div>
+    <div class="fg" id="ts-calc-display" style="display:flex;flex-direction:column;justify-content:flex-end">
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--teal);padding:8px">Total: <span id="ts-total-hrs" style="font-weight:700">—</span> hrs · OT: <span id="ts-ot-hrs" style="color:var(--yellow)">—</span> hrs</div>
+    </div>
+  </div>
+  <div class="fg"><label>Task Description</label><input type="text" id="ts-task" placeholder="What was done today?"></div>
+  <div class="fg"><label>Approved By</label><div id="ts-approver-wrap"></div></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-ts')">Cancel</button>
+    <button class="btn btn-gold" onclick="doSaveTimesheet()">Save Timesheet</button>
   </div>
 </div></div>
 
@@ -1206,7 +1404,11 @@ async function loadDB() {
       { data: fleet },
       { data: categories },
       { data: settings },
-      { data: dipstickLog }
+      { data: dipstickLog },
+      { data: generators },
+      { data: genRunLog },
+      { data: earthMovers },
+      { data: timesheets }
     ] = await Promise.all([
       SB.from('items').select('*').order('created_at'),
       SB.from('transactions').select('*').order('created_at'),
@@ -1220,7 +1422,11 @@ async function loadDB() {
       SB.from('fleet').select('*').order('created_at'),
       SB.from('categories').select('*').order('created_at'),
       SB.from('settings').select('*').limit(1),
-      SB.from('dipstick_log').select('*').order('created_at')
+      SB.from('dipstick_log').select('*').order('created_at'),
+      SB.from('generators').select('*').order('created_at'),
+      SB.from('gen_run_log').select('*').order('created_at'),
+      SB.from('earth_movers').select('*').order('created_at'),
+      SB.from('timesheets').select('*').order('created_at')
     ]);
 
     db.items        = (items || []).map(r => ({ ...r, totalIn: r.total_in||0, totalOut: r.total_out||0 }));
@@ -1235,6 +1441,10 @@ async function loadDB() {
     db.fleet        = (fleet || []).map(r => ({ ...r, driverId: r.driver_id }));
     db.settings     = (settings && settings[0]) ? { ...settings[0], companyName: settings[0].company_name } : { companyName: 'Bravura Kamativi' };
     db.dipstickLog  = (dipstickLog || []).map(r => ({ ...r, dipStart: r.dip_start, dipEnd: r.dip_end, fuelStart: r.fuel_start, fuelEnd: r.fuel_end, fmStart: r.fm_start, fmEnd: r.fm_end, flowmeterIssued: r.flowmeter_issued, actualIssued: r.actual_issued, errorLiters: r.error_liters, errorPct: r.error_pct, doneBy: r.done_by }));
+    db.generators   = (generators || []).map(r => ({ ...r, code: r.gen_code, name: r.gen_name, serviceDate: r.service_date }));
+    db.genRunLog    = (genRunLog || []).map(r => ({ ...r, genId: r.gen_id, startTime: r.start_time, endTime: r.end_time, fuelUsed: r.fuel_used }));
+    db.earthMovers  = (earthMovers || []).map(r => ({ ...r, desc: r.description, operatorId: r.operator_id }));
+    db.timesheets   = (timesheets || []).map(r => ({ ...r, empId: r.emp_id, empName: r.emp_name, startTime: r.start_time, endTime: r.end_time, totalHrs: r.total_hrs, otHrs: r.ot_hrs, workType: r.work_type, approverId: r.approver_id, approverName: r.approver_name }));
 
     if (categories && categories.length > 0) {
       db.categories = categories.map(c => ({ name: c.name, icon: c.icon }));
@@ -1403,7 +1613,7 @@ function calcDeliveryVerify() {
 
 function openDipstickModal() {
   document.getElementById('dip-date').value = today();
-  document.getElementById('dip-emp').innerHTML = empOptions('', true);
+  createSearchableSelect('dip-emp-ss', empSearchOptions(true), '— Recorded By —');
   document.getElementById('dip-calc').style.display = 'none';
   ['dip-start','dip-end','dip-fm-start','dip-fm-end','dip-notes'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
   openM('m-dipstick');
@@ -1411,7 +1621,7 @@ function openDipstickModal() {
 
 async function saveDipstickRecord() {
   const date    = document.getElementById('dip-date').value;
-  const empId   = document.getElementById('dip-emp').value;
+  const empId   = document.getElementById('val-ss-dip-emp-ss')?.value || '';
   const dipStart = parseFloat(document.getElementById('dip-start').value);
   const dipEnd   = parseFloat(document.getElementById('dip-end').value);
   const fmStart  = parseFloat(document.getElementById('dip-fm-start').value) || 0;
@@ -1664,6 +1874,7 @@ function closeSidebar() {
 function startApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  initNavGroups();
   updateAuthUI();
   applyCompanyName();
   renderDashboard();
@@ -1697,8 +1908,10 @@ const pageTitles = {
   dashboard:'Dashboard', balance:'Stock Balance', stockin:'Stock In', stockout:'Stock Out',
   transactions:'All Transactions', stocktake:'Stock Taking', goodsreceived:'Goods Received',
   fuel:'Fuel Management', concrete:'Batch Plant', campsite:'Campsite',
-  fleet:'Fleet Management', employees:'Employees', categories:'Categories',
-  alerts:'Low Stock Alerts', reports:'Reports', settings:'Settings'
+  fleet:'Vehicles', generators:'Generators', earthmovers:'Heavy Plant',
+  employees:'Employees', categories:'Categories',
+  alerts:'Low Stock Alerts', reports:'Reports', settings:'Settings',
+  timesheets:'Timesheets'
 };
 const pageAddMap = {
   balance: () => reqLogin(() => openM('m-item')),
@@ -1739,6 +1952,7 @@ function renderPage(n) {
     goodsreceived: renderGR, fuel: renderFuel, concrete: renderConcrete,
     campsite: renderCampsite, fleet: renderFleet, employees: renderEmployees,
     categories: renderCategories, alerts: renderAlerts, reports: renderReports,
+    generators: renderGenerators, earthmovers: renderEarthMovers, timesheets: renderTimesheets,
     settings: () => { updateStorageSize(); applyCompanyName(); const inp=document.getElementById('setting-company'); const cn=db.settings?.companyName||db.settings?.company_name||''; if(inp&&cn) inp.value=cn; }
   };
   if (map[n]) map[n]();
@@ -2650,29 +2864,35 @@ function openStockInModal() { populateSI(); document.getElementById('si-date').v
 function openStockOutModal() { populateSO(); document.getElementById('so-date').value = today(); openM('m-so'); }
 function openSIFor(itemId) { populateSI(itemId); document.getElementById('si-date').value = today(); openM('m-si'); }
 function openSOFor(itemId) { populateSO(itemId); document.getElementById('so-date').value = today(); updateAvail(); openM('m-so'); }
-function openStocktakeModal() { document.getElementById('st-item').innerHTML = itemOptions(); document.getElementById('st-emp').innerHTML = empOptions('', true); document.getElementById('st-date').value = today(); showSTCurrent(); openM('m-st'); }
+function openStocktakeModal() { document.getElementById('st-item').innerHTML = itemOptions(); createSearchableSelect('st-emp-ss', empSearchOptions(true), '— Counted By —'); document.getElementById('st-date').value = today(); showSTCurrent(); openM('m-st'); }
 function openGRModal() {
   document.getElementById('gr-date').value = today();
   document.getElementById('gr-vehicle').innerHTML = fleetOptions();
-  document.getElementById('gr-emp').innerHTML = empOptions('', true);
+  createSearchableSelect('gr-emp-ss', empSearchOptions(true), '— Received By —');
   initGRNRows();
   openM('m-gr');
 }
 function openFuelModal() {
   document.getElementById('f-date').value = today();
   document.getElementById('f-time').value = nowTime();
-  // Populate vehicle dropdown with Active vehicles first
+  fuelEquipType = 'vehicle';
+  setFuelEquipType('vehicle', document.querySelector('#f-equip-tabs .ftab'));
+  // Vehicles
   const activeFleet = db.fleet.filter(f => (f.status||'Active') === 'Active');
   const groundedFleet = db.fleet.filter(f => (f.status||'Active') !== 'Active');
   document.getElementById('f-vehicle').innerHTML =
     '<option value="">— Select Vehicle —</option>' +
-    (activeFleet.length ? '<optgroup label="Active">' + activeFleet.map(f=>`<option value="${f.reg}">${f.reg} — ${f.desc}</option>`).join('') + '</optgroup>' : '') +
-    (groundedFleet.length ? '<optgroup label="Grounded / Maintenance">' + groundedFleet.map(f=>`<option value="${f.reg}" style="color:var(--red)">${f.reg} — ${f.desc} (${f.status})</option>`).join('') + '</optgroup>' : '');
-  // Populate driver dropdown with Active employees
-  const activeEmps = db.employees.filter(e => (e.status||'Active') === 'Active');
-  const empOpts = '<option value="">— Select —</option>' + activeEmps.map(e=>`<option value="${e.id}">${e.name} · ${e.role||''}</option>`).join('');
-  document.getElementById('f-driver').innerHTML = empOpts;
-  document.getElementById('f-auth').innerHTML = empOpts;
+    (activeFleet.length ? '<optgroup label="Active">' + activeFleet.map(f=>`<option value="${f.reg}">${f.reg} — ${f.desc||f.description||''}</option>`).join('') + '</optgroup>' : '') +
+    (groundedFleet.length ? '<optgroup label="Grounded">' + groundedFleet.map(f=>`<option value="${f.reg}">${f.reg} (${f.status})</option>`).join('') + '</optgroup>' : '');
+  // Generators
+  const genSel = document.getElementById('f-gen-select');
+  if (genSel) genSel.innerHTML = '<option value="">— Select Generator —</option>' + (db.generators||[]).map(g=>`<option value="${g.id}">${g.code||g.gen_code} — ${g.name||g.gen_name}</option>`).join('');
+  // Earth movers
+  const emSel = document.getElementById('f-em-select');
+  if (emSel) emSel.innerHTML = '<option value="">— Select Equipment —</option>' + (db.earthMovers||[]).map(e=>`<option value="${e.id}">${e.reg} — ${e.desc||e.description||''}</option>`).join('');
+  // Driver / auth — searchable
+  createSearchableSelect('f-driver-wrap', empSearchOptions(true), '— Select Driver —');
+  ['f-amount','f-odometer','f-flowmeter','f-purpose'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
   openM('m-fuel');
 }
 function openFuelDeliveryModal() {
@@ -2681,14 +2901,14 @@ function openFuelDeliveryModal() {
   const v = document.getElementById('fd-verify'); if(v) v.style.display='none';
   openM('m-fuel-del');
 }
-function openConcreteModal() { document.getElementById('c-date').value=today(); document.getElementById('c-auth').innerHTML=empOptions('',true); openM('m-concrete'); }
+function openConcreteModal() { document.getElementById('c-date').value=today(); createSearchableSelect('c-auth-ss', empSearchOptions(true), '— Authorized By —'); openM('m-concrete'); }
 function openCampsiteModal() {
   document.getElementById('cs-date').value = today();
   ['cs-qin','cs-qout','cs-notes'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
   updateCampsiteUnit();
   openM('m-campsite');
 }
-function openFleetModal() { document.getElementById('fl-driver').innerHTML=empOptions('',true); openM('m-fleet'); }
+function openFleetModal() { createSearchableSelect('fl-driver-ss', empSearchOptions(true), '— Assigned Driver —'); openM('m-fleet'); }
 function openEmpModal() { openM('m-emp'); }
 
 function openEditItem(itemId) {
@@ -2708,8 +2928,16 @@ function openEditItem(itemId) {
   openM('m-item');
 }
 
-function populateSI(pre = '') { document.getElementById('si-item').innerHTML = itemOptions(pre); document.getElementById('si-emp').innerHTML = empOptions('', true); }
-function populateSO(pre = '') { document.getElementById('so-item').innerHTML = itemOptions(pre); document.getElementById('so-emp').innerHTML = empOptions('', true); document.getElementById('so-auth').innerHTML = empOptions('', true); updateAvail(); }
+function populateSI(pre = '') {
+  document.getElementById('si-item').innerHTML = itemOptions(pre);
+  createSearchableSelect('si-emp-ss', empSearchOptions(true), '— Received By —');
+}
+function populateSO(pre = '') {
+  document.getElementById('so-item').innerHTML = itemOptions(pre);
+  createSearchableSelect('so-emp-ss', empSearchOptions(true), '— Issued To —');
+  createSearchableSelect('so-auth-ss', empSearchOptions(true), '— Authorized By —');
+  updateAvail();
+}
 
 function updateAvail() {
   const item = db.items.find(i => i.id === document.getElementById('so-item').value);
@@ -2799,6 +3027,10 @@ function confirmDeleteGRN(id) {
 function confirmDel(type, id, label) {
   confirmAction(`Delete this ${type} record?`, label, 'Delete', async () => {
     if (type==='dipstick') { await sbDelete('dipstick_log', id); db.dipstickLog = (db.dipstickLog||[]).filter(r=>r.id!==id); renderFuel(); }
+    else if (type==='generator') { await sbDelete('generators', id); db.generators = (db.generators||[]).filter(r=>r.id!==id); renderGenerators(); }
+    else if (type==='genrun') { await sbDelete('gen_run_log', id); db.genRunLog = (db.genRunLog||[]).filter(r=>r.id!==id); renderGenerators(); }
+    else if (type==='earthmover') { await sbDelete('earth_movers', id); db.earthMovers = (db.earthMovers||[]).filter(r=>r.id!==id); renderEarthMovers(); }
+    else if (type==='timesheet') { await sbDelete('timesheets', id); db.timesheets = (db.timesheets||[]).filter(r=>r.id!==id); renderTimesheets(); }
     else if (type==='fuel') { await sbDelete('fuel_log', id); db.fuelLog = db.fuelLog.filter(r=>r.id!==id); renderFuel(); }
     else if (type==='fuelDel') { await sbDelete('fuel_deliveries', id); db.fuelDeliveries = db.fuelDeliveries.filter(r=>r.id!==id); renderFuel(); }
     else if (type==='concrete') { await sbDelete('concrete_log', id); db.concreteLog = db.concreteLog.filter(r=>r.id!==id); renderConcrete(); }
@@ -2866,7 +3098,7 @@ async function doStockIn() {
   const qty = parseInt(document.getElementById('si-qty').value);
   const date = document.getElementById('si-date').value;
   const deliv = document.getElementById('si-deliv').value.trim();
-  const empId = document.getElementById('si-emp').value;
+  const empId = document.getElementById('val-ss-si-emp-ss')?.value || '';
   const notes = document.getElementById('si-notes').value.trim();
   if (!itemId) return toast('Select an item', 'err');
   if (!qty || qty <= 0) return toast('Enter a valid quantity', 'err');
@@ -2886,8 +3118,8 @@ async function doStockOut() {
   const itemId = document.getElementById('so-item').value;
   const qty = parseInt(document.getElementById('so-qty').value);
   const date = document.getElementById('so-date').value;
-  const empId = document.getElementById('so-emp').value;
-  const authId = document.getElementById('so-auth').value;
+  const empId = document.getElementById('val-ss-so-emp-ss')?.value || '';
+  const authId = document.getElementById('val-ss-so-auth-ss')?.value || '';
   const notes = document.getElementById('so-purpose').value.trim();
   if (!qty || qty <= 0) return toast('Enter a valid quantity', 'err');
   if (date > today()) return toast('✕ Stock Out date cannot be in the future', 'err');
@@ -2907,7 +3139,7 @@ async function doStocktake() {
   const itemId = document.getElementById('st-item').value;
   const counted = parseInt(document.getElementById('st-qty').value);
   const date = document.getElementById('st-date').value;
-  const empId = document.getElementById('st-emp').value;
+  const empId = document.getElementById('val-ss-st-emp-ss')?.value || '';
   const notes = document.getElementById('st-notes').value.trim();
   if (isNaN(counted) || counted < 0) return toast('Enter a valid counted qty', 'err');
   const item = db.items.find(i => i.id === itemId); if (!item) return;
@@ -2939,7 +3171,7 @@ async function doGRN() {
   const vehicleSel = document.getElementById('gr-vehicle');
   const vehicle = vehicleSel.value || vehicleSel.options[vehicleSel.selectedIndex]?.text || '';
   const driver = document.getElementById('gr-driver').value.trim();
-  const empId = document.getElementById('gr-emp').value;
+  const empId = document.getElementById('val-ss-gr-emp-ss')?.value || '';
   const notes = document.getElementById('gr-notes').value.trim();
   const rowEls = document.querySelectorAll('#grn-rows .grn-row');
   const items = [];
@@ -2979,9 +3211,9 @@ async function doFuelIssuance() {
   const date      = document.getElementById('f-date').value;
   const time      = document.getElementById('f-time').value;
   const fuelType  = document.getElementById('f-type').value;
-  const vehicle   = document.getElementById('f-vehicle').value;
-  const driverId  = document.getElementById('f-driver').value;
-  const authId    = document.getElementById('f-auth').value;
+  const vehicle   = fuelEquipType === 'vehicle' ? document.getElementById('f-vehicle').value : fuelEquipType === 'generator' ? (document.getElementById('f-gen-select')?.options[document.getElementById('f-gen-select')?.selectedIndex]?.text||'') : (document.getElementById('f-em-select')?.options[document.getElementById('f-em-select')?.selectedIndex]?.text||'');
+  const driverId  = document.getElementById('val-ss-f-driver-wrap')?.value || '';
+  const authId    = '';
   const purpose   = document.getElementById('f-purpose').value.trim();
   const odometer  = document.getElementById('f-odometer').value.trim();
   const flowmeter = parseFloat(document.getElementById('f-flowmeter').value) || 0;
@@ -3021,7 +3253,7 @@ async function doConcrete() {
   const qIn = parseFloat(document.getElementById('c-qin').value) || 0;
   const qOut = parseFloat(document.getElementById('c-qout').value) || 0;
   const supplier = document.getElementById('c-supplier').value.trim();
-  const authId = document.getElementById('c-auth').value;
+  const authId = document.getElementById('val-ss-c-auth-ss')?.value || '';
   const notes = document.getElementById('c-notes').value.trim();
   const prev = db.concreteLog.filter(r=>r.material===material).reduce((s,r)=>s+(r.qIn||0)-(r.qOut||0), 0);
   const id = uid();
@@ -3053,7 +3285,7 @@ async function doAddVehicle() {
   const reg = document.getElementById('fl-reg').value.trim().toUpperCase();
   const type = document.getElementById('fl-type').value;
   const desc = document.getElementById('fl-desc').value.trim();
-  const driverId = document.getElementById('fl-driver').value;
+  const driverId = document.getElementById('val-ss-fl-driver-ss')?.value || '';
   const status = document.getElementById('fl-status').value;
   if (!reg) return toast('Enter registration/ID', 'err');
   if (db.fleet.find(f => f.reg === reg)) return toast('Vehicle with this registration already exists', 'err');
@@ -3366,6 +3598,537 @@ function clearAllErrs(...ids) { ids.forEach(clearErr); }
 
 // Storage is now managed via Supabase — saveDB is a no-op
 
+// ═══════════════════════════════════════════════════════════
+// COLLAPSIBLE SIDEBAR
+// ═══════════════════════════════════════════════════════════
+const NAV_STATE_KEY = 'bk_nav_state';
+function getNavState() {
+  try { return JSON.parse(localStorage.getItem(NAV_STATE_KEY) || '{}'); } catch { return {}; }
+}
+function saveNavState(state) {
+  try { localStorage.setItem(NAV_STATE_KEY, JSON.stringify(state)); } catch {}
+}
+function toggleNavGroup(id) {
+  const body = document.getElementById('grp-' + id);
+  const arrow = document.getElementById('arr-' + id);
+  if (!body) return;
+  const isOpen = !body.classList.contains('collapsed');
+  if (isOpen) {
+    body.classList.add('collapsed');
+    if (arrow) arrow.classList.remove('open');
+  } else {
+    body.classList.remove('collapsed');
+    if (arrow) arrow.classList.add('open');
+  }
+  const state = getNavState();
+  state[id] = !isOpen;
+  saveNavState(state);
+}
+function initNavGroups() {
+  const groups = ['inventory','logistics','fuel','fleet','hr','reports'];
+  const state = getNavState();
+  groups.forEach(id => {
+    const body = document.getElementById('grp-' + id);
+    const arrow = document.getElementById('arr-' + id);
+    if (!body) return;
+    const isOpen = state[id] !== false; // default open
+    if (!isOpen) {
+      body.classList.add('collapsed');
+      if (arrow) arrow.classList.remove('open');
+    } else {
+      body.classList.remove('collapsed');
+      if (arrow) arrow.classList.add('open');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// SEARCHABLE SELECT COMPONENT
+// ═══════════════════════════════════════════════════════════
+function createSearchableSelect(containerId, options, placeholder = '— Select —', selectedVal = '') {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const id = 'ss-' + containerId;
+  const selectedOpt = options.find(o => o.value === selectedVal);
+  container.innerHTML = `
+    <div class="ss-wrap" id="wrap-${id}">
+      <input class="ss-input" id="inp-${id}" placeholder="${placeholder}" autocomplete="off"
+        value="${selectedOpt ? selectedOpt.label : ''}"
+        onfocus="openSS('${id}')" oninput="filterSS('${id}')"
+        onkeydown="keySS(event,'${id}')">
+      <div class="ss-dropdown" id="dd-${id}"></div>
+      <input type="hidden" id="val-${id}" value="${selectedVal}">
+    </div>`;
+  window['_ss_opts_' + id] = options;
+  window['_ss_focused_' + id] = -1;
+  renderSSOptions(id, options, selectedVal);
+}
+
+function renderSSOptions(id, opts, selected = '') {
+  const dd = document.getElementById('dd-' + id);
+  if (!dd) return;
+  if (!opts.length) { dd.innerHTML = '<div class="ss-empty">No results</div>'; return; }
+  dd.innerHTML = opts.map((o, i) =>
+    `<div class="ss-option ${o.value === selected ? 'selected' : ''}" data-val="${o.value}" data-idx="${i}"
+      onclick="selectSS('${id}','${o.value}','${o.label.replace(/'/g,"&#39;")}')"
+      onmouseover="focusSS('${id}',${i})">${o.label}</div>`
+  ).join('');
+}
+
+function openSS(id) {
+  document.getElementById('inp-' + id)?.classList.add('open');
+  document.getElementById('dd-' + id)?.classList.add('open');
+  filterSS(id);
+  // Close other open dropdowns
+  document.querySelectorAll('.ss-dropdown.open').forEach(d => { if (d.id !== 'dd-' + id) { d.classList.remove('open'); } });
+}
+
+function filterSS(id) {
+  const q = (document.getElementById('inp-' + id)?.value || '').toLowerCase();
+  const allOpts = window['_ss_opts_' + id] || [];
+  const filtered = q ? allOpts.filter(o => o.label.toLowerCase().includes(q)) : allOpts;
+  const current = document.getElementById('val-' + id)?.value || '';
+  renderSSOptions(id, filtered, current);
+  document.getElementById('dd-' + id)?.classList.add('open');
+  window['_ss_filtered_' + id] = filtered;
+  window['_ss_focused_' + id] = -1;
+}
+
+function focusSS(id, idx) {
+  window['_ss_focused_' + id] = idx;
+  document.querySelectorAll(`#dd-${id} .ss-option`).forEach((el, i) => {
+    el.classList.toggle('focused', i === idx);
+  });
+}
+
+function keySS(e, id) {
+  const filtered = window['_ss_filtered_' + id] || window['_ss_opts_' + id] || [];
+  let fi = window['_ss_focused_' + id] ?? -1;
+  if (e.key === 'ArrowDown') { e.preventDefault(); fi = Math.min(fi + 1, filtered.length - 1); focusSS(id, fi); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); fi = Math.max(fi - 1, 0); focusSS(id, fi); }
+  else if (e.key === 'Enter' && fi >= 0) { e.preventDefault(); const o = filtered[fi]; if (o) selectSS(id, o.value, o.label); }
+  else if (e.key === 'Escape') { closeSS(id); }
+}
+
+function selectSS(id, val, label) {
+  const inp = document.getElementById('inp-' + id);
+  const hid = document.getElementById('val-' + id);
+  if (inp) inp.value = label;
+  if (hid) hid.value = val;
+  closeSS(id);
+  // Fire custom event
+  const wrap = document.getElementById('wrap-' + id);
+  if (wrap) wrap.dispatchEvent(new CustomEvent('ss-change', { detail: { value: val, label } }));
+}
+
+function closeSS(id) {
+  document.getElementById('inp-' + id)?.classList.remove('open');
+  document.getElementById('dd-' + id)?.classList.remove('open');
+}
+
+function getSS(containerId) {
+  return document.getElementById('val-ss-' + containerId)?.value || '';
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ss-wrap')) {
+    document.querySelectorAll('.ss-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.ss-input.open').forEach(i => i.classList.remove('open'));
+  }
+});
+
+// Helper to get employee options array for searchable select
+function empSearchOptions(activeOnly = false) {
+  let emps = db.employees;
+  if (activeOnly) emps = emps.filter(e => (e.status || 'Active') === 'Active');
+  return [{ value: '', label: '— Select —' }, ...emps.map(e => ({ value: e.id, label: e.name + (e.role ? ' · ' + e.role : '') }))];
+}
+
+function getSSVal(containerId) {
+  return document.getElementById('val-ss-' + containerId)?.value || '';
+}
+
+// Rebuild all searchable selects in open modals after db load
+function rebuildSearchableSelects() {
+  // Will be called after loadDB
+}
+
+// ═══════════════════════════════════════════════════════════
+// GENERATORS MODULE
+// ═══════════════════════════════════════════════════════════
+function renderGenerators() {
+  const grid = document.getElementById('gen-grid');
+  const statusColors = { Running: 'var(--green)', Stopped: 'var(--text-dim)', Maintenance: 'var(--yellow)', Offline: 'var(--red)' };
+  const statusBadge = s => `<span class="badge" style="background:${statusColors[s]||'var(--text-dim)'}22;color:${statusColors[s]||'var(--text-dim)'};border:1px solid ${statusColors[s]||'var(--text-dim)'}44">${s}</span>`;
+  const fuelByGen = {};
+  (db.genRunLog || []).forEach(r => { fuelByGen[r.gen_id || r.genId] = (fuelByGen[r.gen_id || r.genId] || 0) + parseFloat(r.fuel_used || r.fuelUsed || 0); });
+
+  if (!grid) return;
+  grid.innerHTML = !(db.generators || []).length
+    ? '<div class="empty"><div class="ei">⚡</div><p>No generators added</p></div>'
+    : (db.generators || []).map(g => `
+      <div class="emp-card">
+        <div style="font-size:28px;margin-bottom:6px">⚡</div>
+        <div style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:var(--gold)">${g.code || g.gen_code}</div>
+        <div style="font-size:11px;font-weight:700;margin-top:3px">${g.name || g.gen_name}</div>
+        <div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:4px;display:flex;flex-direction:column;gap:2px">
+          ${g.location ? `<span>📍 ${g.location}</span>` : ''}
+          ${g.capacity ? `<span>⚡ ${g.capacity} kVA</span>` : ''}
+          <span>⛽ ${(fuelByGen[g.id] || 0).toLocaleString()}L total</span>
+          ${g.service_date || g.serviceDate ? `<span>🔧 Serviced: ${fmtDate(g.service_date || g.serviceDate)}</span>` : ''}
+        </div>
+        <div style="margin-top:6px">${statusBadge(g.status || 'Stopped')}</div>
+        <div class="card-del" style="display:flex;gap:4px;margin-top:8px">
+          ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditGenerator('${g.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('generator','${g.id}','${g.name || g.gen_name}')">🗑</button>` : '—'}
+        </div>
+      </div>`).join('');
+
+  // KPI cards
+  const gens = db.generators || [];
+  const kpiEl = document.getElementById('gen-status-kpis');
+  if (kpiEl) {
+    const running = gens.filter(g => g.status === 'Running').length;
+    const maint   = gens.filter(g => g.status === 'Maintenance').length;
+    const offline = gens.filter(g => g.status === 'Offline').length;
+    kpiEl.innerHTML = `
+      <div class="kpi-card c-green" style="cursor:default"><div class="kpi-label">RUNNING</div><div class="kpi-val">${running}</div></div>
+      <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">MAINTENANCE</div><div class="kpi-val">${maint}</div></div>
+      <div class="kpi-card c-red" style="cursor:default"><div class="kpi-label">OFFLINE</div><div class="kpi-val">${offline}</div></div>
+      <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">TOTAL</div><div class="kpi-val">${gens.length}</div></div>`;
+  }
+
+  // Run log table
+  const tb = document.getElementById('gen-run-tbody');
+  if (tb) {
+    const runs = [...(db.genRunLog || [])].reverse();
+    tb.innerHTML = !runs.length
+      ? `<tr><td colspan="8"><div class="empty"><div class="ei">⚡</div><p>No run logs yet</p></div></td></tr>`
+      : runs.map(r => {
+          const gen = (db.generators || []).find(g => g.id === (r.gen_id || r.genId));
+          return `<tr>
+            <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+            <td style="font-weight:700;color:var(--gold)">${gen ? (gen.code || gen.gen_code) : '—'}</td>
+            <td style="font-family:var(--font-mono)">${r.start_time || r.startTime || '—'}</td>
+            <td style="font-family:var(--font-mono)">${r.end_time || r.endTime || '—'}</td>
+            <td style="font-family:var(--font-mono);color:var(--teal)">${parseFloat(r.hours || 0).toFixed(1)}h</td>
+            <td style="font-family:var(--font-mono);color:var(--blue)">${parseFloat(r.fuel_used || r.fuelUsed || 0).toLocaleString()}L</td>
+            <td style="color:var(--text-dim);font-size:11px">${r.notes || '—'}</td>
+            <td>${canEdit() ? `<button class="abtn del" onclick="confirmDel('genrun','${r.id}','Run log ${fmtDate(r.date)}')">🗑</button>` : '—'}</td>
+          </tr>`;
+        }).join('');
+  }
+}
+
+function openGenModal() {
+  document.getElementById('gen-edit-id').value = '';
+  ['gen-code','gen-name','gen-location','gen-capacity'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+  document.getElementById('gen-status').value = 'Running';
+  document.getElementById('gen-modal-title').innerHTML = '⚡ Add <span>Generator</span>';
+  document.getElementById('gen-save-btn').textContent = 'Add Generator';
+  openM('m-gen');
+}
+
+function openEditGenerator(id) {
+  const g = (db.generators || []).find(x => x.id === id);
+  if (!g) return;
+  document.getElementById('gen-edit-id').value = id;
+  document.getElementById('gen-code').value = g.code || g.gen_code || '';
+  document.getElementById('gen-name').value = g.name || g.gen_name || '';
+  document.getElementById('gen-location').value = g.location || '';
+  document.getElementById('gen-capacity').value = g.capacity || '';
+  document.getElementById('gen-status').value = g.status || 'Running';
+  document.getElementById('gen-service-date').value = g.service_date || g.serviceDate || '';
+  document.getElementById('gen-modal-title').innerHTML = '✏️ Edit <span>Generator</span>';
+  document.getElementById('gen-save-btn').textContent = 'Save Changes';
+  openM('m-gen');
+}
+
+async function doSaveGenerator() {
+  const editId   = document.getElementById('gen-edit-id').value;
+  const code     = document.getElementById('gen-code').value.trim();
+  const name     = document.getElementById('gen-name').value.trim();
+  const location = document.getElementById('gen-location').value.trim();
+  const capacity = parseFloat(document.getElementById('gen-capacity').value) || 0;
+  const status   = document.getElementById('gen-status').value;
+  const svcDate  = document.getElementById('gen-service-date').value;
+  if (!code || !name) return toast('Enter Generator ID and Name', 'err');
+  if (!db.generators) db.generators = [];
+  if (editId) {
+    const g = db.generators.find(x => x.id === editId);
+    if (g) { Object.assign(g, { code, name, location, capacity, status, service_date: svcDate }); }
+    await sbSave('generators', { id: editId, gen_code: code, gen_name: name, location, capacity, status, service_date: svcDate });
+    toast(`✓ "${name}" updated`);
+  } else {
+    const id = uid();
+    await sbSave('generators', { id, gen_code: code, gen_name: name, location, capacity, status, service_date: svcDate });
+    db.generators.push({ id, code, name, gen_code: code, gen_name: name, location, capacity, status, service_date: svcDate });
+    toast(`✓ "${name}" added`);
+  }
+  closeM('m-gen'); renderGenerators();
+}
+
+function openGenRunModal() {
+  if (!db.generators || !db.generators.length) return toast('Add a generator first', 'err');
+  document.getElementById('gr2-gen').innerHTML = (db.generators || []).map(g => `<option value="${g.id}">${g.code || g.gen_code} — ${g.name || g.gen_name}</option>`).join('');
+  document.getElementById('gr2-date').value = today();
+  ['gr2-start','gr2-end','gr2-hours','gr2-fuel','gr2-notes'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+  openM('m-gen-run');
+}
+
+async function doGenRun() {
+  const genId  = document.getElementById('gr2-gen').value;
+  const date   = document.getElementById('gr2-date').value;
+  const start  = document.getElementById('gr2-start').value;
+  const end    = document.getElementById('gr2-end').value;
+  const hours  = parseFloat(document.getElementById('gr2-hours').value) || 0;
+  const fuel   = parseFloat(document.getElementById('gr2-fuel').value) || 0;
+  const notes  = document.getElementById('gr2-notes').value.trim();
+  if (!date || !genId) return toast('Select generator and date', 'err');
+  const id = uid();
+  await sbSave('gen_run_log', { id, gen_id: genId, date, start_time: start, end_time: end, hours, fuel_used: fuel, notes, user_name: session.user });
+  if (!db.genRunLog) db.genRunLog = [];
+  db.genRunLog.push({ id, genId, gen_id: genId, date, startTime: start, endTime: end, start_time: start, end_time: end, hours, fuelUsed: fuel, fuel_used: fuel, notes });
+  closeM('m-gen-run');
+  toast(`✓ Run log saved — ${hours}h, ${fuel}L`);
+  renderGenerators();
+}
+
+// ═══════════════════════════════════════════════════════════
+// HEAVY PLANT / EARTH MOVERS
+// ═══════════════════════════════════════════════════════════
+function renderEarthMovers() {
+  if (!db.earthMovers) db.earthMovers = [];
+  const grid = document.getElementById('earthmover-grid');
+  const statusBadge = s => s === 'Active' ? '<span class="badge bg-good">Active</span>' : s === 'Grounded' ? '<span class="badge bg-crit">Grounded</span>' : '<span class="badge bg-low">Maintenance</span>';
+  const fuelByEm = {};
+  (db.fuelLog || []).filter(r => r.em_id || r.emId).forEach(r => { const k = r.em_id || r.emId; fuelByEm[k] = (fuelByEm[k] || 0) + parseFloat(r.amount || 0); });
+
+  grid.innerHTML = !db.earthMovers.length
+    ? '<div class="empty"><div class="ei">🏋️</div><p>No heavy plant added</p></div>'
+    : db.earthMovers.map(e => `
+      <div class="emp-card">
+        <div style="font-size:26px;margin-bottom:6px">🏋️</div>
+        <div style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:var(--gold)">${e.reg}</div>
+        <div style="font-size:11px;font-weight:700;margin-top:3px">${e.desc || ''}</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:4px"><span class="badge bg-blue">${e.type}</span></div>
+        <div style="margin-top:4px">${statusBadge(e.status || 'Active')}</div>
+        <div class="card-del" style="display:flex;gap:4px;margin-top:8px">
+          ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditEarthMover('${e.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('earthmover','${e.id}','${e.reg}')">🗑</button>` : '—'}
+        </div>
+      </div>`).join('');
+
+  // Fuel table
+  const ftb = document.getElementById('earthmover-fuel-tbody');
+  if (ftb) {
+    ftb.innerHTML = !db.earthMovers.length ? `<tr><td colspan="4"><div class="empty"><div class="ei">⛽</div><p>No data</p></div></td></tr>`
+      : db.earthMovers.map(e => `<tr>
+          <td style="font-family:var(--font-mono);font-weight:700;color:var(--gold)">${e.reg}</td>
+          <td><span class="badge bg-blue">${e.type}</span></td>
+          <td style="font-family:var(--font-mono);color:var(--blue)">${(fuelByEm[e.id] || 0).toLocaleString()} L</td>
+          <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">—</td>
+        </tr>`).join('');
+  }
+}
+
+function openEarthMoverModal() {
+  document.getElementById('em-edit-id').value = '';
+  ['em-reg','em-desc'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+  document.getElementById('em-status').value = 'Active';
+  document.getElementById('em-modal-title').innerHTML = '🏋️ Add <span>Heavy Plant</span>';
+  document.getElementById('em-save-btn').textContent = 'Add Equipment';
+  createSearchableSelect('em-operator-wrap', empSearchOptions(true), '— Select Operator —');
+  openM('m-earthmover');
+}
+
+function openEditEarthMover(id) {
+  if (!db.earthMovers) return;
+  const e = db.earthMovers.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('em-edit-id').value = id;
+  document.getElementById('em-reg').value  = e.reg || '';
+  document.getElementById('em-desc').value = e.desc || '';
+  document.getElementById('em-type').value = e.type || 'Articulated Dump Truck';
+  document.getElementById('em-status').value = e.status || 'Active';
+  document.getElementById('em-modal-title').innerHTML = '✏️ Edit <span>Heavy Plant</span>';
+  document.getElementById('em-save-btn').textContent = 'Save Changes';
+  createSearchableSelect('em-operator-wrap', empSearchOptions(true), '— Select Operator —', e.operatorId || '');
+  openM('m-earthmover');
+}
+
+async function doSaveEarthMover() {
+  const editId = document.getElementById('em-edit-id').value;
+  const reg    = document.getElementById('em-reg').value.trim().toUpperCase();
+  const type   = document.getElementById('em-type').value;
+  const desc   = document.getElementById('em-desc').value.trim();
+  const status = document.getElementById('em-status').value;
+  const opId   = document.getElementById('val-ss-em-operator-wrap')?.value || '';
+  if (!reg) return toast('Enter equipment ID/registration', 'err');
+  if (!db.earthMovers) db.earthMovers = [];
+  if (editId) {
+    const e = db.earthMovers.find(x => x.id === editId);
+    if (e) Object.assign(e, { reg, type, desc, status, operatorId: opId });
+    await sbSave('earth_movers', { id: editId, reg, type, description: desc, status, operator_id: opId });
+    toast(`✓ "${reg}" updated`);
+  } else {
+    if (db.earthMovers.find(e => e.reg === reg)) return toast('Equipment with this ID already exists', 'err');
+    const id = uid();
+    await sbSave('earth_movers', { id, reg, type, description: desc, status, operator_id: opId });
+    db.earthMovers.push({ id, reg, type, desc, status, operatorId: opId });
+    toast(`✓ "${reg}" added`);
+  }
+  closeM('m-earthmover'); renderEarthMovers();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TIMESHEETS MODULE
+// ═══════════════════════════════════════════════════════════
+let tsView = 'daily';
+function setTSView(v, btn) {
+  tsView = v;
+  document.querySelectorAll('#page-timesheets .ftab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderTimesheets();
+}
+
+function calcTSHours() {
+  const start = document.getElementById('ts-start')?.value;
+  const end   = document.getElementById('ts-end')?.value;
+  const brk   = parseInt(document.getElementById('ts-break')?.value) || 0;
+  if (!start || !end) return;
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  let mins = (eh * 60 + em) - (sh * 60 + sm) - brk;
+  if (mins < 0) mins += 24 * 60;
+  const hrs = mins / 60;
+  const ot  = Math.max(0, hrs - 8);
+  const hEl = document.getElementById('ts-total-hrs');
+  const oEl = document.getElementById('ts-ot-hrs');
+  if (hEl) hEl.textContent = hrs.toFixed(2);
+  if (oEl) oEl.textContent = ot.toFixed(2);
+}
+
+function openTSModal() {
+  document.getElementById('ts-edit-id').value = '';
+  document.getElementById('ts-date').value = today();
+  ['ts-start','ts-end','ts-task'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+  document.getElementById('ts-break').value = '0';
+  createSearchableSelect('ts-emp-wrap', empSearchOptions(true), '— Select Employee —');
+  createSearchableSelect('ts-approver-wrap', empSearchOptions(true), '— Approved By —');
+  openM('m-ts');
+}
+
+async function doSaveTimesheet() {
+  const empId    = document.getElementById('val-ss-ts-emp-wrap')?.value || '';
+  const date     = document.getElementById('ts-date').value;
+  const site     = document.getElementById('ts-site').value;
+  const type     = document.getElementById('ts-type').value;
+  const start    = document.getElementById('ts-start').value;
+  const end      = document.getElementById('ts-end').value;
+  const brk      = parseInt(document.getElementById('ts-break').value) || 0;
+  const task     = document.getElementById('ts-task').value.trim();
+  const approverId = document.getElementById('val-ss-ts-approver-wrap')?.value || '';
+  if (!empId) return toast('Select an employee', 'err');
+  if (!date || !start || !end) return toast('Enter date, start and end time', 'err');
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  let mins = (eh * 60 + em) - (sh * 60 + sm) - brk;
+  if (mins < 0) mins += 1440;
+  const totalHrs = parseFloat((mins / 60).toFixed(2));
+  const otHrs    = parseFloat(Math.max(0, totalHrs - 8).toFixed(2));
+  const id = uid();
+  const rec = { id, emp_id: empId, emp_name: empName(empId), date, site, work_type: type, start_time: start, end_time: end, break_mins: brk, total_hrs: totalHrs, ot_hrs: otHrs, task, approver_id: approverId, approver_name: empName(approverId), status: 'Pending', user_name: session.user };
+  await sbSave('timesheets', rec);
+  if (!db.timesheets) db.timesheets = [];
+  db.timesheets.push({ ...rec, empId, empName: empName(empId), startTime: start, endTime: end, workType: type, totalHrs, otHrs, approverId, approverName: empName(approverId) });
+  closeM('m-ts');
+  toast(`✓ Timesheet saved — ${totalHrs}hrs`);
+  renderTimesheets();
+}
+
+function renderTimesheets() {
+  if (!db.timesheets) db.timesheets = [];
+  const fromV = document.getElementById('ts-from')?.value || '';
+  const toV   = document.getElementById('ts-to')?.value   || '';
+  let rows = [...db.timesheets].reverse();
+  if (fromV) rows = rows.filter(r => r.date >= fromV);
+  if (toV)   rows = rows.filter(r => r.date <= toV);
+
+  const tb = document.getElementById('ts-tbody');
+  if (tb) {
+    tb.innerHTML = !rows.length
+      ? `<tr><td colspan="11"><div class="empty"><div class="ei">🕐</div><p>No timesheets yet</p></div></td></tr>`
+      : rows.map(r => {
+          const statusColor = r.status === 'Approved' ? 'var(--green)' : r.status === 'Rejected' ? 'var(--red)' : 'var(--yellow)';
+          return `<tr>
+            <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
+            <td style="font-weight:700">${r.emp_name || r.empName || '—'}</td>
+            <td style="font-size:10px">${r.site || '—'}</td>
+            <td style="font-family:var(--font-mono);font-size:10px">${r.start_time || r.startTime || '—'}</td>
+            <td style="font-family:var(--font-mono);font-size:10px">${r.end_time || r.endTime || '—'}</td>
+            <td style="font-family:var(--font-mono);color:var(--teal);font-weight:700">${r.total_hrs || r.totalHrs || 0}</td>
+            <td style="font-family:var(--font-mono);color:var(--yellow)">${r.ot_hrs || r.otHrs || 0}</td>
+            <td><span class="badge bg-blue">${r.work_type || r.workType || '—'}</span></td>
+            <td style="font-size:11px;color:var(--text-dim)">${r.task || '—'}</td>
+            <td><span class="badge" style="color:${statusColor}">${r.status || 'Pending'}</span></td>
+            <td>${canEdit() ? `
+              ${r.status === 'Pending' ? `<button class="abtn" onclick="approvTS('${r.id}','Approved')" title="Approve">✅</button><button class="abtn" onclick="approvTS('${r.id}','Rejected')" title="Reject">❌</button>` : ''}
+              <button class="abtn del" onclick="confirmDel('timesheet','${r.id}','Timesheet ${fmtDate(r.date)}')">🗑</button>` : '—'}
+            </td>
+          </tr>`;
+        }).join('');
+  }
+
+  // KPIs
+  const kpiEl = document.getElementById('ts-kpis');
+  if (kpiEl) {
+    const allRows = db.timesheets || [];
+    const totalHrs = allRows.reduce((s, r) => s + parseFloat(r.total_hrs || r.totalHrs || 0), 0);
+    const otHrs    = allRows.reduce((s, r) => s + parseFloat(r.ot_hrs || r.otHrs || 0), 0);
+    const pending  = allRows.filter(r => r.status === 'Pending').length;
+    kpiEl.innerHTML = `
+      <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">${totalHrs.toFixed(1)}</div></div>
+      <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">${otHrs.toFixed(1)}</div></div>
+      <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
+      <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">${allRows.length}</div></div>`;
+  }
+}
+
+async function approvTS(id, status) {
+  if (!db.timesheets) return;
+  const ts = db.timesheets.find(r => r.id === id);
+  if (!ts) return;
+  ts.status = status;
+  await sbSave('timesheets', { id, status });
+  toast(`✓ Timesheet ${status.toLowerCase()}`);
+  renderTimesheets();
+}
+
+function exportTimesheets() {
+  if (!db.timesheets || !db.timesheets.length) return toast('No timesheets to export', 'err');
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Date','Employee','Site','Start','End','Break(min)','Total Hrs','OT Hrs','Work Type','Task','Status','Approved By'],
+    ...db.timesheets.map(r => [r.date, r.emp_name||r.empName, r.site, r.start_time||r.startTime, r.end_time||r.endTime, r.break_mins||0, r.total_hrs||r.totalHrs, r.ot_hrs||r.otHrs, r.work_type||r.workType, r.task, r.status, r.approver_name||r.approverName||''])
+  ]);
+  XLSX.utils.book_append_sheet(wb, ws, 'Timesheets');
+  XLSX.writeFile(wb, `Timesheets_${today()}.xlsx`);
+  toast('✓ Timesheets exported');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// FUEL ISSUANCE — EQUIPMENT TYPE TOGGLE
+// ═══════════════════════════════════════════════════════════
+let fuelEquipType = 'vehicle';
+function setFuelEquipType(type, btn) {
+  fuelEquipType = type;
+  document.querySelectorAll('#f-equip-tabs .ftab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('f-vehicle-wrap').style.display = type === 'vehicle' ? '' : 'none';
+  document.getElementById('f-gen-wrap').style.display = type === 'generator' ? '' : 'none';
+  document.getElementById('f-em-wrap').style.display = type === 'earthmover' ? '' : 'none';
+}
 // ═══════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════
