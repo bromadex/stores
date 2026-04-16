@@ -330,6 +330,26 @@ tr:hover td{background:rgba(255,255,255,.015);}
 @media(max-width:768px) {
   .reports-grid { grid-template-columns:1fr !important; }
 }
+
+/* NAV GROUPS — collapsible sidebar */
+.nav-group{display:flex;flex-direction:column;margin-top:2px;}
+.nav-group-hd{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;border:none;background:rgba(244,162,97,.08);color:var(--gold);font-family:var(--font-head);font-size:11px;font-weight:700;cursor:pointer;text-align:left;width:100%;min-height:38px;letter-spacing:.3px;}
+.nav-group-hd:hover{background:rgba(244,162,97,.16);}
+.nav-group-body{display:flex;flex-direction:column;gap:1px;overflow:hidden;max-height:0;transition:max-height .3s ease;}
+.nav-group-body.open{max-height:500px;}
+.nav-sub{padding-left:18px!important;font-size:11px!important;min-height:38px!important;}
+.nav-arrow{margin-left:auto;font-size:9px;transition:transform .25s;flex-shrink:0;color:var(--text-dim);}
+.nav-arrow.open{transform:rotate(180deg);}
+/* SEARCHABLE SELECT */
+.ss-wrap{position:relative;width:100%;}
+.ss-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-head);font-size:14px;padding:11px 14px;outline:none;cursor:text;transition:border-color .2s;min-height:44px;box-sizing:border-box;}
+.ss-input:focus,.ss-input.open{border-color:var(--gold);}
+.ss-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--surface3);border:1px solid var(--border2);border-radius:10px;z-index:400;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+.ss-dropdown.open{display:block;}
+.ss-option{padding:9px 14px;cursor:pointer;font-size:13px;transition:background .1s;border-bottom:1px solid rgba(255,255,255,.03);}
+.ss-option:hover,.ss-option.focused{background:rgba(244,162,97,.12);color:var(--gold);}
+.ss-option.selected{color:var(--teal);}
+.ss-empty{padding:10px 14px;color:var(--text-dim);font-size:11px;font-family:var(--font-mono);}
 </style>
 </head>
 <body>
@@ -397,7 +417,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <div class="nav-group-body" id="grp-fleet">
         <button class="nav-btn nav-sub" onclick="showPage('fleet',this)"><span class="ic">🚗</span><span class="nav-label">Vehicles</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('generators',this)"><span class="ic">⚡</span><span class="nav-label">Generators</span></button>
-        <button class="nav-btn nav-sub" onclick="showPage('earthmovers',this)"><span class="ic">🏋️</span><span class="nav-label">Heavy Plant</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('earthmovers',this)"><span class="ic">🏋️</span><span class="nav-label">Heavy Equipment</span></button>
       </div>
     </div>
 
@@ -853,7 +873,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
       </div>
       <div class="emp-grid" id="earthmover-grid"></div>
       <div class="tcard" style="margin-top:14px">
-        <div class="tcard-head"><span class="tcard-title">🏋️ Heavy Plant Fuel Consumption</span></div>
+        <div class="tcard-head"><span class="tcard-title">🏋️ Heavy Equipment Fuel Consumption</span></div>
         <div class="table-scroll"><table><thead><tr><th>Equipment</th><th>Type</th><th>Total Fuel (L)</th><th>Last Fuelled</th></tr></thead><tbody id="earthmover-fuel-tbody"></tbody></table></div>
       </div>
     </div>
@@ -1035,17 +1055,17 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="ftabs" id="f-equip-tabs" style="margin-top:4px">
       <button class="ftab active" onclick="setFuelEquipType('vehicle',this)">🚗 Vehicle</button>
       <button class="ftab" onclick="setFuelEquipType('generator',this)">⚡ Generator</button>
-      <button class="ftab" onclick="setFuelEquipType('earthmover',this)">🏋️ Heavy Plant</button>
+      <button class="ftab" onclick="setFuelEquipType('earthmover',this)">🏋️ Heavy Equipment</button>
     </div>
   </div>
   <div class="fr">
     <div class="fg" id="f-vehicle-wrap"><label>Vehicle (Reg)</label><select id="f-vehicle"></select></div>
     <div class="fg" id="f-gen-wrap" style="display:none"><label>Generator</label><select id="f-gen-select"></select></div>
-    <div class="fg" id="f-em-wrap" style="display:none"><label>Heavy Plant</label><select id="f-em-select"></select></div>
+    <div class="fg" id="f-em-wrap" style="display:none"><label>Heavy Equipment</label><select id="f-em-select"></select></div>
     <div class="fg"><label>Driver / Operator</label><div id="f-driver-wrap"></div></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Authorized By</label><select id="f-auth"></select></div>
+    <div class="fg"><label>Authorized By</label><div id="f-auth-wrap"></div></div>
     <div class="fg"><label>Purpose</label><input type="text" id="f-purpose" placeholder="e.g. Site Use, Trip"></div>
   </div>
   <div class="fr">
@@ -1268,7 +1288,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
 <!-- EARTH MOVER -->
 <div class="overlay" id="m-earthmover"><div class="modal modal-lg">
   <input type="hidden" id="em-edit-id">
-  <div class="mtitle" id="em-modal-title">🏋️ Add <span>Heavy Plant</span></div>
+  <div class="mtitle" id="em-modal-title">🏋️ Add <span>Heavy Equipment</span></div>
   <div class="fr">
     <div class="fg"><label>Equipment ID / Reg</label><input type="text" id="em-reg" placeholder="e.g. ADT-001"></div>
     <div class="fg"><label>Equipment Type</label>
@@ -1384,7 +1404,7 @@ let db = {
   items: [], transactions: [],
   goodsReceived: [], fuelLog: [], fuelDeliveries: [],
   stockTakes: [], concreteLog: [], campsiteLog: [],
-  employees: [], fleet: [], settings: {}, dipstickLog: []
+  employees: [], fleet: [], settings: {}, dipstickLog: [], generators: [], genRunLog: [], earthMovers: [], timesheets: []
 };
 
 // Load all data from Supabase into db object
@@ -1908,7 +1928,7 @@ const pageTitles = {
   dashboard:'Dashboard', balance:'Stock Balance', stockin:'Stock In', stockout:'Stock Out',
   transactions:'All Transactions', stocktake:'Stock Taking', goodsreceived:'Goods Received',
   fuel:'Fuel Management', concrete:'Batch Plant', campsite:'Campsite',
-  fleet:'Vehicles', generators:'Generators', earthmovers:'Heavy Plant',
+  fleet:'Vehicles', generators:'Generators', earthmovers:'Heavy Equipment',
   employees:'Employees', categories:'Categories',
   alerts:'Low Stock Alerts', reports:'Reports', settings:'Settings',
   timesheets:'Timesheets'
@@ -2601,20 +2621,20 @@ function renderEmployees() {
     : db.employees.map(e => {
         const statusActive = (e.status || 'Active') === 'Active';
         const avatarColor = roleColors[e.role] || 'var(--gold)';
-        return `<div class="emp-card" style="border-color:${statusActive ? 'var(--border)' : 'rgba(248,113,113,.3)'}">
+        return `<div class="emp-card" style="border-color:${statusActive ? 'var(--border)' : 'rgba(248,113,113,.3)'};display:flex;flex-direction:column;">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
             <div class="emp-avatar-lg" style="background:linear-gradient(135deg,${avatarColor},var(--teal))">${e.name.charAt(0).toUpperCase()}</div>
             <span class="badge ${statusActive ? 'bg-good' : 'bg-crit'}">${e.status||'Active'}</span>
           </div>
           <div style="font-size:13px;font-weight:700">${e.name}</div>
           <div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px">${e.role||'—'}</div>
-          <div style="font-size:9px;color:var(--text-dim);font-family:var(--font-mono);margin-top:4px;display:flex;flex-direction:column;gap:2px">
+          <div style="font-size:9px;color:var(--text-dim);font-family:var(--font-mono);margin-top:4px;display:flex;flex-direction:column;gap:2px;flex:1">
             ${e.dept ? `<span>📁 ${e.dept}</span>` : ''}
             ${e.empId ? `<span>🪪 ${e.empId}</span>` : ''}
             ${e.contact ? `<span>📞 ${e.contact}</span>` : ''}
           </div>
-          <div class="card-del" style="display:flex;gap:4px">
-            ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditEmployee('${e.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('emp','${e.id}','${e.name}')">🗑</button>` : '—'}
+          <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+            ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditEmployee('${e.id}'))">✏️ Edit</button><button class="abtn del" onclick="confirmDel('emp','${e.id}','${e.name}')">🗑 Delete</button>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -2892,6 +2912,7 @@ function openFuelModal() {
   if (emSel) emSel.innerHTML = '<option value="">— Select Equipment —</option>' + (db.earthMovers||[]).map(e=>`<option value="${e.id}">${e.reg} — ${e.desc||e.description||''}</option>`).join('');
   // Driver / auth — searchable
   createSearchableSelect('f-driver-wrap', empSearchOptions(true), '— Select Driver —');
+  createSearchableSelect('f-auth-wrap', empSearchOptions(true), '— Authorized By —');
   ['f-amount','f-odometer','f-flowmeter','f-purpose'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
   openM('m-fuel');
 }
@@ -3213,7 +3234,7 @@ async function doFuelIssuance() {
   const fuelType  = document.getElementById('f-type').value;
   const vehicle   = fuelEquipType === 'vehicle' ? document.getElementById('f-vehicle').value : fuelEquipType === 'generator' ? (document.getElementById('f-gen-select')?.options[document.getElementById('f-gen-select')?.selectedIndex]?.text||'') : (document.getElementById('f-em-select')?.options[document.getElementById('f-em-select')?.selectedIndex]?.text||'');
   const driverId  = document.getElementById('val-ss-f-driver-wrap')?.value || '';
-  const authId    = '';
+  const authId    = document.getElementById('val-ss-f-auth-wrap')?.value || '';
   const purpose   = document.getElementById('f-purpose').value.trim();
   const odometer  = document.getElementById('f-odometer').value.trim();
   const flowmeter = parseFloat(document.getElementById('f-flowmeter').value) || 0;
@@ -3612,12 +3633,12 @@ function toggleNavGroup(id) {
   const body = document.getElementById('grp-' + id);
   const arrow = document.getElementById('arr-' + id);
   if (!body) return;
-  const isOpen = !body.classList.contains('collapsed');
+  const isOpen = body.classList.contains('open');
   if (isOpen) {
-    body.classList.add('collapsed');
+    body.classList.remove('open');
     if (arrow) arrow.classList.remove('open');
   } else {
-    body.classList.remove('collapsed');
+    body.classList.add('open');
     if (arrow) arrow.classList.add('open');
   }
   const state = getNavState();
@@ -3631,13 +3652,14 @@ function initNavGroups() {
     const body = document.getElementById('grp-' + id);
     const arrow = document.getElementById('arr-' + id);
     if (!body) return;
-    const isOpen = state[id] !== false; // default open
-    if (!isOpen) {
-      body.classList.add('collapsed');
-      if (arrow) arrow.classList.remove('open');
-    } else {
-      body.classList.remove('collapsed');
+    // Default: all collapsed on first load, restore saved state
+    const isOpen = state[id] === true;
+    if (isOpen) {
+      body.classList.add('open');
       if (arrow) arrow.classList.add('open');
+    } else {
+      body.classList.remove('open');
+      if (arrow) arrow.classList.remove('open');
     }
   });
 }
@@ -3905,7 +3927,7 @@ function renderEarthMovers() {
   (db.fuelLog || []).filter(r => r.em_id || r.emId).forEach(r => { const k = r.em_id || r.emId; fuelByEm[k] = (fuelByEm[k] || 0) + parseFloat(r.amount || 0); });
 
   grid.innerHTML = !db.earthMovers.length
-    ? '<div class="empty"><div class="ei">🏋️</div><p>No heavy plant added</p></div>'
+    ? '<div class="empty"><div class="ei">🏋️</div><p>No heavy equipment added</p></div>'
     : db.earthMovers.map(e => `
       <div class="emp-card">
         <div style="font-size:26px;margin-bottom:6px">🏋️</div>
@@ -3935,7 +3957,7 @@ function openEarthMoverModal() {
   document.getElementById('em-edit-id').value = '';
   ['em-reg','em-desc'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
   document.getElementById('em-status').value = 'Active';
-  document.getElementById('em-modal-title').innerHTML = '🏋️ Add <span>Heavy Plant</span>';
+  document.getElementById('em-modal-title').innerHTML = '🏋️ Add <span>Heavy Equipment</span>';
   document.getElementById('em-save-btn').textContent = 'Add Equipment';
   createSearchableSelect('em-operator-wrap', empSearchOptions(true), '— Select Operator —');
   openM('m-earthmover');
@@ -3950,7 +3972,7 @@ function openEditEarthMover(id) {
   document.getElementById('em-desc').value = e.desc || '';
   document.getElementById('em-type').value = e.type || 'Articulated Dump Truck';
   document.getElementById('em-status').value = e.status || 'Active';
-  document.getElementById('em-modal-title').innerHTML = '✏️ Edit <span>Heavy Plant</span>';
+  document.getElementById('em-modal-title').innerHTML = '✏️ Edit <span>Heavy Equipment</span>';
   document.getElementById('em-save-btn').textContent = 'Save Changes';
   createSearchableSelect('em-operator-wrap', empSearchOptions(true), '— Select Operator —', e.operatorId || '');
   openM('m-earthmover');
