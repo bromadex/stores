@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -396,6 +397,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
         <button class="nav-btn nav-sub" onclick="showPage('stockout',this)"><span class="ic">📤</span><span class="nav-label">Stock Out</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('transactions',this)"><span class="ic">🔄</span><span class="nav-label">Transactions</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('stocktake',this)"><span class="ic">📋</span><span class="nav-label">Stock Taking</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('requisitions',this)"><span class="ic">📝</span><span class="nav-label">Store Requisition</span><span class="nb" id="req-badge" style="display:none">0</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('alerts',this)"><span class="ic">🚨</span><span class="nav-label">Low Stock</span><span class="nb" id="alert-badge">0</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('categories',this)"><span class="ic">🗂️</span><span class="nav-label">Categories</span></button>
       </div>
@@ -406,7 +408,6 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <button class="nav-group-hd" onclick="toggleNavGroup('logistics')"><span class="ic">🚛</span><span class="nav-label">Logistics</span><span class="nav-arrow" id="arr-logistics">▼</span></button>
       <div class="nav-group-body" id="grp-logistics">
         <button class="nav-btn nav-sub" onclick="showPage('goodsreceived',this)"><span class="ic">📦</span><span class="nav-label">Goods Received</span></button>
-        <button class="nav-btn nav-sub" onclick="showPage('requisitions',this)"><span class="ic">📝</span><span class="nav-label">Requisitions</span><span class="nb" id="req-badge" style="display:none">0</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('concrete',this)"><span class="ic">🏗️</span><span class="nav-label">Batch Plant</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('campsite',this)"><span class="ic">🏕️</span><span class="nav-label">Campsite</span></button>
       </div>
@@ -444,6 +445,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <button class="nav-group-hd" onclick="toggleNavGroup('reports')"><span class="ic">📈</span><span class="nav-label">Reports</span><span class="nav-arrow" id="arr-reports">▼</span></button>
       <div class="nav-group-body" id="grp-reports">
         <button class="nav-btn nav-sub" onclick="showPage('reports',this)"><span class="ic">📊</span><span class="nav-label">Analytics</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('drafts',this)"><span class="ic">📋</span><span class="nav-label">Drafts Manager</span></button>
         <button class="nav-btn nav-sub" id="nav-audit" onclick="showPage('audit',this)"><span class="ic">📜</span><span class="nav-label">Audit Trail</span></button>
         <button class="nav-btn nav-sub" id="nav-users" onclick="showPage('users',this)"><span class="ic">👤</span><span class="nav-label">User Management</span></button>
         <button class="nav-btn nav-sub" onclick="showPage('settings',this)"><span class="ic">⚙️</span><span class="nav-label">Settings</span></button>
@@ -950,7 +952,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
       </div>
       <div class="kpi-grid" id="req-kpis"></div>
       <div class="tcard">
-        <div class="tcard-head"><span class="tcard-title">📝 Purchase Requisitions</span></div>
+        <div class="tcard-head"><span class="tcard-title">📝 Store Requisitions</span></div>
         <div class="table-scroll">
           <table><thead><tr><th>Req #</th><th>Date</th><th>Department</th><th>Requester</th><th>Priority</th><th>Items</th><th>Est. Cost</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="req-tbody"></tbody></table>
@@ -1000,6 +1002,15 @@ tr:hover td{background:rgba(255,255,255,.015);}
       </div>
     </div>
 
+    <!-- DRAFTS MANAGER -->
+    <div class="page" id="page-drafts">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">Drafts auto-expire after 24 hours</div>
+        <button class="btn btn-red btn-sm" onclick="clearAllDrafts()">🗑 Clear All Drafts</button>
+      </div>
+      <div id="drafts-list" class="tcard" style="padding:16px"></div>
+    </div>
+
 <!-- ═══════════ MODALS ═══════════ -->
 
 <!-- CONFIRM DELETE -->
@@ -1039,44 +1050,52 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 <!-- STOCK IN -->
 <div class="overlay" id="m-si"><div class="modal">
-  <div class="mtitle">📥 Stock <span>In</span></div>
+  <input type="hidden" id="si-edit-id">
+  <div class="mtitle" id="si-modal-title">📥 Stock <span>In</span></div>
   <div class="fg"><label>Item</label>
     <div style="display:flex;gap:6px">
-      <select id="si-item" style="flex:1"></select>
+      <select id="si-item" style="flex:1" onchange="updateSIItemInfo()"></select>
       <button class="btn btn-gold btn-sm" onclick="openQuickAddItem('si-item')" title="Add new item on the fly">＋ New</button>
     </div>
   </div>
-  <div class="fr">
-    <div class="fg"><label>Quantity</label><input type="number" id="si-qty" placeholder="0" min="1"></div>
-    <div class="fg"><label>Date</label><input type="date" id="si-date"></div>
+  <div id="si-item-info" style="display:none;font-family:var(--font-mono);font-size:10px;background:var(--surface2);border-radius:6px;padding:6px 10px;margin-bottom:4px;display:flex;gap:16px">
+    <span>Unit: <strong id="si-item-unit" style="color:var(--gold)">—</strong></span>
+    <span>Current Stock: <strong id="si-item-stock" style="color:var(--teal)">—</strong></span>
   </div>
   <div class="fr">
-    <div class="fg"><label>Delivered By</label><input type="text" id="si-deliv" placeholder="Supplier / person"></div>
+    <div class="fg"><label>Quantity</label><input type="number" id="si-qty" placeholder="0" min="1" oninput="draftSave('stockin')"></div>
+    <div class="fg"><label>Date</label><input type="date" id="si-date" oninput="draftSave('stockin')"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Delivered By</label><input type="text" id="si-deliv" placeholder="Supplier / person" oninput="draftSave('stockin')"></div>
     <div class="fg"><label>Received By (Employee)</label><div id="si-emp-ss"></div></div>
   </div>
-  <div class="fg"><label>Notes</label><input type="text" id="si-notes" placeholder="Optional notes"></div>
+  <div class="fg"><label>Notes</label><input type="text" id="si-notes" placeholder="Optional notes" oninput="draftSave('stockin')"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-si')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('stockin')">🗑 Draft</button>
     <button class="btn btn-green" onclick="doStockIn()">Confirm Stock In</button>
   </div>
 </div></div>
 
 <!-- STOCK OUT -->
 <div class="overlay" id="m-so"><div class="modal">
-  <div class="mtitle">📤 Stock <span>Out</span></div>
-  <div class="fg"><label>Item</label><select id="so-item" onchange="updateAvail()"></select></div>
+  <input type="hidden" id="so-edit-id">
+  <div class="mtitle" id="so-modal-title">📤 Stock <span>Out</span></div>
+  <div class="fg"><label>Item</label><select id="so-item" onchange="updateAvail();draftSave('stockout')"></select></div>
   <div id="so-avail" style="font-family:var(--font-mono);font-size:11px;margin:-4px 0 8px;padding:5px 8px;border-radius:6px;"></div>
   <div class="fr">
-    <div class="fg"><label>Quantity</label><input type="number" id="so-qty" placeholder="0" min="1"></div>
-    <div class="fg"><label>Date</label><input type="date" id="so-date"></div>
+    <div class="fg"><label>Quantity</label><input type="number" id="so-qty" placeholder="0" min="1" oninput="draftSave('stockout')"></div>
+    <div class="fg"><label>Date</label><input type="date" id="so-date" oninput="draftSave('stockout')"></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Issued To (Employee)</label><div id="so-emp-ss"></div></div>
     <div class="fg"><label>Authorized By</label><div id="so-auth-ss"></div></div>
   </div>
-  <div class="fg"><label>Purpose / Notes</label><input type="text" id="so-purpose" placeholder="e.g. Site Use, Maintenance"></div>
+  <div class="fg"><label>Purpose / Notes</label><input type="text" id="so-purpose" placeholder="e.g. Site Use, Maintenance" oninput="draftSave('stockout')"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-so')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('stockout')">🗑 Draft</button>
     <button class="btn btn-red" onclick="doStockOut()">Confirm Stock Out</button>
   </div>
 </div></div>
@@ -1106,23 +1125,32 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 <!-- GRN -->
 <div class="overlay" id="m-gr"><div class="modal modal-xl">
-  <div class="mtitle">📦 New Goods Received <span>Note (GRN)</span></div>
+  <input type="hidden" id="gr-edit-id">
+  <div class="mtitle" id="gr-modal-title">📦 Goods Received <span>Note (GRN)</span></div>
   <div class="fr">
-    <div class="fg"><label>Date</label><input type="date" id="gr-date"></div>
+    <div class="fg"><label>Date</label><input type="date" id="gr-date" oninput="draftSave('grn')"></div>
     <div class="fg"><label>Vehicle (Reg)</label><select id="gr-vehicle"></select></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Driver Name</label><input type="text" id="gr-driver" placeholder="Driver name (if not in fleet)"></div>
+    <div class="fg"><label>Supplier / Driver</label><input type="text" id="gr-driver" placeholder="Supplier or driver name" oninput="draftSave('grn')"></div>
     <div class="fg"><label>Received By (Employee)</label><div id="gr-emp-ss"></div></div>
   </div>
-  <div class="fg"><label>Notes / Remarks</label><input type="text" id="gr-notes" placeholder="Optional"></div>
-  <div class="info-box" style="margin-bottom:12px;font-size:10px">✓ Items received will automatically update Stock In</div>
-  <div class="section-label">Items Received</div>
-  <div class="grn-head"><span>Item Name / Description</span><span>Category</span><span>Ordered</span><span>Received</span><span></span></div>
-  <div id="grn-rows"></div>
-  <button class="btn btn-outline btn-sm" onclick="addGRNRow()" style="margin-top:6px">＋ Add Row</button>
+  <div class="fg"><label>Notes / Remarks</label><input type="text" id="gr-notes" placeholder="Optional" oninput="draftSave('grn')"></div>
+  <div class="info-box" style="margin-bottom:10px;font-size:10px">✓ Items received will automatically update Stock Balance</div>
+  <div class="section-label" style="margin-bottom:6px">Items Received</div>
+  <div style="overflow-x:auto">
+    <div style="display:grid;grid-template-columns:2fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr auto;gap:4px;font-family:var(--font-mono);font-size:8px;color:var(--text-dim);padding:0 2px;margin-bottom:4px;min-width:700px">
+      <span>ITEM NAME</span><span>CATEGORY</span><span>UNIT</span><span>ORDERED</span><span>RECEIVED</span><span>UNIT COST</span><span>TOTAL</span><span>LOT/BATCH</span><span></span>
+    </div>
+    <div id="grn-rows"></div>
+  </div>
+  <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+    <button class="btn btn-outline btn-sm" onclick="addGRNRow()">＋ Add Row</button>
+    <div id="grn-total" style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--gold);padding:6px 10px;background:var(--surface2);border-radius:6px">Total: $0.00</div>
+  </div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-gr')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('grn')">🗑 Draft</button>
     <button class="btn btn-purple" onclick="doGRN()">Save GRN</button>
   </div>
 </div></div>
@@ -1318,11 +1346,11 @@ tr:hover td{background:rgba(255,255,255,.015);}
 </div></div>
 
 <!-- EMPLOYEE -->
-<div class="overlay" id="m-emp"><div class="modal">
+<div class="overlay" id="m-emp"><div class="modal modal-lg">
   <input type="hidden" id="e-edit-id">
   <div class="mtitle" id="emp-modal-title">👨‍💼 Add <span>Employee</span></div>
   <div class="fr">
-    <div class="fg"><label>Full Name</label><input type="text" id="e-name" placeholder="Full name"></div>
+    <div class="fg"><label>Full Name</label><input type="text" id="e-name" placeholder="Full name" oninput="autoGenEmpAccount()"></div>
     <div class="fg"><label>Employee ID</label><input type="text" id="e-id" placeholder="e.g. BRA001"></div>
   </div>
   <div class="fr">
@@ -1332,6 +1360,35 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="fr">
     <div class="fg"><label>Phone Number</label><input type="text" id="e-contact" placeholder="Phone number"></div>
     <div class="fg"><label>Status</label><select id="e-status"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
+  </div>
+  <!-- System Account Section -->
+  <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;background:var(--surface2)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <input type="checkbox" id="e-create-account" onchange="toggleAccountSection()" style="accent-color:var(--gold);width:16px;height:16px">
+      <label for="e-create-account" style="font-weight:700;font-size:12px;cursor:pointer">🔐 Create System Account</label>
+    </div>
+    <div id="e-account-section" style="display:none">
+      <div class="fr">
+        <div class="fg"><label>Username</label><input type="text" id="e-username" placeholder="e.g. john.doe"></div>
+        <div class="fg"><label>Password</label><input type="text" id="e-password" placeholder="Auto-generated"></div>
+      </div>
+      <div class="fg"><label>System Role</label>
+        <select id="e-sys-role">
+          <option value="viewer">Viewer (Read Only)</option>
+          <option value="storekeeper">Storekeeper</option>
+          <option value="fuel_attendant">Fuel Attendant</option>
+          <option value="hr_officer">HR Officer</option>
+          <option value="requisition_officer">Requisition Officer</option>
+          <option value="manager">Manager</option>
+          <option value="super_admin">Super Admin</option>
+        </select>
+      </div>
+      <div id="e-creds-result" style="display:none;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:10px;font-family:var(--font-mono);font-size:10px;margin-top:8px">
+        <div style="color:var(--green);margin-bottom:4px">✅ Account created!</div>
+        <div id="e-creds-text"></div>
+        <button class="btn btn-outline btn-sm" onclick="copyEmpCredentials()" style="margin-top:6px">📋 Copy</button>
+      </div>
+    </div>
   </div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-emp')">Cancel</button>
@@ -1525,6 +1582,137 @@ tr:hover td{background:rgba(255,255,255,.015);}
 </div></div>
 
 <!-- DRAFT RESTORE BANNER (global, shown at top of modal) -->
+
+<!-- EDIT STOCK IN MODAL -->
+<div class="overlay" id="m-si-edit"><div class="modal">
+  <input type="hidden" id="sie-tx-id">
+  <div class="mtitle">✏️ Edit Stock <span>In</span></div>
+  <div class="fg"><label>Item</label><input type="text" id="sie-item-name" readonly style="background:var(--surface3);opacity:.7"></div>
+  <div id="sie-info" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);margin-bottom:6px"></div>
+  <div class="fr">
+    <div class="fg"><label>New Quantity</label><input type="number" id="sie-qty" min="1"></div>
+    <div class="fg"><label>Date</label><input type="date" id="sie-date"></div>
+  </div>
+  <div class="fg"><label>Delivered By</label><input type="text" id="sie-deliv"></div>
+  <div class="fg"><label>Notes</label><input type="text" id="sie-notes"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-si-edit')">Cancel</button>
+    <button class="btn btn-green" onclick="doEditStockIn()">Save Changes</button>
+  </div>
+</div></div>
+
+<!-- EDIT STOCK OUT MODAL -->
+<div class="overlay" id="m-so-edit"><div class="modal">
+  <input type="hidden" id="soe-tx-id">
+  <div class="mtitle">✏️ Edit Stock <span>Out</span></div>
+  <div class="fg"><label>Item</label><input type="text" id="soe-item-name" readonly style="background:var(--surface3);opacity:.7"></div>
+  <div id="soe-info" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);margin-bottom:6px"></div>
+  <div class="fr">
+    <div class="fg"><label>New Quantity</label><input type="number" id="soe-qty" min="1"></div>
+    <div class="fg"><label>Date</label><input type="date" id="soe-date"></div>
+  </div>
+  <div class="fg"><label>Purpose / Notes</label><input type="text" id="soe-purpose"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-so-edit')">Cancel</button>
+    <button class="btn btn-red" onclick="doEditStockOut()">Save Changes</button>
+  </div>
+</div></div>
+
+<!-- EDIT CONCRETE MODAL -->
+<div class="overlay" id="m-concrete-edit"><div class="modal">
+  <input type="hidden" id="ce-id">
+  <div class="mtitle">✏️ Edit Batch Plant <span>Record</span></div>
+  <div class="fr">
+    <div class="fg"><label>Material</label><select id="ce-material"><option value="CEMENT">Cement (Tonnes)</option><option value="STONE">Stone (m³)</option><option value="AGGREGATE">Aggregate (m³)</option><option value="SAND">Sand (m³)</option></select></div>
+    <div class="fg"><label>Date</label><input type="date" id="ce-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Qty In</label><input type="number" id="ce-qin" min="0" step="0.01"></div>
+    <div class="fg"><label>Qty Used</label><input type="number" id="ce-qout" min="0" step="0.01"></div>
+  </div>
+  <div class="fg"><label>Supplier</label><input type="text" id="ce-supplier"></div>
+  <div class="fg"><label>Notes</label><input type="text" id="ce-notes"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-concrete-edit')">Cancel</button>
+    <button class="btn btn-gold" onclick="doEditConcrete()">Save Changes</button>
+  </div>
+</div></div>
+
+<!-- EDIT CAMPSITE MODAL -->
+<div class="overlay" id="m-campsite-edit"><div class="modal">
+  <input type="hidden" id="cse-id">
+  <div class="mtitle">✏️ Edit Campsite <span>Record</span></div>
+  <div class="fr">
+    <div class="fg"><label>Supply</label><select id="cse-item"><option value="Water (Cases)">Water (Cases)</option><option value="Soap (bars)">Soap (bars)</option><option value="Washing Powder (kg)">Washing Powder (kg)</option><option value="Toilet Paper (rolls)">Toilet Paper (rolls)</option><option value="Cleaning Chemicals (L)">Cleaning Chemicals (L)</option><option value="Food Supplies (kg)">Food Supplies (kg)</option><option value="Other">Other</option></select></div>
+    <div class="fg"><label>Date</label><input type="date" id="cse-date"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Qty In</label><input type="number" id="cse-qin" min="0"></div>
+    <div class="fg"><label>Qty Out</label><input type="number" id="cse-qout" min="0"></div>
+  </div>
+  <div class="fg"><label>Notes</label><input type="text" id="cse-notes"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-campsite-edit')">Cancel</button>
+    <button class="btn btn-teal" onclick="doEditCampsite()">Save Changes</button>
+  </div>
+</div></div>
+
+<!-- EDIT FUEL ISSUANCE MODAL -->
+<div class="overlay" id="m-fuel-edit"><div class="modal">
+  <input type="hidden" id="fe-id">
+  <div class="mtitle">✏️ Edit Fuel <span>Issuance</span></div>
+  <div class="fr">
+    <div class="fg"><label>Date</label><input type="date" id="fe-date"></div>
+    <div class="fg"><label>Time</label><input type="time" id="fe-time"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Vehicle / Equipment</label><input type="text" id="fe-vehicle"></div>
+    <div class="fg"><label>Flowmeter Amount (L)</label><input type="number" id="fe-flowmeter" min="0" step="0.1"></div>
+  </div>
+  <div class="fg"><label>Purpose</label><input type="text" id="fe-purpose"></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-fuel-edit')">Cancel</button>
+    <button class="btn btn-blue" onclick="doEditFuelIssuance()">Save Changes</button>
+  </div>
+</div></div>
+
+<!-- EDIT FUEL DELIVERY MODAL -->
+<div class="overlay" id="m-fueldev-edit"><div class="modal">
+  <input type="hidden" id="fde-id">
+  <div class="mtitle">✏️ Edit Fuel <span>Delivery</span></div>
+  <div class="fr">
+    <div class="fg"><label>Date</label><input type="date" id="fde-date"></div>
+    <div class="fg"><label>Qty (L)</label><input type="number" id="fde-qty" min="0"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Supplier</label><input type="text" id="fde-supplier"></div>
+    <div class="fg"><label>Dip Before (m)</label><input type="number" id="fde-dip-before" step="0.01"></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label>Dip After (m)</label><input type="number" id="fde-dip-after" step="0.01"></div>
+    <div class="fg"><label>Notes</label><input type="text" id="fde-notes"></div>
+  </div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-fueldev-edit')">Cancel</button>
+    <button class="btn btn-teal" onclick="doEditFuelDelivery()">Save Changes</button>
+  </div>
+</div></div>
+
+<!-- EDIT FLEET VEHICLE MODAL -->
+<div class="overlay" id="m-fleet-edit"><div class="modal">
+  <input type="hidden" id="fle-id">
+  <div class="mtitle">✏️ Edit <span>Vehicle</span></div>
+  <div class="fr">
+    <div class="fg"><label>Registration</label><input type="text" id="fle-reg"></div>
+    <div class="fg"><label>Type</label><select id="fle-type"><option>Earth Mover</option><option>ADT (Articulated Dump Truck)</option><option>Bulldozer</option><option>Excavator</option><option>Grader</option><option>Loader</option><option>Bobcat</option><option>Pool Car</option><option>Bus</option><option>Water Bowser</option><option>Backhoe</option><option>Other</option></select></div>
+  </div>
+  <div class="fg"><label>Description / Model</label><input type="text" id="fle-desc"></div>
+  <div class="fg"><label>Status</label><select id="fle-status"><option value="Active">Active</option><option value="Grounded">Grounded</option><option value="Maintenance">Under Maintenance</option></select></div>
+  <div class="mactions">
+    <button class="btn btn-outline" onclick="closeM('m-fleet-edit')">Cancel</button>
+    <button class="btn btn-gold" onclick="doEditVehicle()">Save Changes</button>
+  </div>
+</div></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -2001,6 +2189,17 @@ function openEmpModal() {
   openM('m-emp');
 }
 
+
+function openCreateAccountForEmp(empId) {
+  const e = db.employees.find(x => x.id === empId);
+  if (!e) return;
+  openEditEmployee(empId);
+  setTimeout(() => {
+    const cb = document.getElementById('e-create-account');
+    if (cb) { cb.checked = true; toggleAccountSection(); }
+    autoGenEmpAccount();
+  }, 100);
+}
 // ═══════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════
@@ -2125,7 +2324,8 @@ const pageTitles = {
   employees:'Employees', categories:'Categories',
   alerts:'Low Stock Alerts', reports:'Reports', settings:'Settings',
   timesheets:'Timesheets',
-  requisitions:'Purchase Requisitions', audit:'Audit Trail', users:'User Management'
+  requisitions:'Store Requisitions', audit:'Audit Trail', users:'User Management',
+  drafts:'Drafts Manager'
 };
 const pageAddMap = {
   balance: () => reqLogin(() => openM('m-item')),
@@ -2168,7 +2368,7 @@ function renderPage(n) {
     campsite: renderCampsite, fleet: renderFleet, employees: renderEmployees,
     categories: renderCategories, alerts: renderAlerts, reports: renderReports,
     generators: renderGenerators, earthmovers: renderEarthMovers, timesheets: renderTimesheets,
-    requisitions: renderRequisitions, audit: renderAuditLog, users: renderUsers,
+    requisitions: renderRequisitions, audit: renderAuditLog, users: renderUsers, drafts: renderDrafts,
     settings: () => { updateStorageSize(); applyCompanyName(); const inp=document.getElementById('setting-company'); const cn=db.settings?.companyName||db.settings?.company_name||''; if(inp&&cn) inp.value=cn; }
   };
   if (map[n]) map[n]();
@@ -2418,36 +2618,36 @@ function renderBalance() {
 // STOCK IN / OUT LOGS
 // ═══════════════════════════════════════════════════════════
 function renderSI() {
-  const txs = db.transactions.filter(t => t.type === 'IN').reverse();
+  const txs = sortByDate(db.transactions.filter(t => t.type === 'IN'));
   const tb = document.getElementById('si-tbody');
   if (!txs.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">📥</div><p>No stock in yet</p></div></td></tr>`; return; }
   tb.innerHTML = txs.map((tx,i) => `<tr>
     <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
     <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(tx.date)}</td>
-    <td class="iname">${tx.itemName}</td>
-    <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.category}</td>
+    <td class="iname">${tx.itemName||tx.item_name||'—'}</td>
+    <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.category||'—'}</td>
     <td style="font-family:var(--font-mono);color:var(--green);font-weight:700">+${tx.qty}</td>
-    <td>${tx.deliveredBy||'—'}</td>
-    <td>${tx.receivedBy||'—'}</td>
+    <td>${tx.deliveredBy||tx.delivered_by||'—'}</td>
+    <td>${tx.receivedBy||tx.received_by||'—'}</td>
     <td style="color:var(--text-dim);font-size:11px">${tx.notes||'—'}</td>
-    <td>${canEdit()?`<button class="abtn del" onclick="confirmDeleteTX('${tx.id}')">🗑</button>`:'—'}</td>
+    <td style="display:flex;gap:4px">${canEdit()?`<button class="abtn" onclick="openEditStockIn('${tx.id}')">✏️</button><button class="abtn del" onclick="confirmDeleteTX('${tx.id}')">🗑</button>`:'—'}</td>
   </tr>`).join('');
 }
 
 function renderSO() {
-  const txs = db.transactions.filter(t => t.type === 'OUT').reverse();
+  const txs = sortByDate(db.transactions.filter(t => t.type === 'OUT'));
   const tb = document.getElementById('so-tbody');
   if (!txs.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">📤</div><p>No stock out yet</p></div></td></tr>`; return; }
   tb.innerHTML = txs.map((tx,i) => `<tr>
     <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
     <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(tx.date)}</td>
-    <td class="iname">${tx.itemName}</td>
-    <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.category}</td>
+    <td class="iname">${tx.itemName||tx.item_name||'—'}</td>
+    <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${tx.category||'—'}</td>
     <td style="font-family:var(--font-mono);color:var(--red);font-weight:700">−${tx.qty}</td>
-    <td>${tx.issuedTo||'—'}</td>
-    <td>${tx.authorizedBy||'—'}</td>
+    <td>${tx.issuedTo||tx.issued_to||'—'}</td>
+    <td>${tx.authorizedBy||tx.authorized_by||'—'}</td>
     <td style="color:var(--text-dim);font-size:11px">${tx.notes||'—'}</td>
-    <td>${canEdit()?`<button class="abtn del" onclick="confirmDeleteTX('${tx.id}')">🗑</button>`:'—'}</td>
+    <td style="display:flex;gap:4px">${canEdit()?`<button class="abtn" onclick="openEditStockOut('${tx.id}')">✏️</button><button class="abtn del" onclick="confirmDeleteTX('${tx.id}')">🗑</button>`:'—'}</td>
   </tr>`).join('');
 }
 
@@ -2552,7 +2752,7 @@ function txGoPage(p) { txPage = p; renderTX(); }
 // STOCK TAKE
 // ═══════════════════════════════════════════════════════════
 function renderST() {
-  const rows = [...db.stockTakes].reverse();
+  const rows = sortByDate(db.stockTakes);
   const tb = document.getElementById('st-tbody');
   if (!rows.length) {
     tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">📋</div><p>No stock takes yet</p></div></td></tr>`;
@@ -2645,7 +2845,7 @@ function filterFuelType(t, btn) { fuelTypeF = t; document.querySelectorAll('#pag
 function renderFuel() {
   renderDipstickTable();
   updateTankGauge();
-  let rows = [...db.fuelLog].reverse();
+  let rows = sortByDate([...db.fuelLog]);
   if (fuelFromF) rows = rows.filter(r => r.date >= fuelFromF);
   if (fuelToF) rows = rows.filter(r => r.date <= fuelToF);
   if (fuelTypeF !== 'ALL') rows = rows.filter(r => r.fuelType === fuelTypeF);
@@ -2673,7 +2873,7 @@ function renderFuel() {
     <td>${r.authorizedBy||r.authorized_by||'—'}</td>
     <td style="color:var(--text-dim);font-size:11px">${r.purpose||'—'}</td>
     <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">${r.odometer||'—'}</td>
-    <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('fuel','${r.id}','${r.amount}L ${r.fuelType} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
+    <td style="display:flex;gap:4px">${canEdit()?`<button class="abtn" onclick="openEditFuelIssuance('${r.id}')">✏️</button><button class="abtn del" onclick="confirmDel('fuel','${r.id}','${r.amount}L ${r.fuelType||r.fuel_type} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
   </tr>`).join('');
   const dtb = document.getElementById('fuel-del-tbody');
   const drows = [...db.fuelDeliveries].reverse();
@@ -2687,7 +2887,7 @@ function renderFuel() {
       <td style="font-family:var(--font-mono);font-size:10px">${r.dipBefore||r.dip_before||'—'}m</td>
       <td style="font-family:var(--font-mono);font-size:10px">${r.dipAfter||r.dip_after||'—'}m</td>
       <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
-      <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('fuelDel','${r.id}','Fuel delivery: ${r.qty}L')">🗑</button>`:'—'}</td>
+      <td style="display:flex;gap:4px">${canEdit()?`<button class="abtn" onclick="openEditFuelDelivery('${r.id}')">✏️</button><button class="abtn del" onclick="confirmDel('fuelDel','${r.id}','Fuel delivery: ${r.qty}L')">🗑</button>`:'—'}</td>
     </tr>`).join('');
 }
 
@@ -2704,7 +2904,7 @@ function renderConcrete() {
     `<div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">${m}</div><div class="kpi-val" style="font-size:20px">${(v.in-v.out).toLocaleString()}</div><div class="kpi-sub">In:${v.in} ${m==='CEMENT'?'t':m.includes('m³')?'m³':'units'} · Used:${v.out}</div></div>`).join('');
   const tb = document.getElementById('concrete-tbody');
   if (!rows.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">🏗️</div><p>No records</p></div></td></tr>`; return; }
-  tb.innerHTML = [...rows].reverse().map((r,i) => `<tr>
+  tb.innerHTML = sortByDate(rows).map((r,i) => `<tr>
     <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:9px">${i+1}</td>
     <td style="font-family:var(--font-mono);font-size:10px">${fmtDate(r.date)}</td>
     <td style="font-weight:700">${r.material}</td>
@@ -2713,7 +2913,7 @@ function renderConcrete() {
     <td style="font-family:var(--font-mono);font-weight:700">${r.balance||0} ${r.material==='CEMENT'?'t':'m³'}</td>
     <td>${r.supplier||'—'}</td>
     <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
-    <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('concrete','${r.id}','${r.material} batch on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
+    <td style="display:flex;gap:4px">${canEdit()?`<button class="abtn" onclick="openEditConcrete('${r.id}')">✏️</button><button class="abtn del" onclick="confirmDel('concrete','${r.id}','${r.material} batch on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
   </tr>`).join('');
 }
 
@@ -2730,7 +2930,7 @@ function renderCampsite() {
     const subDisp = isW ? `In:${v.in} Out:${v.out} · ${bal*12}L` : `In:${v.in} Out:${v.out}`;
     return `<div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">${s}</div><div class="kpi-val" style="font-size:20px">${valDisp}</div><div class="kpi-sub">${subDisp}</div></div>`;
   }).join('');
-  const rows = [...db.campsiteLog].reverse();
+  const rows = sortByDate(db.campsiteLog);
   const tb = document.getElementById('campsite-tbody');
   if (!rows.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ei">🏕️</div><p>No records</p></div></td></tr>`; return; }
   tb.innerHTML = rows.map((r,i) => {
@@ -2747,7 +2947,7 @@ function renderCampsite() {
     <td style="font-family:var(--font-mono);font-weight:700">${balDisp}</td>
     <td>${statBadge(r.balance>10?'GOOD':r.balance>3?'LOW':'CRITICAL')}</td>
     <td style="color:var(--text-dim);font-size:11px">${r.notes||'—'}</td>
-    <td>${canEdit()?`<button class="abtn del" onclick="confirmDel('campsite','${r.id}','${r.supply} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
+    <td style="display:flex;gap:4px">${canEdit()?`<button class="abtn" onclick="openEditCampsite('${r.id}')">✏️</button><button class="abtn del" onclick="confirmDel('campsite','${r.id}','${r.supply} on ${fmtDate(r.date)}')">🗑</button>`:'—'}</td>
   </tr>`; }).join('');
 }
 
@@ -2776,7 +2976,7 @@ function renderFleet() {
           <div style="font-size:11px;color:var(--text-mid);margin-top:2px">${f.desc||''}</div>
           <div style="margin-top:5px"><span class="badge bg-blue">${f.type}</span></div>
           ${assignedEmp ? `<div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:5px">👤 ${assignedEmp.name}</div>` : ''}
-          <div class="card-del">${canEdit()?`<button class="abtn del" onclick="confirmDel('fleet','${f.id}','${f.reg} — ${f.desc}')">🗑</button>`:'—'}</div>
+          <div class="card-del" style="display:flex;gap:4px;margin-top:8px">${canEdit()?`<button class="abtn" onclick="openEditVehicle('${f.id}')">✏️ Edit</button><button class="abtn del" onclick="confirmDel('fleet','${f.id}','${f.reg} — ${f.desc}')">🗑 Del</button>`:'—'}</div>
         </div>`;
       }).join('');
 
@@ -2829,8 +3029,9 @@ function renderEmployees() {
             ${e.empId ? `<span>🪪 ${e.empId}</span>` : ''}
             ${e.contact ? `<span>📞 ${e.contact}</span>` : ''}
           </div>
-          <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+          <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border);padding-top:8px;flex-wrap:wrap">
             ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditEmployee('${e.id}'))">✏️ Edit</button><button class="abtn del" onclick="confirmDel('emp','${e.id}','${e.name}')">🗑 Delete</button>` : ''}
+            ${canEdit() && !(db.appUsers||[]).find(u=>u.employee_id===e.id) ? `<button class="abtn" style="color:var(--gold)" onclick="openCreateAccountForEmp('${e.id}')">🔐 Account</button>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -3540,10 +3741,16 @@ async function doAddEmployee() {
     // ADD MODE
     if (db.employees.find(e => e.name.toLowerCase() === name.toLowerCase())) return toast('Employee with this name already exists', 'err');
     const id = uid();
+    const accountOk = await doAddEmployeeWithAccount(id, name, empId, role, dept, contact, status);
+    if (!accountOk) return;
     await sbSave('employees', { id, name, emp_id: empId, role, dept, contact, status });
     db.employees.push({ id, name, empId, role, dept, contact, status });
-    closeM('m-emp');
-    ['e-name','e-id','e-role','e-dept','e-contact'].forEach(f => document.getElementById(f).value = '');
+    logAction('CREATE_EMPLOYEE', 'hr', id, name);
+    const hasAccount = document.getElementById('e-create-account')?.checked;
+    if (!hasAccount) {
+      closeM('m-emp');
+      ['e-name','e-id','e-role','e-dept','e-contact'].forEach(f => document.getElementById(f).value = '');
+    }
     toast(`✓ "${name}" added`); renderEmployees();
   }
 }
@@ -3675,6 +3882,453 @@ async function changePassword() {
   hidePwErr();
   toast('✓ Password changed successfully', 'ok');
   ['pw-current','pw-new','pw-confirm'].forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// STOCK IN ITEM INFO — show unit & current stock on select
+// ═══════════════════════════════════════════════════════════
+function updateSIItemInfo() {
+  const itemId = document.getElementById('si-item')?.value;
+  const infoEl = document.getElementById('si-item-info');
+  if (!itemId || !infoEl) return;
+  const item = db.items.find(i => i.id === itemId);
+  if (item) {
+    document.getElementById('si-item-unit').textContent = item.unit || 'pcs';
+    document.getElementById('si-item-stock').textContent = `${item.balance} ${item.unit || 'pcs'}`;
+    infoEl.style.display = 'flex';
+  } else {
+    infoEl.style.display = 'none';
+  }
+  draftSave('stockin');
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT STOCK IN
+// ═══════════════════════════════════════════════════════════
+function openEditStockIn(txId) {
+  const tx = db.transactions.find(t => t.id === txId);
+  if (!tx || tx.type !== 'IN') return;
+  document.getElementById('sie-tx-id').value = txId;
+  document.getElementById('sie-item-name').value = tx.itemName || tx.item_name || '';
+  document.getElementById('sie-qty').value = tx.qty;
+  document.getElementById('sie-date').value = tx.date;
+  document.getElementById('sie-deliv').value = tx.deliveredBy || tx.delivered_by || '';
+  document.getElementById('sie-notes').value = tx.notes || '';
+  const item = db.items.find(i => i.id === (tx.itemId || tx.item_id));
+  document.getElementById('sie-info').textContent = item ? `Current balance: ${item.balance} ${item.unit || 'pcs'} · Original qty: ${tx.qty}` : '';
+  openM('m-si-edit');
+}
+
+async function doEditStockIn() {
+  const txId  = document.getElementById('sie-tx-id').value;
+  const newQty = parseInt(document.getElementById('sie-qty').value);
+  const date   = document.getElementById('sie-date').value;
+  const deliv  = document.getElementById('sie-deliv').value.trim();
+  const notes  = document.getElementById('sie-notes').value.trim();
+  if (!newQty || newQty <= 0) return toast('Enter valid quantity', 'err');
+  const tx = db.transactions.find(t => t.id === txId);
+  if (!tx) return;
+  const item = db.items.find(i => i.id === (tx.itemId || tx.item_id));
+  const diff = newQty - tx.qty;
+  const old = { qty: tx.qty, date: tx.date };
+  // Update item balance
+  if (item) {
+    item.balance += diff;
+    item.totalIn = (item.totalIn || 0) + diff;
+    await sbSave('items', { id: item.id, balance: item.balance, total_in: item.totalIn });
+  }
+  // Update transaction
+  tx.qty = newQty; tx.date = date; tx.deliveredBy = deliv; tx.notes = notes;
+  await sbSave('transactions', { id: txId, qty: newQty, date, delivered_by: deliv, notes });
+  logAction('UPDATE_STOCK_IN', 'inventory', txId, tx.itemName, old, { qty: newQty, date });
+  closeM('m-si-edit');
+  toast(`✓ Stock In updated (${diff >= 0 ? '+' : ''}${diff} adjustment)`);
+  refreshAll();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT STOCK OUT
+// ═══════════════════════════════════════════════════════════
+function openEditStockOut(txId) {
+  const tx = db.transactions.find(t => t.id === txId);
+  if (!tx || tx.type !== 'OUT') return;
+  document.getElementById('soe-tx-id').value = txId;
+  document.getElementById('soe-item-name').value = tx.itemName || tx.item_name || '';
+  document.getElementById('soe-qty').value = tx.qty;
+  document.getElementById('soe-date').value = tx.date;
+  document.getElementById('soe-purpose').value = tx.notes || '';
+  const item = db.items.find(i => i.id === (tx.itemId || tx.item_id));
+  document.getElementById('soe-info').textContent = item ? `Current balance: ${item.balance} ${item.unit || 'pcs'} · Original qty: ${tx.qty}` : '';
+  openM('m-so-edit');
+}
+
+async function doEditStockOut() {
+  const txId   = document.getElementById('soe-tx-id').value;
+  const newQty = parseInt(document.getElementById('soe-qty').value);
+  const date   = document.getElementById('soe-date').value;
+  const purpose = document.getElementById('soe-purpose').value.trim();
+  if (!newQty || newQty <= 0) return toast('Enter valid quantity', 'err');
+  const tx = db.transactions.find(t => t.id === txId);
+  if (!tx) return;
+  const item = db.items.find(i => i.id === (tx.itemId || tx.item_id));
+  const diff = newQty - tx.qty; // positive = issued more
+  if (item && item.balance - diff < 0) return toast('Insufficient stock for this edit', 'err');
+  const old = { qty: tx.qty };
+  if (item) {
+    item.balance -= diff;
+    item.totalOut = (item.totalOut || 0) + diff;
+    await sbSave('items', { id: item.id, balance: item.balance, total_out: item.totalOut });
+  }
+  tx.qty = newQty; tx.date = date; tx.notes = purpose;
+  await sbSave('transactions', { id: txId, qty: newQty, date, notes: purpose });
+  logAction('UPDATE_STOCK_OUT', 'inventory', txId, tx.itemName, old, { qty: newQty });
+  closeM('m-so-edit');
+  toast('✓ Stock Out updated');
+  refreshAll();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT CONCRETE
+// ═══════════════════════════════════════════════════════════
+function openEditConcrete(id) {
+  const r = db.concreteLog.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('ce-id').value = id;
+  document.getElementById('ce-material').value = r.material;
+  document.getElementById('ce-date').value = r.date;
+  document.getElementById('ce-qin').value = r.qIn || 0;
+  document.getElementById('ce-qout').value = r.qOut || 0;
+  document.getElementById('ce-supplier').value = r.supplier || '';
+  document.getElementById('ce-notes').value = r.notes || '';
+  openM('m-concrete-edit');
+}
+
+async function doEditConcrete() {
+  const id  = document.getElementById('ce-id').value;
+  const mat = document.getElementById('ce-material').value;
+  const date= document.getElementById('ce-date').value;
+  const qIn = parseFloat(document.getElementById('ce-qin').value) || 0;
+  const qOut= parseFloat(document.getElementById('ce-qout').value) || 0;
+  const sup = document.getElementById('ce-supplier').value.trim();
+  const notes = document.getElementById('ce-notes').value.trim();
+  const r = db.concreteLog.find(x => x.id === id);
+  if (!r) return;
+  // Recalculate balance
+  const prevOthers = db.concreteLog.filter(x => x.id !== id && x.material === mat).reduce((s,x) => s + (x.qIn||0) - (x.qOut||0), 0);
+  const balance = prevOthers + qIn - qOut;
+  Object.assign(r, { material: mat, date, qIn, qOut, balance, supplier: sup, notes });
+  await sbSave('concrete_log', { id, material: mat, date, q_in: qIn, q_out: qOut, balance, supplier: sup, notes });
+  logAction('UPDATE_CONCRETE', 'batch_plant', id, mat);
+  closeM('m-concrete-edit');
+  toast('✓ Batch Plant record updated');
+  renderConcrete();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT CAMPSITE
+// ═══════════════════════════════════════════════════════════
+function openEditCampsite(id) {
+  const r = db.campsiteLog.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('cse-id').value = id;
+  document.getElementById('cse-item').value = r.supply;
+  document.getElementById('cse-date').value = r.date;
+  document.getElementById('cse-qin').value = r.qIn || 0;
+  document.getElementById('cse-qout').value = r.qOut || 0;
+  document.getElementById('cse-notes').value = r.notes || '';
+  openM('m-campsite-edit');
+}
+
+async function doEditCampsite() {
+  const id   = document.getElementById('cse-id').value;
+  const sup  = document.getElementById('cse-item').value;
+  const date = document.getElementById('cse-date').value;
+  const qIn  = parseFloat(document.getElementById('cse-qin').value) || 0;
+  const qOut = parseFloat(document.getElementById('cse-qout').value) || 0;
+  const notes= document.getElementById('cse-notes').value.trim();
+  const r = db.campsiteLog.find(x => x.id === id);
+  if (!r) return;
+  const prevOthers = db.campsiteLog.filter(x => x.id !== id && x.supply === sup).reduce((s,x) => s + (x.qIn||0) - (x.qOut||0), 0);
+  const balance = prevOthers + qIn - qOut;
+  Object.assign(r, { supply: sup, date, qIn, qOut, balance, notes });
+  await sbSave('campsite_log', { id, supply: sup, date, q_in: qIn, q_out: qOut, balance, notes });
+  logAction('UPDATE_CAMPSITE', 'campsite', id, sup);
+  closeM('m-campsite-edit');
+  toast('✓ Campsite record updated');
+  renderCampsite();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT FUEL ISSUANCE
+// ═══════════════════════════════════════════════════════════
+function openEditFuelIssuance(id) {
+  const r = db.fuelLog.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('fe-id').value = id;
+  document.getElementById('fe-date').value = r.date;
+  document.getElementById('fe-time').value = r.time || '';
+  document.getElementById('fe-vehicle').value = r.vehicle || '';
+  document.getElementById('fe-flowmeter').value = r.flowmeter || r.amount || '';
+  document.getElementById('fe-purpose').value = r.purpose || '';
+  openM('m-fuel-edit');
+}
+
+async function doEditFuelIssuance() {
+  const id   = document.getElementById('fe-id').value;
+  const date = document.getElementById('fe-date').value;
+  const time = document.getElementById('fe-time').value;
+  const vehicle = document.getElementById('fe-vehicle').value.trim();
+  const flowmeter = parseFloat(document.getElementById('fe-flowmeter').value) || 0;
+  const purpose = document.getElementById('fe-purpose').value.trim();
+  const r = db.fuelLog.find(x => x.id === id);
+  if (!r) return;
+  Object.assign(r, { date, time, vehicle, amount: flowmeter, flowmeter, purpose });
+  await sbSave('fuel_log', { id, date, time, vehicle, amount: flowmeter, flowmeter, purpose });
+  logAction('UPDATE_FUEL', 'fuel', id, vehicle);
+  closeM('m-fuel-edit');
+  toast('✓ Fuel issuance updated');
+  renderFuel();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT FUEL DELIVERY
+// ═══════════════════════════════════════════════════════════
+function openEditFuelDelivery(id) {
+  const r = db.fuelDeliveries.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('fde-id').value = id;
+  document.getElementById('fde-date').value = r.date;
+  document.getElementById('fde-qty').value = r.qty;
+  document.getElementById('fde-supplier').value = r.supplier || '';
+  document.getElementById('fde-dip-before').value = r.dipBefore || r.dip_before || '';
+  document.getElementById('fde-dip-after').value = r.dipAfter || r.dip_after || '';
+  document.getElementById('fde-notes').value = r.notes || '';
+  openM('m-fueldev-edit');
+}
+
+async function doEditFuelDelivery() {
+  const id  = document.getElementById('fde-id').value;
+  const date = document.getElementById('fde-date').value;
+  const qty  = parseFloat(document.getElementById('fde-qty').value) || 0;
+  const sup  = document.getElementById('fde-supplier').value.trim();
+  const dipB = document.getElementById('fde-dip-before').value;
+  const dipA = document.getElementById('fde-dip-after').value;
+  const notes= document.getElementById('fde-notes').value.trim();
+  const r = db.fuelDeliveries.find(x => x.id === id);
+  if (!r) return;
+  Object.assign(r, { date, qty, supplier: sup, dipBefore: dipB, dipAfter: dipA, notes });
+  await sbSave('fuel_deliveries', { id, date, qty, supplier: sup, dip_before: dipB, dip_after: dipA, notes });
+  logAction('UPDATE_FUEL_DELIVERY', 'fuel', id, sup);
+  closeM('m-fueldev-edit');
+  toast('✓ Fuel delivery updated');
+  renderFuel();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT VEHICLE
+// ═══════════════════════════════════════════════════════════
+function openEditVehicle(id) {
+  const f = db.fleet.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('fle-id').value = id;
+  document.getElementById('fle-reg').value = f.reg;
+  document.getElementById('fle-type').value = f.type;
+  document.getElementById('fle-desc').value = f.desc || f.description || '';
+  document.getElementById('fle-status').value = f.status || 'Active';
+  openM('m-fleet-edit');
+}
+
+async function doEditVehicle() {
+  const id   = document.getElementById('fle-id').value;
+  const reg  = document.getElementById('fle-reg').value.trim().toUpperCase();
+  const type = document.getElementById('fle-type').value;
+  const desc = document.getElementById('fle-desc').value.trim();
+  const status = document.getElementById('fle-status').value;
+  if (!reg) return toast('Enter registration', 'err');
+  const f = db.fleet.find(x => x.id === id);
+  if (!f) return;
+  Object.assign(f, { reg, type, desc, description: desc, status });
+  await sbSave('fleet', { id, reg, type, description: desc, status });
+  logAction('UPDATE_VEHICLE', 'fleet', id, reg);
+  closeM('m-fleet-edit');
+  toast('✓ Vehicle updated');
+  renderFleet();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EMPLOYEE ACCOUNT CREATION
+// ═══════════════════════════════════════════════════════════
+function autoGenEmpAccount() {
+  const name = document.getElementById('e-name')?.value.trim() || '';
+  if (!name) return;
+  const parts = name.toLowerCase().split(' ');
+  const username = parts.length >= 2 ? parts[0] + '.' + parts[parts.length - 1] : parts[0];
+  const password = parts[parts.length - 1] || parts[0];
+  const uEl = document.getElementById('e-username');
+  const pEl = document.getElementById('e-password');
+  if (uEl && !uEl.value) uEl.value = username;
+  if (pEl && !pEl.value) pEl.value = password;
+}
+
+function toggleAccountSection() {
+  const checked = document.getElementById('e-create-account')?.checked;
+  const section = document.getElementById('e-account-section');
+  if (section) section.style.display = checked ? 'block' : 'none';
+}
+
+function copyEmpCredentials() {
+  const text = document.getElementById('e-creds-text')?.textContent || '';
+  navigator.clipboard?.writeText(text).catch(() => {});
+  toast('✓ Credentials copied');
+}
+
+// ═══════════════════════════════════════════════════════════
+// ENHANCED addGRNRow — with all extended fields
+// ═══════════════════════════════════════════════════════════
+function addGRNRow() {
+  grnRowCount++;
+  const id = `grn-r${grnRowCount}`;
+  const d = document.createElement('div');
+  d.id = id;
+  d.style.cssText = 'display:grid;grid-template-columns:2fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr auto;gap:4px;margin-bottom:6px;align-items:center;min-width:700px';
+  const itemOpts = db.items.map(i => `<option value="${i.name}" data-unit="${i.unit||'pcs'}">${i.name}</option>`).join('');
+  d.innerHTML = `
+    <input type="text" list="grn-items-list" placeholder="Item name / description" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px;font-family:var(--font-head)" oninput="autoFillGRNUnit(this,\'${id}\');updateGRNTotal();draftSave(\'grn\')">
+    <select style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px;font-size:11px">${catOptions()}</select>
+    <input type="text" placeholder="pcs" id="${id}-unit" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
+    <input type="number" placeholder="Ordered" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input type="number" placeholder="Received" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input type="number" placeholder="Cost" min="0" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <span id="${id}-total" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);padding:0 4px">$0.00</span>
+    <input type="text" placeholder="Lot/Batch" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
+    <button onclick="document.getElementById('${id}').remove();updateGRNTotal()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:var(--red);border-radius:6px;padding:6px 9px;cursor:pointer;font-size:12px">✕</button>`;
+  document.getElementById('grn-rows').appendChild(d);
+  // Add datalist if not exists
+  if (!document.getElementById('grn-items-list')) {
+    const dl = document.createElement('datalist');
+    dl.id = 'grn-items-list';
+    dl.innerHTML = itemOpts;
+    document.body.appendChild(dl);
+  }
+}
+
+function autoFillGRNUnit(input, rowId) {
+  const name = input.value.trim();
+  const item = db.items.find(i => i.name.toLowerCase() === name.toLowerCase());
+  if (item) {
+    const unitEl = document.getElementById(rowId + '-unit');
+    if (unitEl) unitEl.value = item.unit || 'pcs';
+  }
+}
+
+function updateGRNTotal() {
+  let total = 0;
+  document.querySelectorAll('#grn-rows > div').forEach(row => {
+    const ins = row.querySelectorAll('input[type="number"]');
+    const received = parseFloat(ins[1]?.value) || 0;
+    const cost     = parseFloat(ins[2]?.value) || 0;
+    const lineTotal = received * cost;
+    total += lineTotal;
+    const span = row.querySelector('[id$="-total"]');
+    if (span) span.textContent = '$' + lineTotal.toFixed(2);
+  });
+  const el = document.getElementById('grn-total');
+  if (el) el.textContent = 'Total: $' + total.toFixed(2);
+}
+
+// ═══════════════════════════════════════════════════════════
+// DRAFTS MANAGER PAGE
+// ═══════════════════════════════════════════════════════════
+const DRAFT_KEYS = ['grn','req','stockin','stockout','stocktake','fuel','fueldelivery','concrete','campsite','employee','vehicle','generator','earthmover','timesheet'];
+
+function renderDrafts() {
+  const container = document.getElementById('drafts-list');
+  if (!container) return;
+  // Auto-clear expired
+  DRAFT_KEYS.forEach(k => { const d = checkDraft(k); if (!d) localStorage.removeItem('draft_' + k); });
+  const drafts = DRAFT_KEYS.map(k => {
+    const d = checkDraft(k);
+    return d ? { key: k, ...d } : null;
+  }).filter(Boolean);
+  if (!drafts.length) {
+    container.innerHTML = '<div class="empty"><div class="ei">📋</div><p>No saved drafts</p><p style="font-size:11px;color:var(--text-dim);margin-top:6px">Drafts are auto-saved as you fill in forms</p></div>';
+    return;
+  }
+  const names = { grn:'GRN', req:'Store Requisition', stockin:'Stock In', stockout:'Stock Out', stocktake:'Stock Take', fuel:'Fuel Issuance', fueldelivery:'Fuel Delivery', concrete:'Batch Plant', campsite:'Campsite', employee:'Employee', vehicle:'Vehicle', generator:'Generator', earthmover:'Heavy Equipment', timesheet:'Timesheet' };
+  container.innerHTML = `<div style="font-size:13px;font-weight:700;margin-bottom:12px">📋 Saved Drafts (${drafts.length})</div>` +
+    drafts.map(d => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface2);border-radius:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:12px">${names[d.key] || d.key}</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">Saved: ${new Date(d.savedAt).toLocaleString()} · Expires: ${new Date(d.expiresAt).toLocaleString()}</div>
+        </div>
+        <button class="btn btn-teal btn-sm" onclick="restoreDraftAndOpen('${d.key}')">↩ Restore</button>
+        <button class="btn btn-red btn-sm" onclick="dismissDraft('${d.key}');renderDrafts()">🗑</button>
+      </div>`).join('');
+}
+
+function restoreDraftAndOpen(key) {
+  const modalMap = { grn:'m-gr', req:'m-req', stockin:'m-si', stockout:'m-so', stocktake:'m-st', fuel:'m-fuel', fueldelivery:'m-fuel-del', concrete:'m-concrete', campsite:'m-campsite', employee:'m-emp', vehicle:'m-fleet', generator:'m-gen', earthmover:'m-earthmover', timesheet:'m-ts' };
+  restoreDraft(key);
+  const modalId = modalMap[key];
+  if (modalId) openM(modalId);
+}
+
+function clearAllDrafts() {
+  DRAFT_KEYS.forEach(k => localStorage.removeItem('draft_' + k));
+  toast('✓ All drafts cleared');
+  renderDrafts();
+}
+
+// ═══════════════════════════════════════════════════════════
+// DATE SORTING HELPERS — latest first for all lists
+// ═══════════════════════════════════════════════════════════
+function sortByDate(arr, field = 'date') {
+  return [...arr].sort((a, b) => {
+    const da = a[field] || a.created_at || '';
+    const db2 = b[field] || b.created_at || '';
+    return da > db2 ? -1 : da < db2 ? 1 : 0;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// EMPLOYEE WITH ACCOUNT CREATION — enhanced doAddEmployee
+// ═══════════════════════════════════════════════════════════
+async function doAddEmployeeWithAccount(editId, name, empId, role, dept, contact, status) {
+  const createAccount = document.getElementById('e-create-account')?.checked;
+  if (createAccount) {
+    const username = document.getElementById('e-username')?.value.trim().toLowerCase();
+    const password = document.getElementById('e-password')?.value.trim();
+    const sysRole  = document.getElementById('e-sys-role')?.value || 'viewer';
+    if (!username || !password || password.length < 6) {
+      toast('Username and password (min 6 chars) required for account creation', 'err');
+      return false;
+    }
+    // Check username not taken
+    if ((db.appUsers || []).find(u => u.username === username && u.id !== editId)) {
+      toast('Username already taken', 'err');
+      return false;
+    }
+    const userId = editId || uid();
+    const userRec = { id: userId, username, full_name: name, role: sysRole, is_active: true, password_plain: password, password_hash: btoa(password), employee_id: editId || null };
+    await sbSave('app_users', userRec);
+    if (!db.appUsers) db.appUsers = [];
+    const existingUser = db.appUsers.find(u => u.username === username);
+    if (existingUser) Object.assign(existingUser, userRec);
+    else db.appUsers.push(userRec);
+    // Show credentials
+    const resEl = document.getElementById('e-creds-result');
+    const txtEl = document.getElementById('e-creds-text');
+    if (resEl && txtEl) {
+      txtEl.innerHTML = `Username: <strong>${username}</strong><br>Password: <strong>${password}</strong><br>Role: <strong>${getRoleLabel(sysRole)}</strong>`;
+      resEl.style.display = 'block';
+      window._lastEmpCreds = `Username: ${username}\nPassword: ${password}\nRole: ${getRoleLabel(sysRole)}`;
+    }
+    logAction('CREATE_USER', 'user', userId, username);
+    toast(`✅ Account created! User: ${username}`);
+  }
+  return true;
 }
 
 
@@ -4131,7 +4785,7 @@ function renderTimesheets() {
   if (!db.timesheets) db.timesheets = [];
   const fromV = document.getElementById('ts-from')?.value || '';
   const toV   = document.getElementById('ts-to')?.value   || '';
-  let rows = [...db.timesheets].reverse();
+  let rows = sortByDate(db.timesheets);
   if (fromV) rows = rows.filter(r => r.date >= fromV);
   if (toV)   rows = rows.filter(r => r.date <= toV);
 
@@ -4594,7 +5248,7 @@ async function submitRequisition() {
 
 function renderRequisitions() {
   if (!db.requisitions) db.requisitions = [];
-  let rows = [...db.requisitions];
+  let rows = sortByDate(db.requisitions);
   if (reqViewFilter !== 'all') rows = rows.filter(r => r.status === reqViewFilter);
 
   // KPIs
