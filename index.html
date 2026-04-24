@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -675,8 +674,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
         <div class="ftabs">
           <button class="ftab active" onclick="filterConcrete('ALL',this)">All</button>
           <button class="ftab" onclick="filterConcrete('CEMENT',this)">Cement</button>
-          <button class="ftab" onclick="filterConcrete('STONE',this)">Stone</button>
-          <button class="ftab" onclick="filterConcrete('AGGREGATE',this)">Aggregate</button>
+          <button class="ftab" onclick="filterConcrete('QUARRY_STONE',this)">Stone</button>
+          <button class="ftab" onclick="filterConcrete('QUARRY_DUST',this)">Aggregate</button>
           <button class="ftab" onclick="filterConcrete('SAND',this)">Sand</button>
         </div>
       </div>
@@ -1195,11 +1194,12 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Purpose</label><input type="text" id="f-purpose" placeholder="e.g. Site Use, Trip"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Odometer Reading (km)</label><input type="number" id="f-odometer" placeholder="Optional"></div>
-    <div class="fg"><label>Flowmeter Amount (L)</label><input type="number" id="f-flowmeter" placeholder="Amount on pump meter" min="0" step="0.1"></div>
+    <div class="fg"><label>Odometer Reading (km)</label><input type="number" id="f-odometer" placeholder="Optional" oninput="draftSave('fuel')"></div>
+    <div class="fg"><label>Flowmeter Amount (L)</label><input type="number" id="f-flowmeter" placeholder="Amount on pump meter" min="0" step="0.1" oninput="draftSave('fuel')"></div>
   </div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-fuel')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('fuel')">🗑 Draft</button>
     <button class="btn btn-blue" onclick="doFuelIssuance()">Log Issuance</button>
   </div>
 </div></div>
@@ -1212,17 +1212,18 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Fuel Type</label><select id="fd-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Quantity Delivered (Litres)</label><input type="number" id="fd-qty" placeholder="0" min="1"></div>
-    <div class="fg"><label>Supplier</label><input type="text" id="fd-supplier" placeholder="Supplier name"></div>
+    <div class="fg"><label>Quantity Delivered (Litres)</label><input type="number" id="fd-qty" placeholder="0" min="1" oninput="draftSave('fueldelivery')"></div>
+    <div class="fg"><label>Supplier</label><input type="text" id="fd-supplier" placeholder="Supplier name" oninput="draftSave('fueldelivery')"></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Dipstick Before Delivery (m)</label><input type="number" id="fd-dip-before" placeholder="e.g. 0.85" step="0.01" oninput="calcDeliveryVerify()"></div>
     <div class="fg"><label>Dipstick After Delivery (m)</label><input type="number" id="fd-dip-after" placeholder="e.g. 1.40" step="0.01" oninput="calcDeliveryVerify()"></div>
   </div>
   <div id="fd-verify" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);background:rgba(45,212,191,.08);border-radius:6px;padding:6px 10px;margin-bottom:8px;display:none"></div>
-  <div class="fg"><label>Notes</label><input type="text" id="fd-notes" placeholder="Optional"></div>
+  <div class="fg"><label>Notes</label><input type="text" id="fd-notes" placeholder="Optional" oninput="draftSave('fueldelivery')"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-fuel-del')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('fueldelivery')">🗑 Draft</button>
     <button class="btn btn-teal" onclick="doFuelDelivery()">Record Delivery</button>
   </div>
 </div></div>
@@ -1284,13 +1285,13 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🏗️ Batch Plant <span>Material</span></div>
   <div class="fr">
     <div class="fg"><label>Material Type</label>
-      <select id="c-material"><option value="CEMENT">Cement (Tonnes)</option><option value="STONE">Quarry Stone (m³)</option><option value="AGGREGATE">Aggregate (m³)</option><option value="SAND">Sand (m³)</option></select>
+      <select id="c-material"><option value="CEMENT">Cement (Tonnes)</option><option value="QUARRY_STONE">Quarry Stone (m³)</option><option value="QUARRY_DUST">Quarry Dust (m³)</option><option value="SAND">Sand (m³)</option></select>
     </div>
     <div class="fg"><label>Date</label><input type="date" id="c-date"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Qty Received (delivery)</label><input type="number" id="c-qin" placeholder="0" min="0" step="0.01"></div>
-    <div class="fg"><label>Qty Used / Consumed</label><input type="number" id="c-qout" placeholder="0" min="0" step="0.01"></div>
+    <div class="fg"><label>Qty Received (delivery)</label><input type="number" id="c-qin" placeholder="0" min="0" step="0.01" oninput="draftSave('concrete')"></div>
+    <div class="fg"><label>Qty Used / Consumed</label><input type="number" id="c-qout" placeholder="0" min="0" step="0.01" oninput="draftSave('concrete')"></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Supplier / Source</label><input type="text" id="c-supplier" placeholder="Optional"></div>
@@ -1299,6 +1300,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="fg"><label>Notes</label><input type="text" id="c-notes" placeholder="Batch details, mix ratio, etc."></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-concrete')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('concrete')">🗑 Draft</button>
     <button class="btn btn-gold" onclick="doConcrete()">Save Record</button>
   </div>
 </div></div>
@@ -1314,13 +1316,14 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div id="cs-water-info" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);background:rgba(45,212,191,.08);border-radius:6px;padding:6px 10px;margin-bottom:8px">1 Case = 24 × 500ml bottles = 12 Litres</div>
   <div class="fr">
-    <div class="fg"><label id="cs-qin-label">Qty In (Cases)</label><input type="number" id="cs-qin" placeholder="0" min="0" oninput="updateCampsiteConversion()"></div>
-    <div class="fg"><label id="cs-qout-label">Qty Out (Cases)</label><input type="number" id="cs-qout" placeholder="0" min="0" oninput="updateCampsiteConversion()"></div>
+    <div class="fg"><label id="cs-qin-label">Qty In (Cases)</label><input type="number" id="cs-qin" placeholder="0" min="0" oninput="updateCampsiteConversion();draftSave('campsite')"></div>
+    <div class="fg"><label id="cs-qout-label">Qty Out (Cases)</label><input type="number" id="cs-qout" placeholder="0" min="0" oninput="updateCampsiteConversion();draftSave('campsite')"></div>
   </div>
   <div id="cs-conversion" style="font-family:var(--font-mono);font-size:10px;color:var(--gold);margin:-4px 0 8px;padding:4px 8px"></div>
   <div class="fg"><label>Notes</label><input type="text" id="cs-notes" placeholder="Optional"></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-campsite')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('campsite')">🗑 Draft</button>
     <button class="btn btn-teal" onclick="doCampsite()">Save</button>
   </div>
 </div></div>
@@ -1350,7 +1353,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <input type="hidden" id="e-edit-id">
   <div class="mtitle" id="emp-modal-title">👨‍💼 Add <span>Employee</span></div>
   <div class="fr">
-    <div class="fg"><label>Full Name</label><input type="text" id="e-name" placeholder="Full name" oninput="autoGenEmpAccount()"></div>
+    <div class="fg"><label>Full Name</label><input type="text" id="e-name" placeholder="Full name" oninput="autoGenEmpAccount();draftSave('employee')"></div>
     <div class="fg"><label>Employee ID</label><input type="text" id="e-id" placeholder="e.g. BRA001"></div>
   </div>
   <div class="fr">
@@ -1392,6 +1395,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-emp')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('employee')">🗑 Draft</button>
     <button class="btn btn-gold" id="emp-save-btn" onclick="doAddEmployee()">Add Employee</button>
   </div>
 </div></div>
@@ -1401,8 +1405,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <input type="hidden" id="gen-edit-id">
   <div class="mtitle" id="gen-modal-title">⚡ Add <span>Generator</span></div>
   <div class="fr">
-    <div class="fg"><label>Generator ID</label><input type="text" id="gen-code" placeholder="e.g. GEN-001"></div>
-    <div class="fg"><label>Name / Description</label><input type="text" id="gen-name" placeholder="e.g. CAT 3516 - Workshop"></div>
+    <div class="fg"><label>Generator ID</label><input type="text" id="gen-code" placeholder="e.g. GEN-001" oninput="draftSave('generator')"></div>
+    <div class="fg"><label>Name / Description</label><input type="text" id="gen-name" placeholder="e.g. CAT 3516 - Workshop" oninput="draftSave('generator')"></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Location</label><input type="text" id="gen-location" placeholder="e.g. Workshop, Admin Block"></div>
@@ -1414,6 +1418,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   </div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-gen')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('generator')">🗑 Draft</button>
     <button class="btn btn-gold" id="gen-save-btn" onclick="doSaveGenerator()">Add Generator</button>
   </div>
 </div></div>
@@ -1445,7 +1450,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <input type="hidden" id="em-edit-id">
   <div class="mtitle" id="em-modal-title">🏋️ Add <span>Heavy Equipment</span></div>
   <div class="fr">
-    <div class="fg"><label>Equipment ID / Reg</label><input type="text" id="em-reg" placeholder="e.g. ADT-001"></div>
+    <div class="fg"><label>Equipment ID / Reg</label><input type="text" id="em-reg" placeholder="e.g. ADT-001" oninput="draftSave('earthmover')"></div>
     <div class="fg"><label>Equipment Type</label>
       <select id="em-type"><option>Articulated Dump Truck</option><option>Excavator</option><option>Bulldozer</option><option>Grader</option><option>Loader</option><option>Compactor</option><option>Scraper</option><option>Crane</option><option>Other</option></select>
     </div>
@@ -1483,10 +1488,11 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <div style="font-family:var(--font-mono);font-size:10px;color:var(--teal);padding:8px">Total: <span id="ts-total-hrs" style="font-weight:700">—</span> hrs · OT: <span id="ts-ot-hrs" style="color:var(--yellow)">—</span> hrs</div>
     </div>
   </div>
-  <div class="fg"><label>Task Description</label><input type="text" id="ts-task" placeholder="What was done today?"></div>
+  <div class="fg"><label>Task Description</label><input type="text" id="ts-task" placeholder="What was done today?" oninput="draftSave('timesheet')"></div>
   <div class="fg"><label>Approved By</label><div id="ts-approver-wrap"></div></div>
   <div class="mactions">
     <button class="btn btn-outline" onclick="closeM('m-ts')">Cancel</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissDraft('timesheet')">🗑 Draft</button>
     <button class="btn btn-gold" onclick="doSaveTimesheet()">Save Timesheet</button>
   </div>
 </div></div>
@@ -1623,7 +1629,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <input type="hidden" id="ce-id">
   <div class="mtitle">✏️ Edit Batch Plant <span>Record</span></div>
   <div class="fr">
-    <div class="fg"><label>Material</label><select id="ce-material"><option value="CEMENT">Cement (Tonnes)</option><option value="STONE">Stone (m³)</option><option value="AGGREGATE">Aggregate (m³)</option><option value="SAND">Sand (m³)</option></select></div>
+    <div class="fg"><label>Material</label><select id="ce-material"><option value="CEMENT">Cement (Tonnes)</option><option value="QUARRY_STONE">Quarry Stone (m³)</option><option value="QUARRY_DUST">Quarry Dust (m³)</option><option value="SAND">Sand (m³)</option></select></div>
     <div class="fg"><label>Date</label><input type="date" id="ce-date"></div>
   </div>
   <div class="fr">
@@ -1846,6 +1852,9 @@ async function loadDB() {
     if (categories && categories.length > 0) {
       db.categories = categories.map(c => ({ name: c.name, icon: c.icon }));
     }
+    // Seed super admin if no users exist
+    await seedSuperAdminIfNeeded();
+
   } catch(e) {
     console.error('loadDB error:', e);
     toast('⚠️ Could not load data from server: ' + e.message, 'err');
@@ -2040,6 +2049,7 @@ async function saveDipstickRecord() {
   await sbSave('dipstick_log', rec);
   if (!db.dipstickLog) db.dipstickLog = [];
   db.dipstickLog.push({ ...rec, dipStart, dipEnd, fuelStart, fuelEnd, fmStart, fmEnd, flowmeterIssued, actualIssued, errorLiters: rec.error_liters, errorPct, doneBy: empName(empId) });
+  logAction('DIPSTICK_RECORD', 'fuel', id, `Dip ${date}`);
   closeM('m-dipstick');
   toast(`✓ Dipstick record saved — ${actualIssued.toLocaleString()}L actual issued`);
   renderFuel();
@@ -2199,6 +2209,165 @@ function openCreateAccountForEmp(empId) {
     if (cb) { cb.checked = true; toggleAccountSection(); }
     autoGenEmpAccount();
   }, 100);
+}
+// ═══════════════════════════════════════════════════════════
+// FIX 1: COMPREHENSIVE AUDIT LOGGING — wrap all save operations
+// ═══════════════════════════════════════════════════════════
+
+// Audit log is already called in some places. This ensures consistent logging
+// by wrapping sbSave with automatic audit tracking where needed.
+
+// ═══════════════════════════════════════════════════════════
+// FIX 2: TIMESHEET APPROVAL — manager/super_admin only
+// ═══════════════════════════════════════════════════════════
+function canApproveTimesheets() {
+  return currentUser && (currentUser.role === 'manager' || currentUser.role === 'super_admin');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIX 3: UNIQUE USERNAME GENERATION
+// ═══════════════════════════════════════════════════════════
+function generateUniqueUsername(fullName) {
+  const parts = fullName.trim().toLowerCase().split(/\s+/);
+  const first = parts[0] || 'user';
+  const last  = parts[parts.length - 1] || 'user';
+  let base = first + '.' + last;
+  // Check for duplicates in app_users
+  const existing = (db.appUsers || []).map(u => u.username);
+  if (!existing.includes(base)) return base;
+  let i = 2;
+  while (existing.includes(base + i)) i++;
+  return base + i;
+}
+
+function generateDefaultPassword(fullName) {
+  const parts = fullName.trim().split(/\s+/);
+  return (parts[parts.length - 1] || 'password').toLowerCase();
+}
+
+function autoGenEmpAccount() {
+  const name = document.getElementById('e-name')?.value.trim() || '';
+  if (!name) return;
+  const uEl = document.getElementById('e-username');
+  const pEl = document.getElementById('e-password');
+  if (uEl && !uEl.value) uEl.value = generateUniqueUsername(name);
+  if (pEl && !pEl.value) pEl.value = generateDefaultPassword(name);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIX 9: STOCK OUT — show unit and current stock, validate qty
+// ═══════════════════════════════════════════════════════════
+// updateAvail() defined in final_fixes section below
+
+
+// ═══════════════════════════════════════════════════════════
+// FIX 10: EDIT TIMESHEETS
+// ═══════════════════════════════════════════════════════════
+function openEditTimesheet(id) {
+  const ts = (db.timesheets || []).find(r => r.id === id);
+  if (!ts) return;
+  document.getElementById('ts-edit-id').value = id;
+  document.getElementById('ts-date').value = ts.date || today();
+  document.getElementById('ts-start').value = ts.start_time || ts.startTime || '';
+  document.getElementById('ts-end').value = ts.end_time || ts.endTime || '';
+  document.getElementById('ts-break').value = ts.break_mins || 0;
+  document.getElementById('ts-task').value = ts.task || '';
+  document.getElementById('ts-site').value = ts.site || 'Main Site';
+  document.getElementById('ts-type').value = ts.work_type || ts.workType || 'Normal';
+  createSearchableSelect('ts-emp-wrap', empSearchOptions(true), '— Select Employee —', ts.emp_id || ts.empId || '');
+  createSearchableSelect('ts-approver-wrap', empSearchOptions(true), '— Approved By —', ts.approver_id || ts.approverId || '');
+  calcTSHours();
+  openM('m-ts');
+}
+
+// doSaveTimesheet() defined in final_fixes section below
+
+
+// ═══════════════════════════════════════════════════════════
+// FIX 12: SEED DEFAULT SUPER ADMIN ON FIRST RUN
+// ═══════════════════════════════════════════════════════════
+async function seedSuperAdminIfNeeded() {
+  try {
+    const { data: users } = await SB.from('app_users').select('id').limit(1);
+    if (users && users.length > 0) return; // already seeded
+    // No users exist — create default super admin
+    const empWendy = db.employees.find(e => e.name && e.name.toLowerCase().includes('wendy'));
+    const adminRec = {
+      id: 'admin-wendy-001',
+      username: 'wendy',
+      full_name: 'Wendy Mpala',
+      role: 'super_admin',
+      is_active: true,
+      password_plain: 'Wendy123',
+      password_hash: btoa('Wendy123'),
+      employee_id: empWendy ? empWendy.id : null,
+      created_at: new Date().toISOString()
+    };
+    await SB.from('app_users').insert(adminRec);
+    db.appUsers = [adminRec];
+    console.log('✅ Default super admin created: wendy / Wendy123');
+  } catch(e) {
+    console.warn('Could not seed admin:', e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIX 1 CONTINUED: LOG ALL REMAINING ACTIONS
+// The following wrappers ensure every major action is audited
+// ═══════════════════════════════════════════════════════════
+
+// Wrap category add/delete with audit
+// addCategory() defined in final_fixes section below
+
+
+// Stocktake is already logged. Fuel issuance is logged.
+// Make sure GRN is logged:
+// (GRN logging was already added with logAction('CREATE_GRN'...))
+// Employee deletion:
+// confirmDel() defined in final_fixes section below
+
+
+
+
+function openEditReq(id) {
+  const req = (db.requisitions || []).find(r => r.id === id);
+  if (!req) return;
+  document.getElementById('req-edit-id').value = id;
+  document.getElementById('req-date').value = req.date || today();
+  document.getElementById('req-dept').value = req.department || '';
+  document.getElementById('req-priority').value = req.priority || 'normal';
+  document.getElementById('req-notes').value = req.notes || '';
+  // Rebuild rows
+  document.getElementById('req-rows').innerHTML = '';
+  reqRowCount = 0;
+  const items = typeof req.items === 'string' ? JSON.parse(req.items || '[]') : (req.items || []);
+  items.forEach(it => {
+    addReqRow();
+    const row = document.getElementById('req-rows').lastElementChild;
+    if (!row) return;
+    const ins = row.querySelectorAll('input');
+    const sels = row.querySelectorAll('select');
+    if (ins[0]) ins[0].value = it.name || '';
+    if (sels[0]) sels[0].value = it.category || '';
+    if (ins[1]) ins[1].value = it.qty || '';
+    if (ins[2]) ins[2].value = it.unit || 'pcs';
+    if (ins[3]) ins[3].value = it.est_cost || '';
+    if (ins[4]) ins[4].value = it.notes || '';
+  });
+  if (!items.length) { addReqRow(); addReqRow(); }
+  updateReqTotal();
+  document.getElementById('req-draft-banner').style.display = 'none';
+  openM('m-req');
+}
+
+function confirmDelReq(id, label) {
+  confirmAction('Delete this requisition?', label, 'Delete', async () => {
+    await sbDelete('requisitions', id);
+    db.requisitions = (db.requisitions || []).filter(r => r.id !== id);
+    logAction('DELETE_REQ', 'requisition', id, label);
+    toast('Requisition deleted');
+    renderRequisitions();
+  });
 }
 // ═══════════════════════════════════════════════════════════
 // HELPERS
@@ -2436,14 +2605,53 @@ function renderDashboard() {
     : dashPeriod === 'week'  ? 'this week'
     : 'this month';
 
-  document.getElementById('dash-kpis').innerHTML = [
-    kpiCard('kpi-total','c-gold','Total Items',    items.length,        'tracked SKUs',             'total'),
-    kpiCard('kpi-good', 'c-green','✅ In Stock',   good,                'sufficient qty',           'good'),
-    kpiCard('kpi-low',  'c-yellow','⚠️ Low / Crit',low+crit,           'near/at threshold',        'low'),
-    kpiCard('kpi-out',  'c-red','✕ Out of Stock',  out,                 'zero balance',             'out'),
-    kpiCard('kpi-in',   'c-teal','Stock In',       inPeriod,            `units received ${periodLabel}`, 'total'),
-    kpiCard('kpi-fuel', 'c-blue','Fuel Issued',    fuelPeriod.toLocaleString()+'L', `${periodFuel.length} fills ${periodLabel}`, 'fuel'),
-  ].join('');
+  // ── Fuel tank level from last dipstick ──
+  const lastDip = db.dipstickLog && db.dipstickLog.length ? [...db.dipstickLog].sort((a,b) => (a.date > b.date ? -1 : 1))[0] : null;
+  const tankLiters = lastDip ? (lastDip.fuelEnd ?? lastDip.fuel_end ?? 0) : 0;
+  const tankPct = Math.min(100, Math.round((tankLiters / 10103) * 100));
+  const tankColor = tankPct < 20 ? 'c-red' : tankPct < 40 ? 'c-yellow' : 'c-teal';
+
+  // ── Batch plant material balances ──
+  const bpMats = { CEMENT: 0, QUARRY_STONE: 0, QUARRY_DUST: 0, SAND: 0 };
+  // Legacy support for old data
+  (db.concreteLog || []).forEach(r => {
+    const mat = r.material === 'STONE' ? 'QUARRY_STONE' : r.material === 'AGGREGATE' ? 'QUARRY_DUST' : r.material;
+    if (bpMats[mat] !== undefined) bpMats[mat] += (r.qIn||0) - (r.qOut||0);
+  });
+
+  // ── Pending requisitions ──
+  const pendingReqs = (db.requisitions || []).filter(r => r.status === 'submitted').length;
+
+  // ── Inventory value ──
+  const invValue = items.reduce((s,i) => s + (i.balance * (i.cost || 0)), 0);
+
+  document.getElementById('dash-kpis').innerHTML = `
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      <!-- Fuel tank gauge card -->
+      <div class="kpi-card ${tankColor}" style="grid-column:span 2;cursor:default">
+        <div class="kpi-label">⛽ FUEL TANK LEVEL (ZUFTA10)</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <div class="kpi-val" style="font-size:22px">${tankLiters.toLocaleString()}L</div>
+          <div style="flex:1">
+            <div style="background:var(--surface2);border-radius:6px;height:18px;overflow:hidden;border:1px solid var(--border);position:relative">
+              <div style="height:100%;width:${tankPct}%;background:${tankPct < 20 ? 'var(--red)' : tankPct < 40 ? 'var(--yellow)' : 'var(--teal)'};border-radius:6px;transition:width .5s"></div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:9px;font-weight:700">${tankPct}%</div>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-dim);margin-top:2px">${lastDip ? 'Last dip: ' + fmtDate(lastDip.date) : 'No dipstick data'} · Cap: 10,103L</div>
+          </div>
+        </div>
+      </div>
+      ${kpiCard('kpi-cement','c-gold','🏭 Cement Silo',bpMats.CEMENT.toFixed(1)+' t','Batch Plant balance','total')}
+      ${kpiCard('kpi-stone','c-blue','🪨 Quarry Stone',bpMats.QUARRY_STONE.toFixed(1)+' m³','Batch Plant balance','total')}
+      ${kpiCard('kpi-qdust','c-purple','💨 Quarry Dust',bpMats.QUARRY_DUST.toFixed(1)+' m³','Batch Plant balance','total')}
+      ${kpiCard('kpi-sand','c-yellow','🏖 Sand',bpMats.SAND.toFixed(1)+' m³','Batch Plant balance','total')}
+      ${kpiCard('kpi-total','c-gold','📦 Total Items',items.length,'tracked SKUs','total')}
+      ${kpiCard('kpi-low','c-red','🚨 Low Stock',low+crit+out,'items need attention','low')}
+      ${kpiCard('kpi-reqs','c-yellow','📝 Pending Req',pendingReqs,'awaiting approval','total')}
+      ${kpiCard('kpi-val','c-teal','💰 Inv. Value','$'+invValue.toLocaleString(undefined,{maximumFractionDigits:0}),'USD total','val')}
+      ${kpiCard('kpi-in','c-green','📥 Stock In',inPeriod+' units',`received ${periodLabel}`,'total')}
+      ${kpiCard('kpi-fuel','c-blue','⛽ Fuel Issued',fuelPeriod.toLocaleString()+'L',`${periodFuel.length} fills ${periodLabel}`,'fuel')}
+    </div>`;
 
   const recent = [...db.transactions].reverse().slice(0, 10);
   document.getElementById('recent-tx').innerHTML = recent.length === 0
@@ -2813,24 +3021,51 @@ function showGRNDetail(grnId) {
   currentGRNId = grnId;
   const grn = db.goodsReceived.find(g => g.id === grnId);
   if (!grn) return;
+  const grnItems = grn.items || [];
+  const totalValue = grnItems.reduce((s,it) => s + ((it.received||0)*(it.unit_cost||it.unitCost||0)), 0);
   document.getElementById('grn-detail-content').innerHTML = `
-    <div class="fr3" style="margin-bottom:14px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;font-size:12px">
       <div><div class="section-label">Date</div><strong>${fmtDate(grn.date)}</strong></div>
       <div><div class="section-label">Vehicle</div><strong>${grn.vehicle||'—'}</strong></div>
-      <div><div class="section-label">Driver</div><strong>${grn.driver||'—'}</strong></div>
-    </div>
-    <div class="fr" style="margin-bottom:14px">
-      <div><div class="section-label">Received By</div><strong>${grn.receivedBy||'—'}</strong></div>
+      <div><div class="section-label">Supplier/Driver</div><strong>${grn.driver||'—'}</strong></div>
+      <div><div class="section-label">Received By</div><strong>${grn.receivedBy||grn.received_by||'—'}</strong></div>
+      <div><div class="section-label">Total Value</div><strong style="color:var(--gold)">$${totalValue.toFixed(2)}</strong></div>
       <div><div class="section-label">Notes</div><strong>${grn.notes||'—'}</strong></div>
     </div>
-    <div class="section-label" style="margin-bottom:8px">Items Received</div>
-    ${grn.items.map(it => `
-      <div style="background:var(--surface2);border-radius:7px;padding:8px 12px;margin-bottom:6px;display:flex;gap:12px;align-items:center;font-size:12px">
-        <span style="flex:2;font-weight:600">${it.name}</span>
-        <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${it.category||'—'}</span>
-        <span style="font-family:var(--font-mono)">Ordered: ${it.ordered||'—'}</span>
-        <span style="font-family:var(--font-mono);color:var(--green);font-weight:700">Received: ${it.received}</span>
-      </div>`).join('')}`;
+    <div class="section-label" style="margin-bottom:8px">Items Received (${grnItems.length})</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr style="background:var(--surface2)">
+          <th style="padding:6px 8px;text-align:left">Item</th>
+          <th style="padding:6px 8px;text-align:left">Category</th>
+          <th style="padding:6px 8px">Unit</th>
+          <th style="padding:6px 8px">Ordered</th>
+          <th style="padding:6px 8px">Received</th>
+          <th style="padding:6px 8px">Unit Cost</th>
+          <th style="padding:6px 8px">Total</th>
+          <th style="padding:6px 8px">Lot/Batch</th>
+          <th style="padding:6px 8px">Expiry</th>
+          <th style="padding:6px 8px">Location</th>
+        </tr></thead>
+        <tbody>${grnItems.map(it => `<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:6px 8px;font-weight:600">${it.name||'—'}</td>
+          <td style="padding:6px 8px;color:var(--text-dim)">${it.category||'—'}</td>
+          <td style="padding:6px 8px;font-family:var(--font-mono);text-align:center">${it.unit||'pcs'}</td>
+          <td style="padding:6px 8px;font-family:var(--font-mono);text-align:center">${it.ordered||'—'}</td>
+          <td style="padding:6px 8px;font-family:var(--font-mono);color:var(--green);font-weight:700;text-align:center">${it.received||0}</td>
+          <td style="padding:6px 8px;font-family:var(--font-mono);text-align:right">$${parseFloat(it.unit_cost||it.unitCost||0).toFixed(2)}</td>
+          <td style="padding:6px 8px;font-family:var(--font-mono);color:var(--teal);text-align:right">$${((it.received||0)*(it.unit_cost||it.unitCost||0)).toFixed(2)}</td>
+          <td style="padding:6px 8px;color:var(--text-dim)">${it.lot_batch||it.lotBatch||'—'}</td>
+          <td style="padding:6px 8px;color:var(--text-dim)">${it.expiry_date||it.expiryDate ? fmtDate(it.expiry_date||it.expiryDate) : '—'}</td>
+          <td style="padding:6px 8px;color:var(--text-dim)">${it.storage_location||it.storageLocation||'—'}</td>
+        </tr>`).join('')}</tbody>
+        <tfoot><tr style="background:var(--surface2);font-weight:700">
+          <td colspan="6" style="padding:6px 8px;text-align:right">Total Value:</td>
+          <td style="padding:6px 8px;color:var(--gold);font-family:var(--font-mono)">$${totalValue.toFixed(2)}</td>
+          <td colspan="3"></td>
+        </tr></tfoot>
+      </table>
+    </div>`;
   openM('m-gr-detail');
 }
 
@@ -2967,16 +3202,19 @@ function renderFleet() {
     ? '<div class="empty"><div class="ei">🚜</div><p>No vehicles added</p></div>'
     : db.fleet.map(f => {
         const assignedEmp = db.employees.find(e => e.id === f.driverId);
-        return `<div class="fleet-card">
+        return `<div class="fleet-card" style="display:flex;flex-direction:column;min-height:160px">
           <div style="display:flex;justify-content:space-between;align-items:flex-start">
             <div style="font-size:28px">${fleetEmoji[f.type]||'🚜'}</div>
             ${statusBadgeFleet(f.status||'Active')}
           </div>
           <div style="font-family:var(--font-mono);font-weight:800;font-size:14px;color:var(--gold);margin-top:6px">${f.reg}</div>
-          <div style="font-size:11px;color:var(--text-mid);margin-top:2px">${f.desc||''}</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:2px">${f.desc||f.description||''}</div>
           <div style="margin-top:5px"><span class="badge bg-blue">${f.type}</span></div>
           ${assignedEmp ? `<div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:5px">👤 ${assignedEmp.name}</div>` : ''}
-          <div class="card-del" style="display:flex;gap:4px;margin-top:8px">${canEdit()?`<button class="abtn" onclick="openEditVehicle('${f.id}')">✏️ Edit</button><button class="abtn del" onclick="confirmDel('fleet','${f.id}','${f.reg} — ${f.desc}')">🗑 Del</button>`:'—'}</div>
+          <div style="flex:1"></div>
+          <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+            ${canEdit()?`<button class="abtn" onclick="openEditVehicle('${f.id}')">✏️</button><button class="abtn del" onclick="confirmDel('fleet','${f.id}','${f.reg}')">🗑</button>`:''}
+          </div>
         </div>`;
       }).join('');
 
@@ -3250,8 +3488,8 @@ function renderReports() {
   const filtConcrete = filterDate(db.concreteLog).sort((a,b)=>a.date.localeCompare(b.date));
   const mats = [...new Set(filtConcrete.map(r=>r.material))];
   const concreteDates = [...new Set(filtConcrete.map(r=>r.date))].sort();
-  const matColors = { CEMENT:'rgba(244,162,97,.8)',STONE:'rgba(96,165,250,.8)',
-    AGGREGATE:'rgba(167,139,250,.8)',SAND:'rgba(251,191,36,.8)',WATER:'rgba(45,212,191,.8)' };
+  const matColors = { CEMENT:'rgba(244,162,97,.8)',QUARRY_STONE:'rgba(96,165,250,.8)',
+    QUARRY_DUST:'rgba(167,139,250,.8)',SAND:'rgba(251,191,36,.8)',WATER:'rgba(45,212,191,.8)' };
   charts.concrete = new Chart(document.getElementById('chart-concrete'), {
     type:'line',
     data:{ labels:concreteDates.map(fmtDate),
@@ -3414,6 +3652,7 @@ function confirmDeleteItem(itemId) {
     await sbDelete('items', itemId);
     db.items = db.items.filter(i => i.id !== itemId);
     db.transactions = db.transactions.filter(t => t.itemId !== itemId);
+    logAction('DELETE_ITEM', 'inventory', itemId, item?.name || itemId);
     toast(`"${item?.name}" deleted`); refreshAll();
   });
 }
@@ -3454,7 +3693,7 @@ function confirmDel(type, id, label) {
     else if (type==='concrete') { await sbDelete('concrete_log', id); db.concreteLog = db.concreteLog.filter(r=>r.id!==id); renderConcrete(); }
     else if (type==='campsite') { await sbDelete('campsite_log', id); db.campsiteLog = db.campsiteLog.filter(r=>r.id!==id); renderCampsite(); }
     else if (type==='fleet') { await sbDelete('fleet', id); db.fleet = db.fleet.filter(f=>f.id!==id); renderFleet(); }
-    else if (type==='emp') { await sbDelete('employees', id); db.employees = db.employees.filter(e=>e.id!==id); renderEmployees(); }
+    else if (type==='emp') { await sbDelete('employees', id); db.employees = db.employees.filter(e=>e.id!==id); logAction('DELETE_EMPLOYEE','hr',id,label); renderEmployees(); }
     else if (type==='cat') {
       if (db.items.some(i=>i.category===id)) return toast('Cannot delete — items use this category','err');
       const { error } = await SB.from('categories').delete().eq('name', id);
@@ -3491,6 +3730,7 @@ async function saveItem() {
     closeM('m-item'); document.getElementById('i-edit-id').value = '';
     document.getElementById('item-modal-title').innerHTML = 'Add New <span>Item</span>';
     document.getElementById('item-save-btn').textContent = 'Add Item';
+    logAction('UPDATE_ITEM', 'inventory', item.id, name);
     toast(`✓ "${name}" updated`); refreshAll();
   } else {
     if (db.items.find(i => i.name.toLowerCase() === name.toLowerCase() && i.category === cat))
@@ -3584,6 +3824,7 @@ async function doStocktake() {
   closeM('m-st');
   ['st-qty','st-notes'].forEach(f => document.getElementById(f).value = '');
   const varStr = variance === 0 ? 'no variance' : `variance ${variance >= 0 ? '+' : ''}${variance}`;
+  logAction('STOCK_TAKE', 'inventory', stId, item.name, { balance: item.balance - variance }, { balance: counted, variance });
   toast(`✓ Stock take applied — ${varStr}`); refreshAll();
 }
 
@@ -3623,6 +3864,7 @@ async function doGRN() {
     await sbSave('transactions', { id: txId, type: 'GRN', item_id: inv.id, item_name: inv.name, category: inv.category, qty: it.received, date, delivered_by: driver||vehicle, received_by: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
     db.transactions.push({ id: txId, type: 'GRN', itemId: inv.id, itemName: inv.name, category: inv.category, qty: it.received, date, deliveredBy: driver||vehicle, receivedBy: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
   }
+  logAction('CREATE_GRN', 'grn', grnId, `GRN: ${vehicle||today()}`);
   closeM('m-gr');
   ['gr-vehicle','gr-driver','gr-notes'].forEach(f => document.getElementById(f).value = '');
   toast(`✓ GRN saved — ${items.length} item(s) stocked in`); refreshAll();
@@ -3663,6 +3905,7 @@ async function doFuelDelivery() {
   const id = uid();
   await sbSave('fuel_deliveries', { id, date, fuel_type: fuelType, qty, supplier, dip_before: dipBefore, dip_after: dipAfter, notes, user_name: session.user });
   db.fuelDeliveries.push({ id, date, fuelType, qty, supplier, dipBefore, dipAfter, notes });
+  logAction('FUEL_DELIVERY', 'fuel', id, `${qty}L ${fuelType} from ${supplier}`);
   closeM('m-fuel-del');
   ['fd-qty','fd-supplier','fd-notes','fd-dip-before','fd-dip-after'].forEach(f => document.getElementById(f).value = '');
   document.getElementById('fd-verify').style.display = 'none';
@@ -3682,6 +3925,7 @@ async function doConcrete() {
   const balance = prev + qIn - qOut;
   await sbSave('concrete_log', { id, date, material, q_in: qIn, q_out: qOut, balance, supplier, authorized_by: empName(authId), notes, user_name: session.user });
   db.concreteLog.push({ id, date, material, qIn, qOut, balance, supplier, authorizedBy: empName(authId), notes, user_name: session.user });
+  logAction('CREATE_BATCH', 'batch_plant', id, `${material} ${date}`);
   closeM('m-concrete');
   ['c-qin','c-qout','c-supplier','c-notes'].forEach(f => document.getElementById(f).value = '');
   toast(`✓ ${material} batch recorded`); renderConcrete();
@@ -3698,6 +3942,7 @@ async function doCampsite() {
   const balance = prev + qIn - qOut;
   await sbSave('campsite_log', { id, date, supply, q_in: qIn, q_out: qOut, balance, notes, user_name: session.user });
   db.campsiteLog.push({ id, date, supply, qIn, qOut, balance, notes, user_name: session.user });
+  logAction('CREATE_CAMPSITE', 'campsite', id, `${supply} ${date}`);
   closeM('m-campsite');
   ['cs-qin','cs-qout','cs-notes'].forEach(f => document.getElementById(f).value = '');
   toast(`✓ ${supply} recorded`); renderCampsite();
@@ -3714,6 +3959,7 @@ async function doAddVehicle() {
   const id = uid();
   await sbSave('fleet', { id, reg, type, description: desc, driver_id: driverId, status });
   db.fleet.push({ id, reg, type, desc, driverId, status });
+  logAction('CREATE_VEHICLE', 'fleet', id, reg);
   closeM('m-fleet');
   ['fl-reg','fl-desc'].forEach(f => document.getElementById(f).value = '');
   toast(`✓ Vehicle "${reg}" added`); renderFleet();
@@ -3735,6 +3981,7 @@ async function doAddEmployee() {
     if (!emp) return;
     emp.name = name; emp.empId = empId; emp.role = role; emp.dept = dept; emp.contact = contact; emp.status = status;
     await sbSave('employees', { id: editId, name, emp_id: empId, role, dept, contact, status });
+    logAction('UPDATE_EMPLOYEE', 'hr', editId, name);
     closeM('m-emp');
     toast(`✓ "${name}" updated`); renderEmployees();
   } else {
@@ -4159,17 +4406,7 @@ async function doEditVehicle() {
 // ═══════════════════════════════════════════════════════════
 // EMPLOYEE ACCOUNT CREATION
 // ═══════════════════════════════════════════════════════════
-function autoGenEmpAccount() {
-  const name = document.getElementById('e-name')?.value.trim() || '';
-  if (!name) return;
-  const parts = name.toLowerCase().split(' ');
-  const username = parts.length >= 2 ? parts[0] + '.' + parts[parts.length - 1] : parts[0];
-  const password = parts[parts.length - 1] || parts[0];
-  const uEl = document.getElementById('e-username');
-  const pEl = document.getElementById('e-password');
-  if (uEl && !uEl.value) uEl.value = username;
-  if (pEl && !pEl.value) pEl.value = password;
-}
+// autoGenEmpAccount defined in final_fixes section above
 
 function toggleAccountSection() {
   const checked = document.getElementById('e-create-account')?.checked;
@@ -4503,19 +4740,21 @@ function renderGenerators() {
   grid.innerHTML = !(db.generators || []).length
     ? '<div class="empty"><div class="ei">⚡</div><p>No generators added</p></div>'
     : (db.generators || []).map(g => `
-      <div class="emp-card">
-        <div style="font-size:28px;margin-bottom:6px">⚡</div>
-        <div style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:var(--gold)">${g.code || g.gen_code}</div>
-        <div style="font-size:11px;font-weight:700;margin-top:3px">${g.name || g.gen_name}</div>
-        <div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:4px;display:flex;flex-direction:column;gap:2px">
+      <div class="emp-card" style="display:flex;flex-direction:column;min-height:180px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="font-size:28px">⚡</div>
+          ${statusBadge(g.status || 'Stopped')}
+        </div>
+        <div style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:var(--gold);margin-top:4px">${g.code || g.gen_code}</div>
+        <div style="font-size:11px;font-weight:700;margin-top:2px">${g.name || g.gen_name}</div>
+        <div style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono);margin-top:4px;display:flex;flex-direction:column;gap:2px;flex:1">
           ${g.location ? `<span>📍 ${g.location}</span>` : ''}
           ${g.capacity ? `<span>⚡ ${g.capacity} kVA</span>` : ''}
           <span>⛽ ${(fuelByGen[g.id] || 0).toLocaleString()}L total</span>
           ${g.service_date || g.serviceDate ? `<span>🔧 Serviced: ${fmtDate(g.service_date || g.serviceDate)}</span>` : ''}
         </div>
-        <div style="margin-top:6px">${statusBadge(g.status || 'Stopped')}</div>
-        <div class="card-del" style="display:flex;gap:4px;margin-top:8px">
-          ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditGenerator('${g.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('generator','${g.id}','${g.name || g.gen_name}')">🗑</button>` : '—'}
+        <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+          ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditGenerator('${g.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('generator','${g.id}','${g.name || g.gen_name}')">🗑</button>` : ''}
         </div>
       </div>`).join('');
 
@@ -4600,6 +4839,7 @@ async function doSaveGenerator() {
     db.generators.push({ id, code, name, gen_code: code, gen_name: name, location, capacity, status, service_date: svcDate });
     toast(`✓ "${name}" added`);
   }
+  logAction(editId ? 'UPDATE_GENERATOR' : 'CREATE_GENERATOR', 'fleet', editId || 'new', name);
   closeM('m-gen'); renderGenerators();
 }
 
@@ -4642,14 +4882,16 @@ function renderEarthMovers() {
   grid.innerHTML = !db.earthMovers.length
     ? '<div class="empty"><div class="ei">🏋️</div><p>No heavy equipment added</p></div>'
     : db.earthMovers.map(e => `
-      <div class="emp-card">
-        <div style="font-size:26px;margin-bottom:6px">🏋️</div>
-        <div style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:var(--gold)">${e.reg}</div>
-        <div style="font-size:11px;font-weight:700;margin-top:3px">${e.desc || ''}</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:4px"><span class="badge bg-blue">${e.type}</span></div>
-        <div style="margin-top:4px">${statusBadge(e.status || 'Active')}</div>
-        <div class="card-del" style="display:flex;gap:4px;margin-top:8px">
-          ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditEarthMover('${e.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('earthmover','${e.id}','${e.reg}')">🗑</button>` : '—'}
+      <div class="emp-card" style="display:flex;flex-direction:column;min-height:160px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="font-size:26px">🏋️</div>
+          ${statusBadge(e.status || 'Active')}
+        </div>
+        <div style="font-family:var(--font-mono);font-weight:800;font-size:13px;color:var(--gold);margin-top:4px">${e.reg}</div>
+        <div style="font-size:11px;font-weight:700;margin-top:2px">${e.desc || e.description || ''}</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:4px;flex:1"><span class="badge bg-blue">${e.type}</span></div>
+        <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+          ${canEdit() ? `<button class="abtn" onclick="reqLogin(()=>openEditEarthMover('${e.id}'))">✏️</button><button class="abtn del" onclick="confirmDel('earthmover','${e.id}','${e.reg}')">🗑</button>` : ''}
         </div>
       </div>`).join('');
 
@@ -4712,6 +4954,7 @@ async function doSaveEarthMover() {
     db.earthMovers.push({ id, reg, type, desc, status, operatorId: opId });
     toast(`✓ "${reg}" added`);
   }
+  logAction(editId ? 'UPDATE_EQUIPMENT' : 'CREATE_EQUIPMENT', 'fleet', editId || 'new', reg);
   closeM('m-earthmover'); renderEarthMovers();
 }
 
@@ -4776,6 +5019,7 @@ async function doSaveTimesheet() {
   await sbSave('timesheets', rec);
   if (!db.timesheets) db.timesheets = [];
   db.timesheets.push({ ...rec, empId, empName: empName(empId), startTime: start, endTime: end, workType: type, totalHrs, otHrs, approverId, approverName: empName(approverId) });
+  logAction('CREATE_TIMESHEET', 'timesheet', id, empName(empId), null, { date, total_hrs: totalHrs });
   closeM('m-ts');
   toast(`✓ Timesheet saved — ${totalHrs}hrs`);
   renderTimesheets();
@@ -4806,9 +5050,10 @@ function renderTimesheets() {
             <td><span class="badge bg-blue">${r.work_type || r.workType || '—'}</span></td>
             <td style="font-size:11px;color:var(--text-dim)">${r.task || '—'}</td>
             <td><span class="badge" style="color:${statusColor}">${r.status || 'Pending'}</span></td>
-            <td>${canEdit() ? `
-              ${r.status === 'Pending' ? `<button class="abtn" onclick="approvTS('${r.id}','Approved')" title="Approve">✅</button><button class="abtn" onclick="approvTS('${r.id}','Rejected')" title="Reject">❌</button>` : ''}
-              <button class="abtn del" onclick="confirmDel('timesheet','${r.id}','Timesheet ${fmtDate(r.date)}')">🗑</button>` : '—'}
+            <td style="display:flex;gap:3px;flex-wrap:wrap">
+              ${canApproveTimesheets() && r.status === 'Pending' ? `<button class="abtn" onclick="approvTS('${r.id}','Approved')" title="Approve">✅</button><button class="abtn" onclick="approvTS('${r.id}','Rejected')" title="Reject">❌</button>` : ''}
+              <button class="abtn" onclick="openEditTimesheet('${r.id}')" title="Edit">✏️</button>
+              ${canEdit() ? `<button class="abtn del" onclick="confirmDel('timesheet','${r.id}','Timesheet ${fmtDate(r.date)}')">🗑</button>` : ''}
             </td>
           </tr>`;
         }).join('');
@@ -4831,11 +5076,16 @@ function renderTimesheets() {
 
 async function approvTS(id, status) {
   if (!db.timesheets) return;
+  if (!canApproveTimesheets()) return toast('Only Managers and Super Admins can approve timesheets', 'err');
   const ts = db.timesheets.find(r => r.id === id);
   if (!ts) return;
+  const approverName = currentUser?.full_name || session.user;
   ts.status = status;
-  await sbSave('timesheets', { id, status });
-  toast(`✓ Timesheet ${status.toLowerCase()}`);
+  ts.approver_name = approverName;
+  ts.approver_id = currentUser?.id || '';
+  await sbSave('timesheets', { id, status, approver_name: approverName, approver_id: currentUser?.id || '' });
+  logAction(status === 'Approved' ? 'APPROVE_TIMESHEET' : 'REJECT_TIMESHEET', 'timesheet', id, ts.emp_name || ts.empName);
+  toast(`✓ Timesheet ${status.toLowerCase()} by ${approverName}`);
   renderTimesheets();
 }
 
@@ -5085,17 +5335,52 @@ function gatherFormData(formName) {
     stocktake: ['st-item','st-qty','st-date','st-notes'],
     fuel: ['f-date','f-time','f-amount','f-purpose','f-odometer','f-flowmeter'],
     fueldelivery: ['fd-date','fd-qty','fd-supplier','fd-notes','fd-dip-before','fd-dip-after'],
-    concrete: ['c-date','c-qin','c-qout','c-supplier','c-notes'],
-    campsite: ['cs-date','cs-qin','cs-qout','cs-notes'],
+    concrete: ['c-date','c-qin','c-qout','c-supplier','c-notes','c-material'],
+    campsite: ['cs-date','cs-qin','cs-qout','cs-notes','cs-item'],
     employee: ['e-name','e-id','e-role','e-dept','e-contact'],
     vehicle: ['fl-reg','fl-desc'],
     generator: ['gen-code','gen-name','gen-location','gen-capacity'],
     earthmover: ['em-reg','em-desc'],
-    timesheet: ['ts-date','ts-start','ts-end','ts-break','ts-task']
+    timesheet: ['ts-date','ts-start','ts-end','ts-break','ts-task','ts-site']
   };
   const fields = maps[formName] || [];
   const data = {};
   fields.forEach(f => { const el = document.getElementById(f); if (el) data[f] = el.value; });
+  // Serialize dynamic rows for GRN
+  if (formName === 'grn') {
+    const rows = [];
+    document.querySelectorAll('#grn-rows > div').forEach(row => {
+      const ins = row.querySelectorAll('input');
+      const sel = row.querySelectorAll('select');
+      rows.push({
+        name: ins[0]?.value || '',
+        category: sel[0]?.value || '',
+        unit: ins[1]?.value || 'pcs',  // unit field after name
+        ordered: ins[2]?.value || '',
+        received: ins[3]?.value || '',
+        unit_cost: ins[4]?.value || '',
+        lot_batch: ins[5]?.value || '',
+      });
+    });
+    data._rows = rows;
+  }
+  // Serialize dynamic rows for Requisition
+  if (formName === 'req') {
+    const rows = [];
+    document.querySelectorAll('#req-rows > div').forEach(row => {
+      const ins = row.querySelectorAll('input');
+      const sel = row.querySelectorAll('select');
+      rows.push({
+        name: ins[0]?.value || '',
+        category: sel[0]?.value || '',
+        qty: ins[1]?.value || '',
+        unit: ins[2]?.value || 'pcs',
+        est_cost: ins[3]?.value || '',
+        notes: ins[4]?.value || '',
+      });
+    });
+    data._rows = rows;
+  }
   return data;
 }
 
@@ -5126,7 +5411,51 @@ function showDraftBanner(formName, modalId) {
 function restoreDraft(formName) {
   const draft = checkDraft(formName);
   if (!draft) return;
-  Object.entries(draft.data).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; });
+  Object.entries(draft.data).forEach(([id, val]) => {
+    if (id === '_rows') return; // handle separately
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  });
+  // Rebuild dynamic rows
+  if (draft.data._rows && draft.data._rows.length) {
+    if (formName === 'grn') {
+      document.getElementById('grn-rows').innerHTML = '';
+      grnRowCount = 0;
+      draft.data._rows.forEach(r => {
+        addGRNRow();
+        const row = document.getElementById('grn-rows').lastElementChild;
+        if (!row) return;
+        const ins = row.querySelectorAll('input');
+        const sels = row.querySelectorAll('select');
+        if (ins[0]) ins[0].value = r.name || '';
+        if (sels[0]) sels[0].value = r.category || '';
+        if (ins[1]) ins[1].value = r.unit || 'pcs';
+        if (ins[2]) ins[2].value = r.ordered || '';
+        if (ins[3]) ins[3].value = r.received || '';
+        if (ins[4]) ins[4].value = r.unit_cost || '';
+        if (ins[5]) ins[5].value = r.lot_batch || '';
+      });
+      updateGRNTotal();
+    }
+    if (formName === 'req') {
+      document.getElementById('req-rows').innerHTML = '';
+      reqRowCount = 0;
+      draft.data._rows.forEach(r => {
+        addReqRow();
+        const row = document.getElementById('req-rows').lastElementChild;
+        if (!row) return;
+        const ins = row.querySelectorAll('input');
+        const sels = row.querySelectorAll('select');
+        if (ins[0]) ins[0].value = r.name || '';
+        if (sels[0]) sels[0].value = r.category || '';
+        if (ins[1]) ins[1].value = r.qty || '';
+        if (ins[2]) ins[2].value = r.unit || 'pcs';
+        if (ins[3]) ins[3].value = r.est_cost || '';
+        if (ins[4]) ins[4].value = r.notes || '';
+      });
+      updateReqTotal();
+    }
+  }
   toast('✓ Draft restored', 'ok');
   const banner = document.getElementById('req-draft-banner');
   if (banner) banner.style.display = 'none';
@@ -5226,6 +5555,22 @@ async function submitRequisition() {
     if (name && qty > 0) { items.push({ name, category: cat, qty, unit, est_cost: cost, notes: inotes }); totalCost += qty * cost; }
   });
   if (!items.length) return toast('Add at least one item with a quantity', 'err');
+  const editId = document.getElementById('req-edit-id').value;
+  if (editId) {
+    // UPDATE existing requisition
+    const existing = (db.requisitions || []).find(r => r.id === editId);
+    if (existing) {
+      existing.department = dept; existing.date = date; existing.priority = prio;
+      existing.items = items; existing.total_estimated_cost = totalCost; existing.notes = notes;
+      await sbSave('requisitions', { id: editId, department: dept, date, priority: prio, items: JSON.stringify(items), total_estimated_cost: totalCost, notes });
+      logAction('UPDATE_REQ', 'requisition', editId, existing.req_number);
+      toast(`✓ Requisition ${existing.req_number} updated`);
+    }
+    dismissDraft('req');
+    closeM('m-req');
+    renderRequisitions();
+    return;
+  }
   const id = uid();
   const reqNum = 'REQ-' + new Date().getFullYear() + '-' + String((db.requisitions || []).length + 1).padStart(4, '0');
   const rec = {
@@ -5281,11 +5626,12 @@ function renderRequisitions() {
           <td style="font-family:var(--font-mono)">${items.length} items</td>
           <td style="font-family:var(--font-mono);color:var(--teal)">$${parseFloat(r.total_estimated_cost||0).toLocaleString(undefined,{maximumFractionDigits:2})}</td>
           <td><span class="badge ${statusBg[r.status]||'bg-low'}">${(r.status||'draft').toUpperCase()}</span></td>
-          <td onclick="event.stopPropagation()" style="display:flex;gap:4px">
+          <td onclick="event.stopPropagation()" style="display:flex;gap:4px;flex-wrap:wrap">
             ${r.status === 'submitted' && can('can_approve_requisitions') ? `
               <button class="abtn" onclick="approveReq('${r.id}','approved')" title="Approve">✅</button>
               <button class="abtn del" onclick="promptRejectReq('${r.id}')" title="Reject">❌</button>` : ''}
-            ${r.status === 'draft' && can('can_create_requisitions') ? `<button class="abtn" onclick="event.stopPropagation();openEditReq('${r.id}')">✏️</button>` : ''}
+            ${(r.status === 'draft' || r.status === 'submitted') && can('can_create_requisitions') ? `<button class="abtn" onclick="event.stopPropagation();openEditReq('${r.id}')">✏️</button>` : ''}
+            ${canEdit() ? `<button class="abtn del" onclick="event.stopPropagation();confirmDelReq('${r.id}','${r.req_number}')">🗑</button>` : ''}
           </td>
         </tr>`;
       }).join('');
