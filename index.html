@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,9 +40,34 @@ body::before{content:'';position:fixed;inset:0;opacity:.4;pointer-events:none;z-
 .login-error{color:var(--red);font-size:11px;font-family:var(--font-mono);margin-bottom:8px;display:none;padding:6px 10px;background:rgba(248,113,113,.08);border-radius:6px;}
 /* APP */
 #app{display:none;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:98;backdrop-filter:blur(2px);}
+.sidebar-overlay.show{display:block;}
 /* SIDEBAR */
-
-.main{margin-left:0;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:99;overflow-y:auto;transition:transform .25s cubic-bezier(.4,0,.2,1),width .2s;}
+.logo{padding:20px 18px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.logo-mark{font-family:var(--font-mono);font-size:9px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;}
+.logo h1{font-size:17px;font-weight:800;line-height:1.15;}
+.logo h1 span{color:var(--gold);}
+.logo-sub{font-size:9px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px;}
+.nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
+.nav-sec{font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;padding:10px 10px 4px;white-space:nowrap;overflow:hidden;}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:10px;border-radius:7px;border:none;background:transparent;color:var(--text-mid);font-family:var(--font-head);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:left;width:100%;min-height:44px;white-space:nowrap;overflow:hidden;position:relative;}
+.nav-btn:hover{background:var(--surface2);color:var(--text);}
+.nav-btn.active{background:rgba(244,162,97,.12);color:var(--gold);}
+.nav-btn .ic{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-btn .nb{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-family:var(--font-mono);padding:1px 5px;border-radius:8px;font-weight:700;flex-shrink:0;}
+.nav-label{overflow:hidden;text-overflow:ellipsis;}
+.nav-btn .tt{display:none;position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text);white-space:nowrap;pointer-events:none;z-index:200;}
+.sidebar-user{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#0b0f1a;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{font-size:9px;color:var(--text-dim);font-family:var(--font-mono);}
+.user-logout{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:6px;min-height:44px;min-width:36px;}
+.user-logout:hover{color:var(--red);}
+.sidebar-footer{padding:8px 14px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:.5px;line-height:1.7;flex-shrink:0;}
+/* MAIN */
+.main{margin-left:var(--sidebar-w);min-height:100vh;position:relative;z-index:1;transition:margin-left .2s;}
 .topbar{position:sticky;top:0;background:rgba(11,15,26,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;z-index:50;flex-wrap:wrap;}
 .hamburger{display:none;background:transparent;border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;padding:6px 10px;min-height:40px;min-width:40px;align-items:center;justify-content:center;border-radius:7px;}
 .hamburger:hover{background:var(--surface2);}
@@ -204,10 +230,24 @@ tr:hover td{background:rgba(255,255,255,.015);}
 /* RESPONSIVE */
 @media(max-width:1024px){
   :root{--sidebar-w:var(--sidebar-icon);}
-
+  .sidebar .logo h1,.sidebar .logo-mark,.sidebar .logo-sub,.sidebar .nav-sec,
+  .sidebar .nav-label,.sidebar .nb,.sidebar .user-info,.sidebar .user-logout,.sidebar-footer{display:none;}
+  .sidebar .logo{padding:12px 0;display:flex;justify-content:center;}
+  .sidebar .nav-btn{justify-content:center;padding:10px;}
+  .sidebar .sidebar-user{justify-content:center;padding:10px 0;}
+  .sidebar .nav-btn:hover .tt{display:block;}
 }
 @media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.mobile-open{transform:translateX(0);width:var(--sidebar-w) !important;}
+  .sidebar.mobile-open .logo h1,.sidebar.mobile-open .logo-mark,.sidebar.mobile-open .logo-sub,
+  .sidebar.mobile-open .nav-sec,.sidebar.mobile-open .nav-label,.sidebar.mobile-open .nb,
+  .sidebar.mobile-open .user-info,.sidebar.mobile-open .user-logout,.sidebar-footer{display:block !important;}
+  .sidebar.mobile-open .logo{padding:20px 18px 14px;display:block;}
+  .sidebar.mobile-open .nav-btn{justify-content:flex-start;padding:10px;}
+  .sidebar.mobile-open .sidebar-user{justify-content:flex-start;padding:10px 14px;}
   .main{margin-left:0 !important;}
+  .hamburger{display:flex !important;}
   /* Grids — single column on mobile */
   .kpi-grid{grid-template-columns:1fr 1fr;}
   .fr{grid-template-columns:1fr;}
@@ -261,8 +301,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
 /* PRINT STYLES */
 @media print {
   body { background:#fff !important; color:#000 !important; font-family:'Arial',sans-serif !important; }
-  .topbar,.top-nav,.sub-nav,.overlay,.toast,#toast-wrap,.abtn,.btn,
-  .no-print { display:none !important; }
+  .sidebar,.topbar,.overlay,.toast,#toast-wrap,.abtn,.btn,.hamburger,
+  .sidebar-overlay,.no-print { display:none !important; }
   .main { margin-left:0 !important; }
   .print-only { display:block !important; }
   .print-header { border-bottom:2px solid #000; padding-bottom:12px; margin-bottom:16px; }
@@ -292,7 +332,15 @@ tr:hover td{background:rgba(255,255,255,.015);}
   .reports-grid { grid-template-columns:1fr !important; }
 }
 
-
+/* NAV GROUPS — collapsible sidebar */
+.nav-group{display:flex;flex-direction:column;margin-top:2px;}
+.nav-group-hd{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;border:none;background:rgba(244,162,97,.08);color:var(--gold);font-family:var(--font-head);font-size:11px;font-weight:700;cursor:pointer;text-align:left;width:100%;min-height:38px;letter-spacing:.3px;}
+.nav-group-hd:hover{background:rgba(244,162,97,.16);}
+.nav-group-body{display:flex;flex-direction:column;gap:1px;overflow:hidden;max-height:0;transition:max-height .3s ease;}
+.nav-group-body.open{max-height:500px;}
+.nav-sub{padding-left:18px!important;font-size:11px!important;min-height:38px!important;}
+.nav-arrow{margin-left:auto;font-size:9px;transition:transform .25s;flex-shrink:0;color:var(--text-dim);}
+.nav-arrow.open{transform:rotate(180deg);}
 /* SEARCHABLE SELECT */
 .ss-wrap{position:relative;width:100%;}
 .ss-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-head);font-size:14px;padding:11px 14px;outline:none;cursor:text;transition:border-color .2s;min-height:44px;box-sizing:border-box;}
@@ -303,54 +351,6 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .ss-option:hover,.ss-option.focused{background:rgba(244,162,97,.12);color:var(--gold);}
 .ss-option.selected{color:var(--teal);}
 .ss-empty{padding:10px 14px;color:var(--text-dim);font-size:11px;font-family:var(--font-mono);}
-
-/* ========== LAYOUT FIXES ========== */
-.content { padding: 16px 20px !important; flex:1; overflow-y:auto; }
-.tcard-head { padding: 8px 12px !important; }
-.kpi-grid:empty { display: none !important; }
-#page-earthmovers > div:first-child,
-#page-generators > div:first-child,
-#page-timesheets > div:first-child,
-#page-requisitions > div:first-child {
-  display: flex !important; justify-content: space-between;
-  align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
-}
-#page-earthmovers .kpi-grid,
-#page-generators .kpi-grid,
-#page-requisitions .kpi-grid { flex: 1; min-width: 180px; margin-bottom: 0; }
-@media (max-width: 768px) {
-  #page-earthmovers > div:first-child,
-  #page-generators > div:first-child,
-  #page-timesheets > div:first-child,
-  #page-requisitions > div:first-child { flex-direction: column; align-items: stretch; }
-  .btn { align-self: flex-end; }
-  #page-timesheets .table-scroll { overflow-x: auto; }
-  #page-timesheets table { min-width: 700px; }
-}
-
-/* ═══════════════ TOP NAV ═══════════════ */
-.top-nav{display:flex;align-items:center;gap:4px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;scrollbar-width:none;}
-.top-nav::-webkit-scrollbar{display:none;}
-.top-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 14px;border-radius:10px;border:none;background:transparent;color:var(--text-mid);cursor:pointer;font-family:var(--font-head);font-size:10px;font-weight:600;transition:all .15s;min-width:62px;white-space:nowrap;letter-spacing:.2px;}
-.top-nav-item:hover{background:var(--surface2);color:var(--text);}
-.top-nav-item.active{background:rgba(244,162,97,.15);color:var(--gold);}
-.top-nav-item .tni-icon{font-size:22px;line-height:1;}
-.top-nav-item .tni-badge{position:relative;}
-.top-nav-item .tni-badge .nb{position:absolute;top:-6px;right:-8px;background:var(--red);color:#fff;font-size:8px;font-family:var(--font-mono);padding:1px 4px;border-radius:8px;font-weight:700;}
-.sub-nav{display:flex;align-items:center;gap:4px;padding:6px 16px;background:var(--surface2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;scrollbar-width:none;min-height:42px;}
-.sub-nav::-webkit-scrollbar{display:none;}
-.sub-nav-btn{padding:5px 12px;border-radius:7px;border:none;background:transparent;color:var(--text-mid);font-family:var(--font-head);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.sub-nav-btn:hover{background:var(--surface3);color:var(--text);}
-.sub-nav-btn.active{background:rgba(244,162,97,.2);color:var(--gold);font-weight:700;}
-.topbar{display:flex;align-items:center;gap:8px;padding:0 16px;height:50px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
-.topbar h2{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;}
-.content{padding:16px 20px !important;flex:1;overflow-y:auto;}
-@media(max-width:600px){
-  .top-nav-item{padding:6px 10px;min-width:52px;font-size:9px;}
-  .top-nav-item .tni-icon{font-size:18px;}
-  .sub-nav-btn{padding:4px 9px;font-size:10px;}
-  .topbar h2{font-size:12px;}
-}
 </style>
 </head>
 <body>
@@ -376,14 +376,88 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div style="margin-top:10px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">v6.0 · Designed by Clement Mpala</div>
   </div>
 </div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="app">
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Bravura Kamativi</div>
+    <h1>Operations<span>.</span></h1>
+    <div class="logo-sub">Inventory &amp; Ops Manager</div>
+  </div>
+  <nav class="nav">
+    <!-- DASHBOARD -->
+    <button class="nav-btn active" id="nav-dashboard" onclick="showPage('dashboard',this)"><span class="ic">📊</span><span class="nav-label">Dashboard</span></button>
 
+    <!-- INVENTORY -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('inventory')"><span class="ic">📦</span><span class="nav-label">Inventory</span><span class="nav-arrow" id="arr-inventory">▼</span></button>
+      <div class="nav-group-body" id="grp-inventory">
+        <button class="nav-btn nav-sub" onclick="showPage('balance',this)"><span class="ic">⚖️</span><span class="nav-label">Stock Balance</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('stockin',this)"><span class="ic">📥</span><span class="nav-label">Stock In</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('stockout',this)"><span class="ic">📤</span><span class="nav-label">Stock Out</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('transactions',this)"><span class="ic">🔄</span><span class="nav-label">Transactions</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('stocktake',this)"><span class="ic">📋</span><span class="nav-label">Stock Taking</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('requisitions',this)"><span class="ic">📝</span><span class="nav-label">Store Requisition</span><span class="nb" id="req-badge" style="display:none">0</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('alerts',this)"><span class="ic">🚨</span><span class="nav-label">Low Stock</span><span class="nb" id="alert-badge">0</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('categories',this)"><span class="ic">🗂️</span><span class="nav-label">Categories</span></button>
+      </div>
+    </div>
+
+    <!-- LOGISTICS -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('logistics')"><span class="ic">🚛</span><span class="nav-label">Logistics</span><span class="nav-arrow" id="arr-logistics">▼</span></button>
+      <div class="nav-group-body" id="grp-logistics">
+        <button class="nav-btn nav-sub" onclick="showPage('goodsreceived',this)"><span class="ic">📦</span><span class="nav-label">Goods Received</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('concrete',this)"><span class="ic">🏗️</span><span class="nav-label">Batch Plant</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('campsite',this)"><span class="ic">🏕️</span><span class="nav-label">Campsite</span></button>
+      </div>
+    </div>
+
+    <!-- FUEL -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('fuel')"><span class="ic">⛽</span><span class="nav-label">Fuel Management</span><span class="nav-arrow" id="arr-fuel">▼</span></button>
+      <div class="nav-group-body" id="grp-fuel">
+        <button class="nav-btn nav-sub" onclick="showPage('fuel',this)"><span class="ic">📏</span><span class="nav-label">Fuel & Dipstick</span></button>
+      </div>
+    </div>
+
+    <!-- FLEET -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('fleet')"><span class="ic">🚜</span><span class="nav-label">Fleet Management</span><span class="nav-arrow" id="arr-fleet">▼</span></button>
+      <div class="nav-group-body" id="grp-fleet">
+        <button class="nav-btn nav-sub" onclick="showPage('fleet',this)"><span class="ic">🚗</span><span class="nav-label">Vehicles</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('generators',this)"><span class="ic">⚡</span><span class="nav-label">Generators</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('earthmovers',this)"><span class="ic">🏋️</span><span class="nav-label">Heavy Equipment</span></button>
+      </div>
+    </div>
+
+    <!-- HUMAN RESOURCES -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('hr')"><span class="ic">👥</span><span class="nav-label">Human Resources</span><span class="nav-arrow" id="arr-hr">▼</span></button>
+      <div class="nav-group-body" id="grp-hr">
+        <button class="nav-btn nav-sub" onclick="showPage('employees',this)"><span class="ic">👨‍💼</span><span class="nav-label">Employees</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('timesheets',this)"><span class="ic">🕐</span><span class="nav-label">Timesheets</span></button>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="nav-group">
+      <button class="nav-group-hd" onclick="toggleNavGroup('reports')"><span class="ic">📈</span><span class="nav-label">Reports</span><span class="nav-arrow" id="arr-reports">▼</span></button>
+      <div class="nav-group-body" id="grp-reports">
+        <button class="nav-btn nav-sub" onclick="showPage('reports',this)"><span class="ic">📊</span><span class="nav-label">Analytics</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('drafts',this)"><span class="ic">📋</span><span class="nav-label">Drafts Manager</span></button>
+        <button class="nav-btn nav-sub" id="nav-audit" onclick="showPage('audit',this)"><span class="ic">📜</span><span class="nav-label">Audit Trail</span></button>
+        <button class="nav-btn nav-sub" id="nav-users" onclick="showPage('users',this)"><span class="ic">👤</span><span class="nav-label">User Management</span></button>
+        <button class="nav-btn nav-sub" onclick="showPage('settings',this)"><span class="ic">⚙️</span><span class="nav-label">Settings</span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-user" id="sidebar-user"></div>
+  <div class="sidebar-footer">Designed by Clement Mpala · Bravura Kamativi<br>Junior Electrical Engineer<br>v4.0 &middot; Offline Capable</div>
+</aside>
 <main class="main" id="main-area">
-  <!-- TOP ICON BAR -->
-  <div class="top-nav" id="top-nav"></div>
-  <!-- SUB-NAV BAR -->
-  <div class="sub-nav" id="sub-nav"></div>
   <div class="topbar">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" style="display:none">&#9776;</button>
     <h2 id="page-title">Dashboard</h2>
     <span class="company-name-badge" id="topbar-company" style="display:none"></span>
     <div style="flex:1"></div>
@@ -937,22 +1011,6 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <div id="drafts-list" class="tcard" style="padding:16px"></div>
     </div>
 
-    <!-- PROJECT MANAGEMENT (placeholder) -->
-    <div class="page" id="page-projectmanagement">
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px">
-        <div style="font-size:72px;opacity:.4">📋</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text)">Project Management</div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim);letter-spacing:2px">COMING SOON</div>
-        <div style="max-width:360px;font-size:12px;color:var(--text-dim);line-height:1.7;margin-top:8px">
-          This module is under development. It will include project tracking, milestones, task assignments, and progress reporting for Kamativi operations.
-        </div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <span style="background:rgba(244,162,97,.1);border:1px solid rgba(244,162,97,.25);color:var(--gold);border-radius:20px;padding:4px 14px;font-size:10px;font-family:var(--font-mono)">Phase 2 Roadmap</span>
-          <span style="background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);color:var(--teal);border-radius:20px;padding:4px 14px;font-size:10px;font-family:var(--font-mono)">Q3 2025</span>
-        </div>
-      </div>
-    </div>
-
 <!-- ═══════════ MODALS ═══════════ -->
 
 <!-- CONFIRM DELETE -->
@@ -1082,7 +1140,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="section-label" style="margin-bottom:6px">Items Received</div>
   <div style="overflow-x:auto">
     <div style="display:grid;grid-template-columns:2fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr auto;gap:4px;font-family:var(--font-mono);font-size:8px;color:var(--text-dim);padding:0 2px;margin-bottom:4px;min-width:700px">
-      <span>ITEM NAME</span><span>CATEGORY</span><span>UNIT</span><span>ORDERED QTY</span><span>RECEIVED QTY</span><span>UNIT COST(USD)</span><span>TOTAL</span><span>LOT/BATCH</span><span></span>
+      <span>ITEM NAME</span><span>CATEGORY</span><span>UNIT</span><span>ORDERED</span><span>RECEIVED</span><span>UNIT COST</span><span>TOTAL</span><span>LOT/BATCH</span><span></span>
     </div>
     <div id="grn-rows"></div>
   </div>
@@ -1115,7 +1173,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Time</label><input type="time" id="f-time"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Fuel Type</label><select id="f-type" onchange="draftSave('fuel')"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
+    <div class="fg"><label>Fuel Type</label><select id="f-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
     <div class="fg"><label>Amount (Litres)</label><input type="number" id="f-amount" placeholder="0" min="1"></div>
   </div>
   <div class="fg" style="margin-bottom:8px">
@@ -1152,7 +1210,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🚛 Fuel <span>Delivery</span></div>
   <div class="fr">
     <div class="fg"><label>Date</label><input type="date" id="fd-date"></div>
-    <div class="fg"><label>Fuel Type</label><select id="fd-type" onchange="draftSave('fueldelivery')"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
+    <div class="fg"><label>Fuel Type</label><select id="fd-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Quantity Delivered (Litres)</label><input type="number" id="fd-qty" placeholder="0" min="1" oninput="draftSave('fueldelivery')"></div>
@@ -1228,7 +1286,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🏗️ Batch Plant <span>Material</span></div>
   <div class="fr">
     <div class="fg"><label>Material Type</label>
-      <select id="c-material" onchange="draftSave('concrete')"><option value="CEMENT">Cement (Tonnes)</option><option value="QUARRY_STONE">Quarry Stone (m³)</option><option value="QUARRY_DUST">Quarry Dust (m³)</option><option value="SAND">Sand (m³)</option></select>
+      <select id="c-material"><option value="CEMENT">Cement (Tonnes)</option><option value="QUARRY_STONE">Quarry Stone (m³)</option><option value="QUARRY_DUST">Quarry Dust (m³)</option><option value="SAND">Sand (m³)</option></select>
     </div>
     <div class="fg"><label>Date</label><input type="date" id="c-date"></div>
   </div>
@@ -1253,7 +1311,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🏕️ Campsite <span>Supply</span></div>
   <div class="fr">
     <div class="fg"><label>Supply Item</label>
-      <select id="cs-item" onchange="updateCampsiteUnit();draftSave('campsite')"><option value="Water (Cases)">Water (Cases)</option><option value="Soap (bars)">Soap (bars)</option><option value="Washing Powder (kg)">Washing Powder (kg)</option><option value="Toilet Paper (rolls)">Toilet Paper (rolls)</option><option value="Cleaning Chemicals (L)">Cleaning Chemicals (L)</option><option value="Food Supplies (kg)">Food Supplies (kg)</option><option value="Other">Other</option></select>
+      <select id="cs-item" onchange="updateCampsiteUnit()"><option value="Water (Cases)">Water (Cases)</option><option value="Soap (bars)">Soap (bars)</option><option value="Washing Powder (kg)">Washing Powder (kg)</option><option value="Toilet Paper (rolls)">Toilet Paper (rolls)</option><option value="Cleaning Chemicals (L)">Cleaning Chemicals (L)</option><option value="Food Supplies (kg)">Food Supplies (kg)</option><option value="Other">Other</option></select>
     </div>
     <div class="fg"><label>Date</label><input type="date" id="cs-date"></div>
   </div>
@@ -1418,15 +1476,15 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Date</label><input type="date" id="ts-date"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Site / Project</label><select id="ts-site" onchange="draftSave('timesheet')"><option>Main Site</option><option>Batch Plant</option><option>Workshop</option><option>Admin Block</option><option>Campsite</option><option>Other</option></select></div>
-    <div class="fg"><label>Work Type</label><select id="ts-type" onchange="draftSave('timesheet')"><option value="Normal">Normal</option><option value="Overtime">Overtime</option><option value="Holiday">Holiday</option></select></div>
+    <div class="fg"><label>Site / Project</label><select id="ts-site"><option>Main Site</option><option>Batch Plant</option><option>Workshop</option><option>Admin Block</option><option>Campsite</option><option>Other</option></select></div>
+    <div class="fg"><label>Work Type</label><select id="ts-type"><option value="Normal">Normal</option><option value="Overtime">Overtime</option><option value="Holiday">Holiday</option></select></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Start Time</label><input type="time" id="ts-start" oninput="calcTSHours();draftSave('timesheet')"></div>
-    <div class="fg"><label>End Time</label><input type="time" id="ts-end" oninput="calcTSHours();draftSave('timesheet')"></div>
+    <div class="fg"><label>Start Time</label><input type="time" id="ts-start" oninput="calcTSHours()"></div>
+    <div class="fg"><label>End Time</label><input type="time" id="ts-end" oninput="calcTSHours()"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Break (minutes)</label><input type="number" id="ts-break" placeholder="0" min="0" value="0" oninput="calcTSHours();draftSave('timesheet')"></div>
+    <div class="fg"><label>Break (minutes)</label><input type="number" id="ts-break" placeholder="0" min="0" value="0" oninput="calcTSHours()"></div>
     <div class="fg" id="ts-calc-display" style="display:flex;flex-direction:column;justify-content:flex-end">
       <div style="font-family:var(--font-mono);font-size:10px;color:var(--teal);padding:8px">Total: <span id="ts-total-hrs" style="font-weight:700">—</span> hrs · OT: <span id="ts-ot-hrs" style="color:var(--yellow)">—</span> hrs</div>
     </div>
@@ -2395,8 +2453,7 @@ function closeSidebar() {
 function startApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  buildTopNav();
-  buildSubNav('dashboard');
+  initNavGroups();
   applyRBAC();
   updateAuthUI();
   updateNotifications();
@@ -2417,17 +2474,13 @@ function updateAuthUI() {
   const role = currentUser?.role || 'viewer';
   const name = currentUser?.full_name || session.user || 'Viewer';
   document.getElementById('topbar-add-btn').style.display = loggedIn ? 'flex' : 'none';
-  // sidebar-user removed — user info shown in topbar chip only
-  const logoutInChip = document.getElementById('topbar-user-chip');
-  if (logoutInChip && !document.getElementById('topbar-logout-btn')) {
-    const logoutBtn = document.createElement('button');
-    logoutBtn.id = 'topbar-logout-btn';
-    logoutBtn.title = 'Logout';
-    logoutBtn.onclick = logout;
-    logoutBtn.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:14px;padding:2px 0 2px 4px;';
-    logoutBtn.textContent = '⏻';
-    logoutInChip.appendChild(logoutBtn);
-  }
+  document.getElementById('sidebar-user').innerHTML = `
+    <div class="user-avatar">${name.charAt(0).toUpperCase()}</div>
+    <div class="user-info">
+      <div class="user-name">${name}</div>
+      <div class="user-role">${getRoleLabel(role)}</div>
+    </div>
+    <button class="user-logout" onclick="logout()" title="Logout">⏻</button>`;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2442,8 +2495,7 @@ const pageTitles = {
   alerts:'Low Stock Alerts', reports:'Reports', settings:'Settings',
   timesheets:'Timesheets',
   requisitions:'Store Requisitions', audit:'Audit Trail', users:'User Management',
-  drafts:'Drafts Manager',
-  projectmanagement:'Project Management'
+  drafts:'Drafts Manager'
 };
 const pageAddMap = {
   balance: () => reqLogin(() => openM('m-item')),
@@ -2462,7 +2514,6 @@ let topbarAddFn = () => {};
 
 function showPage(name, btn) {
   pushPageHistory(name);
-  setActiveSubNav(name);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
@@ -2488,7 +2539,6 @@ function renderPage(n) {
     categories: renderCategories, alerts: renderAlerts, reports: renderReports,
     generators: renderGenerators, earthmovers: renderEarthMovers, timesheets: renderTimesheets,
     requisitions: renderRequisitions, audit: renderAuditLog, users: renderUsers, drafts: renderDrafts,
-    projectmanagement: () => {},
     settings: () => { updateStorageSize(); applyCompanyName(); const inp=document.getElementById('setting-company'); const cn=db.settings?.companyName||db.settings?.company_name||''; if(inp&&cn) inp.value=cn; }
   };
   if (map[n]) map[n]();
@@ -3472,15 +3522,10 @@ function openSIFor(itemId) { populateSI(itemId); document.getElementById('si-dat
 function openSOFor(itemId) { populateSO(itemId); document.getElementById('so-date').value = today(); updateAvail(); openM('m-so'); }
 function openStocktakeModal() { document.getElementById('st-item').innerHTML = itemOptions(); createSearchableSelect('st-emp-ss', empSearchOptions(true), '— Counted By —'); document.getElementById('st-date').value = today(); showSTCurrent(); openM('m-st'); }
 function openGRModal() {
-  document.getElementById('gr-edit-id').value = '';
-  document.getElementById('gr-modal-title').innerHTML = '📦 Goods Received <span>Note (GRN)</span>';
   document.getElementById('gr-date').value = today();
-  ['gr-driver','gr-notes'].forEach(f => { const el = document.getElementById(f); if(el) el.value=''; });
   document.getElementById('gr-vehicle').innerHTML = fleetOptions();
   createSearchableSelect('gr-emp-ss', empSearchOptions(true), '— Received By —');
   initGRNRows();
-  const draftGR = checkDraft('grn');
-  if (draftGR) toast('📝 You have a GRN draft. Open Drafts Manager to restore.', 'info');
   openM('m-gr');
 }
 function openFuelModal() {
@@ -3785,77 +3830,45 @@ async function doStocktake() {
 }
 
 async function doGRN() {
-  const date     = document.getElementById('gr-date').value;
+  const date = document.getElementById('gr-date').value;
   const vehicleSel = document.getElementById('gr-vehicle');
-  const vehicle  = vehicleSel?.value || vehicleSel?.options[vehicleSel?.selectedIndex]?.text || '';
-  const driver   = document.getElementById('gr-driver').value.trim();
-  const empId    = document.getElementById('val-ss-gr-emp-ss')?.value || '';
-  const notes    = document.getElementById('gr-notes').value.trim();
-  if (!date) return toast('Enter a delivery date', 'err');
-
-  // Extract enhanced rows
-  const rowEls = document.querySelectorAll('#grn-rows > div');
+  const vehicle = vehicleSel.value || vehicleSel.options[vehicleSel.selectedIndex]?.text || '';
+  const driver = document.getElementById('gr-driver').value.trim();
+  const empId = document.getElementById('val-ss-gr-emp-ss')?.value || '';
+  const notes = document.getElementById('gr-notes').value.trim();
+  const rowEls = document.querySelectorAll('#grn-rows .grn-row');
   const items = [];
-  for (const row of rowEls) {
-    const inputs  = row.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input:not([type])');
+  rowEls.forEach(row => {
+    const inputs = row.querySelectorAll('input');
     const selects = row.querySelectorAll('select');
-    // Grid order: name(text), category(select), unit(text), ordered(number), received(number), unit_cost(number), total(span), lot_batch(text), [expiry(date)], [location(text)]
-    const allInputs = Array.from(row.querySelectorAll('input'));
-    const name      = allInputs[0]?.value.trim() || '';
-    const unit      = allInputs[1]?.value.trim() || 'pcs';
-    const ordered   = parseFloat(allInputs[2]?.value) || 0;
-    const received  = parseFloat(allInputs[3]?.value) || 0;
-    const unitCost  = parseFloat(allInputs[4]?.value) || 0;
-    const lotBatch  = allInputs[5]?.value.trim() || '';
-    const category  = selects[0]?.value || '';
-    if (name && received > 0) {
-      items.push({ name, category, unit, ordered, received, unit_cost: unitCost, lot_batch: lotBatch });
-    }
-  }
-  if (!items.length) return toast('Add at least one item with received qty > 0', 'err');
-
-  const grnId = uid();
-  const receivedBy = empName(empId);
-
-  // Save GRN record
-  await sbSave('goods_received', {
-    id: grnId, date, vehicle, driver, received_by: receivedBy,
-    notes, items: items, user_name: session.user
+    const name = inputs[0].value.trim();
+    const cat = selects[0].value;
+    const ordered = parseInt(inputs[1].value) || 0;
+    const received = parseInt(inputs[2].value) || 0;
+    if (name && received > 0) items.push({ name, category:cat, ordered, received });
   });
-  db.goodsReceived.unshift({ id: grnId, date, vehicle, driver, receivedBy, notes, items, user_name: session.user });
-
-  // Update inventory for each item
+  if (!date) return toast('Enter a delivery date', 'err');
+  if (!items.length) return toast('Add at least one received item with a received qty > 0', 'err');
+  const grnId = uid();
+  await sbSave('goods_received', { id: grnId, date, vehicle, driver, received_by: empName(empId), notes, items, user_name: session.user });
+  db.goodsReceived.push({ id: grnId, date, vehicle, driver, receivedBy: empName(empId), notes, items, user_name: session.user });
   for (const it of items) {
-    let inv = db.items.find(i => i.name.toLowerCase() === it.name.toLowerCase());
+    let inv = db.items.find(i => i.name.toLowerCase() === it.name.toLowerCase() && i.category === it.category);
     if (!inv) {
       const nid = uid();
-      inv = { id: nid, name: it.name, category: it.category, balance: 0, threshold: 5, totalIn: 0, totalOut: 0, unit: it.unit, cost: it.unit_cost, notes: '' };
-      await sbSave('items', { id: inv.id, name: inv.name, category: inv.category, balance: 0, threshold: 5, total_in: 0, total_out: 0, unit: inv.unit, cost: inv.cost, notes: '' });
+      inv = { id: nid, name: it.name, category: it.category, balance: 0, threshold: 5, totalIn: 0, totalOut: 0, unit: 'pcs', cost: 0 };
       db.items.push(inv);
-    } else if (it.unit_cost > 0) {
-      // Weighted average cost
-      const newCost = ((inv.cost || 0) * inv.balance + it.unit_cost * it.received) / (inv.balance + it.received);
-      inv.cost = parseFloat(newCost.toFixed(4));
     }
-    inv.balance    += it.received;
-    inv.totalIn    = (inv.totalIn || 0) + it.received;
-    await sbSave('items', { id: inv.id, name: inv.name, category: inv.category, balance: inv.balance, threshold: inv.threshold || 5, total_in: inv.totalIn, total_out: inv.totalOut || 0, unit: inv.unit, cost: inv.cost || 0, notes: inv.notes || '' });
-
-    // Create transaction record
+    inv.balance += it.received; inv.totalIn += it.received;
+    await sbSave('items', { id: inv.id, name: inv.name, category: inv.category, balance: inv.balance, threshold: inv.threshold, total_in: inv.totalIn, total_out: inv.totalOut, unit: inv.unit, cost: inv.cost, notes: inv.notes || '' });
     const txId = uid();
-    await sbSave('transactions', {
-      id: txId, type: 'GRN', item_id: inv.id, item_name: inv.name, category: inv.category,
-      qty: it.received, date, delivered_by: driver || vehicle, received_by: receivedBy,
-      notes: `GRN · ${vehicle || '—'}`, user_name: session.user
-    });
-    db.transactions.push({ id: txId, type: 'GRN', itemId: inv.id, itemName: inv.name, category: inv.category, qty: it.received, date, deliveredBy: driver || vehicle, receivedBy, notes: `GRN · ${vehicle || '—'}`, user_name: session.user });
+    await sbSave('transactions', { id: txId, type: 'GRN', item_id: inv.id, item_name: inv.name, category: inv.category, qty: it.received, date, delivered_by: driver||vehicle, received_by: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
+    db.transactions.push({ id: txId, type: 'GRN', itemId: inv.id, itemName: inv.name, category: inv.category, qty: it.received, date, deliveredBy: driver||vehicle, receivedBy: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
   }
-
-  logAction('CREATE_GRN', 'grn', grnId, `GRN: ${vehicle || today()} · ${items.length} items`);
-  dismissDraft('grn');
+  logAction('CREATE_GRN', 'grn', grnId, `GRN: ${vehicle||today()}`);
   closeM('m-gr');
-  toast(`✓ GRN saved — ${items.length} item(s) received`);
-  refreshAll();
+  ['gr-vehicle','gr-driver','gr-notes'].forEach(f => document.getElementById(f).value = '');
+  toast(`✓ GRN saved — ${items.length} item(s) stocked in`); refreshAll();
 }
 
 async function doFuelIssuance() {
@@ -4419,14 +4432,14 @@ function addGRNRow() {
   d.style.cssText = 'display:grid;grid-template-columns:2fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr auto;gap:4px;margin-bottom:6px;align-items:center;min-width:700px';
   const itemOpts = db.items.map(i => `<option value="${i.name}" data-unit="${i.unit||'pcs'}">${i.name}</option>`).join('');
   d.innerHTML = `
-    <input class="grn-name" type="text" list="grn-items-list" placeholder="Item name / description" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px;font-family:var(--font-head)" oninput="autoFillGRNUnit(this,\'${id}\');updateGRNTotal();draftSave(\'grn\')">
-    <select class="grn-cat" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px;font-size:11px">${catOptions()}</select>
-    <input class="grn-unit" type="text" placeholder="pcs" id="${id}-unit" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
-    <input class="grn-ordered" type="number" placeholder="Ordered" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
-    <input class="grn-received" type="number" placeholder="Received" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
-    <input class="grn-cost" type="number" placeholder="Cost" min="0" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input type="text" list="grn-items-list" placeholder="Item name / description" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px;font-family:var(--font-head)" oninput="autoFillGRNUnit(this,\'${id}\');updateGRNTotal();draftSave(\'grn\')">
+    <select style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px;font-size:11px">${catOptions()}</select>
+    <input type="text" placeholder="pcs" id="${id}-unit" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
+    <input type="number" placeholder="Ordered" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input type="number" placeholder="Received" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input type="number" placeholder="Cost" min="0" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
     <span id="${id}-total" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);padding:0 4px">$0.00</span>
-    <input class="grn-lot" type="text" placeholder="Lot/Batch" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
+    <input type="text" placeholder="Lot/Batch" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
     <button onclick="document.getElementById('${id}').remove();updateGRNTotal()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:var(--red);border-radius:6px;padding:6px 9px;cursor:pointer;font-size:12px">✕</button>`;
   document.getElementById('grn-rows').appendChild(d);
   // Add datalist if not exists
@@ -4583,7 +4596,7 @@ function toggleNavGroup(id) {
   state[id] = !isOpen;
   saveNavState(state);
 }
-function initNavGroups() { return; // sidebar removed — 
+function initNavGroups() {
   const groups = ['inventory','logistics','fuel','fleet','hr','reports'];
   const state = getNavState();
   groups.forEach(id => {
@@ -4758,7 +4771,6 @@ function renderGenerators() {
       <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">MAINTENANCE</div><div class="kpi-val">${maint}</div></div>
       <div class="kpi-card c-red" style="cursor:default"><div class="kpi-label">OFFLINE</div><div class="kpi-val">${offline}</div></div>
       <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">TOTAL</div><div class="kpi-val">${gens.length}</div></div>`;
-    kpiEl.style.display = gens.length === 0 ? 'none' : 'grid';
   }
 
   // Run log table
@@ -4884,24 +4896,17 @@ function renderEarthMovers() {
         </div>
       </div>`).join('');
 
-  // Fuel table + hide if empty
+  // Fuel table
   const ftb = document.getElementById('earthmover-fuel-tbody');
-  const fuelCard = document.querySelector('#page-earthmovers .tcard:last-child');
-  if (db.earthMovers.length === 0) {
-    if (fuelCard) fuelCard.style.display = 'none';
-  } else {
-    if (fuelCard) fuelCard.style.display = '';
-    if (ftb) {
-      ftb.innerHTML = db.earthMovers.map(e => `<tr>
+  if (ftb) {
+    ftb.innerHTML = !db.earthMovers.length ? `<tr><td colspan="4"><div class="empty"><div class="ei">⛽</div><p>No data</p></div></td></tr>`
+      : db.earthMovers.map(e => `<tr>
           <td style="font-family:var(--font-mono);font-weight:700;color:var(--gold)">${e.reg}</td>
           <td><span class="badge bg-blue">${e.type}</span></td>
           <td style="font-family:var(--font-mono);color:var(--blue)">${(fuelByEm[e.id] || 0).toLocaleString()} L</td>
           <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">—</td>
         </tr>`).join('');
-    }
   }
-  // Hide earthmover KPI grid if empty
-  const emKpiEl = document.getElementById('gen-status-kpis');
 }
 
 function openEarthMoverModal() {
@@ -5016,11 +5021,9 @@ async function doSaveTimesheet() {
   if (!db.timesheets) db.timesheets = [];
   db.timesheets.push({ ...rec, empId, empName: empName(empId), startTime: start, endTime: end, workType: type, totalHrs, otHrs, approverId, approverName: empName(approverId) });
   logAction('CREATE_TIMESHEET', 'timesheet', id, empName(empId), null, { date, total_hrs: totalHrs });
-  dismissDraft('timesheet');
   closeM('m-ts');
   toast(`✓ Timesheet saved — ${totalHrs}hrs`);
   renderTimesheets();
-  updateNotifications();
 }
 
 function renderTimesheets() {
@@ -5061,17 +5064,14 @@ function renderTimesheets() {
   const kpiEl = document.getElementById('ts-kpis');
   if (kpiEl) {
     const allRows = db.timesheets || [];
-    if (!allRows.length) { kpiEl.style.display = 'none'; } else {
-      const totalHrs = allRows.reduce((s, r) => s + parseFloat(r.total_hrs || r.totalHrs || 0), 0);
-      const otHrs    = allRows.reduce((s, r) => s + parseFloat(r.ot_hrs || r.otHrs || 0), 0);
-      const pending  = allRows.filter(r => r.status === 'Pending').length;
-      kpiEl.style.display = 'grid';
-      kpiEl.innerHTML = `
-        <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">${totalHrs.toFixed(1)}</div></div>
-        <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">${otHrs.toFixed(1)}</div></div>
-        <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
-        <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">${allRows.length}</div></div>`;
-    }
+    const totalHrs = allRows.reduce((s, r) => s + parseFloat(r.total_hrs || r.totalHrs || 0), 0);
+    const otHrs    = allRows.reduce((s, r) => s + parseFloat(r.ot_hrs || r.otHrs || 0), 0);
+    const pending  = allRows.filter(r => r.status === 'Pending').length;
+    kpiEl.innerHTML = `
+      <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">${totalHrs.toFixed(1)}</div></div>
+      <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">${otHrs.toFixed(1)}</div></div>
+      <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
+      <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">${allRows.length}</div></div>`;
   }
 }
 
@@ -5088,7 +5088,6 @@ async function approvTS(id, status) {
   logAction(status === 'Approved' ? 'APPROVE_TIMESHEET' : 'REJECT_TIMESHEET', 'timesheet', id, ts.emp_name || ts.empName);
   toast(`✓ Timesheet ${status.toLowerCase()} by ${approverName}`);
   renderTimesheets();
-  updateNotifications();
 }
 
 function exportTimesheets() {
@@ -5142,9 +5141,11 @@ function getRoleLabel(role) {
 }
 
 function applyRBAC() {
-  // Nav visibility handled by top-nav (no sidebar elements to hide)
-  // Rebuild sub-nav with correct visibility for current category
-  buildSubNav(_activeCategory);
+  // Show/hide nav items based on role
+  const navAudit = document.getElementById('nav-audit');
+  const navUsers = document.getElementById('nav-users');
+  if (navAudit) navAudit.style.display = can('can_view_audit') ? '' : 'none';
+  if (navUsers) navUsers.style.display = can('can_manage_users') ? '' : 'none';
   // Update topbar user chip
   if (currentUser) {
     const av = document.getElementById('topbar-avatar');
@@ -5263,18 +5264,7 @@ function renderAuditLog() {
   let rows = [...(db.auditLogs || [])];
   if (fromV) rows = rows.filter(r => r.created_at >= fromV);
   if (toV)   rows = rows.filter(r => r.created_at <= toV + 'T23:59:59');
-  if (actF) {
-    const actionMap = {
-      'LOGIN': ['LOGIN_SUCCESS','LOGIN_FAILED','LOGOUT','PASSWORD_CHANGE'],
-      'STOCK': ['STOCK_IN','STOCK_OUT','CREATE_ITEM','UPDATE_ITEM','DELETE_ITEM','STOCK_TAKE','CREATE_GRN','UPDATE_STOCK_IN','UPDATE_STOCK_OUT'],
-      'FUEL': ['FUEL_ISSUANCE','FUEL_DELIVERY','DIPSTICK_RECORD','UPDATE_FUEL','DELETE_FUEL'],
-      'REQ': ['CREATE_REQ','UPDATE_REQ','SUBMIT_REQ','APPROVE_REQ','REJECT_REQ','DELETE_REQ'],
-      'HR': ['CREATE_EMPLOYEE','UPDATE_EMPLOYEE','DELETE_EMPLOYEE','CREATE_USER','DELETE_USER','CREATE_TIMESHEET','UPDATE_TIMESHEET','APPROVE_TIMESHEET','REJECT_TIMESHEET','DELETE_TIMESHEET'],
-      'FLEET': ['CREATE_VEHICLE','UPDATE_VEHICLE','DELETE_VEHICLE','CREATE_GENERATOR','UPDATE_GENERATOR','DELETE_GENERATOR','CREATE_EQUIPMENT','UPDATE_EQUIPMENT','DELETE_EQUIPMENT']
-    };
-    if (actionMap[actF]) rows = rows.filter(r => actionMap[actF].includes(r.action));
-    else rows = rows.filter(r => r.action.includes(actF));
-  }
+  if (actF)  rows = rows.filter(r => r.action.includes(actF));
   const total = rows.length;
   const pageRows = rows.slice(auditPage * AUDIT_PER_PAGE, (auditPage+1) * AUDIT_PER_PAGE);
   const cntEl = document.getElementById('audit-count');
@@ -5436,20 +5426,15 @@ function restoreDraft(formName) {
         addGRNRow();
         const row = document.getElementById('grn-rows').lastElementChild;
         if (!row) return;
-        const nameEl = row.querySelector('.grn-name') || row.querySelectorAll('input')[0];
-        const catEl  = row.querySelector('.grn-cat')  || row.querySelectorAll('select')[0];
-        const unitEl = row.querySelector('.grn-unit')  || row.querySelectorAll('input[type="text"]')[1];
-        const ordEl  = row.querySelector('.grn-ordered');
-        const recEl  = row.querySelector('.grn-received');
-        const costEl = row.querySelector('.grn-cost');
-        const lotEl  = row.querySelector('.grn-lot');
-        if (nameEl) nameEl.value = r.name || '';
-        if (catEl)  catEl.value  = r.category || '';
-        if (unitEl) unitEl.value = r.unit || 'pcs';
-        if (ordEl)  ordEl.value  = r.ordered || '';
-        if (recEl)  recEl.value  = r.received || '';
-        if (costEl) costEl.value = r.unit_cost || '';
-        if (lotEl)  lotEl.value  = r.lot_batch || '';
+        const ins = row.querySelectorAll('input');
+        const sels = row.querySelectorAll('select');
+        if (ins[0]) ins[0].value = r.name || '';
+        if (sels[0]) sels[0].value = r.category || '';
+        if (ins[1]) ins[1].value = r.unit || 'pcs';
+        if (ins[2]) ins[2].value = r.ordered || '';
+        if (ins[3]) ins[3].value = r.received || '';
+        if (ins[4]) ins[4].value = r.unit_cost || '';
+        if (ins[5]) ins[5].value = r.lot_batch || '';
       });
       updateGRNTotal();
     }
@@ -5615,20 +5600,15 @@ function renderRequisitions() {
   // KPIs
   const kpi = document.getElementById('req-kpis');
   if (kpi) {
-    const all = db.requisitions || [];
-    const pending   = all.filter(r => r.status === 'submitted').length;
-    const approved  = all.filter(r => r.status === 'approved').length;
+    const all = db.requisitions;
+    const pending = all.filter(r => r.status === 'submitted').length;
+    const approved = all.filter(r => r.status === 'approved').length;
     const fulfilled = all.filter(r => r.status === 'fulfilled').length;
-    if (!all.length) {
-      kpi.style.display = 'none';
-    } else {
-      kpi.style.display = 'grid';
-      kpi.innerHTML = `
-        <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
-        <div class="kpi-card c-green" style="cursor:default"><div class="kpi-label">APPROVED</div><div class="kpi-val">${approved}</div></div>
-        <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">FULFILLED</div><div class="kpi-val">${fulfilled}</div></div>
-        <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">TOTAL</div><div class="kpi-val">${all.length}</div></div>`;
-    }
+    kpi.innerHTML = `
+      <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
+      <div class="kpi-card c-green" style="cursor:default"><div class="kpi-label">APPROVED</div><div class="kpi-val">${approved}</div></div>
+      <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">FULFILLED</div><div class="kpi-val">${fulfilled}</div></div>
+      <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">TOTAL</div><div class="kpi-val">${all.length}</div></div>`;
   }
 
   const tb = document.getElementById('req-tbody');
@@ -5848,7 +5828,6 @@ function updateNotifications() {
   const notifs = buildNotifications();
   const count = document.getElementById('notif-count');
   if (count) { count.textContent = notifs.length; count.style.display = notifs.length > 0 ? '' : 'none'; }
-  syncBadges();
 }
 
 function buildNotifications() {
@@ -5915,137 +5894,6 @@ function restorePageFromHash() {
   }
 }
 
-
-
-// ═══════════════════════════════════════════════════════════
-// TOP NAV — ICON BAR + SUB-NAV
-// ═══════════════════════════════════════════════════════════
-const TOP_NAV = [
-  { id:'dashboard',         icon:'📊', label:'Dashboard',    pages:[
-    { id:'dashboard',        label:'Dashboard' }
-  ]},
-  { id:'inventory',         icon:'📦', label:'Inventory',    pages:[
-    { id:'balance',          label:'Stock Balance' },
-    { id:'stockin',          label:'Stock In' },
-    { id:'stockout',         label:'Stock Out' },
-    { id:'transactions',     label:'Transactions' },
-    { id:'stocktake',        label:'Stock Taking' },
-    { id:'requisitions',     label:'Store Requisition', badge:'req-badge' },
-    { id:'alerts',           label:'Low Stock', badge:'alert-badge' },
-    { id:'categories',       label:'Categories' },
-  ]},
-  { id:'logistics',         icon:'🚛', label:'Logistics',    pages:[
-    { id:'goodsreceived',    label:'Goods Received' },
-    { id:'concrete',         label:'Batch Plant' },
-    { id:'campsite',         label:'Campsite' },
-  ]},
-  { id:'fuel',              icon:'⛽', label:'Fuel',          pages:[
-    { id:'fuel',             label:'Fuel & Dipstick' },
-  ]},
-  { id:'fleet',             icon:'🚜', label:'Fleet',         pages:[
-    { id:'fleet',            label:'Vehicles' },
-    { id:'generators',       label:'Generators' },
-    { id:'earthmovers',      label:'Heavy Equipment' },
-  ]},
-  { id:'hr',                icon:'👥', label:'HR',            pages:[
-    { id:'employees',        label:'Employees' },
-    { id:'timesheets',       label:'Timesheets' },
-  ]},
-  { id:'reports',           icon:'📈', label:'Reports',       pages:[
-    { id:'reports',          label:'Analytics' },
-    { id:'drafts',           label:'Drafts Manager' },
-    { id:'audit',            label:'Audit Trail' },
-    { id:'users',            label:'User Management' },
-    { id:'settings',         label:'Settings' },
-  ]},
-  { id:'projectmanagement', icon:'📋', label:'Project',       pages:[
-    { id:'projectmanagement',label:'Project Management' },
-  ]},
-];
-
-let _activeCategory = 'dashboard';
-let _activePage     = 'dashboard';
-
-function buildTopNav() {
-  const nav = document.getElementById('top-nav');
-  if (!nav) return;
-  nav.innerHTML = TOP_NAV.map(cat => `
-    <button class="top-nav-item${cat.id === _activeCategory ? ' active' : ''}"
-      id="tni-${cat.id}" onclick="selectCategory('${cat.id}')">
-      <span class="tni-icon">${cat.icon}</span>
-      <span>${cat.label}</span>
-    </button>`).join('');
-}
-
-function buildSubNav(categoryId) {
-  const sub = document.getElementById('sub-nav');
-  if (!sub) return;
-  const cat = TOP_NAV.find(c => c.id === categoryId);
-  if (!cat) { sub.innerHTML = ''; return; }
-  sub.innerHTML = cat.pages.map(p => `
-    <button class="sub-nav-btn${p.id === _activePage ? ' active' : ''}"
-      id="sni-${p.id}" onclick="showPage('${p.id}', this)">
-      ${p.label}${p.badge ? `<span id="${p.badge}" class="nb" style="display:none;margin-left:4px">0</span>` : ''}
-    </button>`).join('');
-  // Move existing badge elements into sub-nav
-  syncBadges();
-}
-
-function syncBadges() {
-  // Re-attach badges from old elements (alert-badge, req-badge)
-  ['alert-badge','req-badge'].forEach(id => {
-    const newEl = document.getElementById(id);
-    if (newEl) {
-      // Update notification count from db
-      if (id === 'alert-badge') {
-        const n = (db.items || []).filter(i => ['LOW','CRITICAL','OUT'].includes(getStat(i.balance, i.threshold))).length;
-        newEl.textContent = n; newEl.style.display = n > 0 ? 'inline' : 'none';
-      }
-      if (id === 'req-badge') {
-        const n = (db.requisitions || []).filter(r => r.status === 'submitted').length;
-        newEl.textContent = n; newEl.style.display = n > 0 ? 'inline' : 'none';
-      }
-    }
-  });
-}
-
-function selectCategory(categoryId) {
-  _activeCategory = categoryId;
-  // Highlight active top-nav item
-  document.querySelectorAll('.top-nav-item').forEach(el => el.classList.remove('active'));
-  const btn = document.getElementById('tni-' + categoryId);
-  if (btn) btn.classList.add('active');
-  // Build sub-nav
-  buildSubNav(categoryId);
-  // Load first page of this category
-  const cat = TOP_NAV.find(c => c.id === categoryId);
-  if (cat && cat.pages.length > 0) {
-    const firstPage = cat.pages[0].id;
-    showPage(firstPage, document.getElementById('sni-' + firstPage));
-  }
-}
-
-function setActiveSubNav(pageId) {
-  _activePage = pageId;
-  document.querySelectorAll('.sub-nav-btn').forEach(el => el.classList.remove('active'));
-  const btn = document.getElementById('sni-' + pageId);
-  if (btn) btn.classList.add('active');
-  // Also ensure correct category is active
-  const cat = TOP_NAV.find(c => c.pages.some(p => p.id === pageId));
-  if (cat && cat.id !== _activeCategory) {
-    _activeCategory = cat.id;
-    document.querySelectorAll('.top-nav-item').forEach(el => el.classList.remove('active'));
-    const catBtn = document.getElementById('tni-' + cat.id);
-    if (catBtn) catBtn.classList.add('active');
-    buildSubNav(cat.id);
-    // Re-apply active after rebuild
-    setTimeout(() => {
-      document.querySelectorAll('.sub-nav-btn').forEach(el => el.classList.remove('active'));
-      const nb = document.getElementById('sni-' + pageId);
-      if (nb) nb.classList.add('active');
-    }, 10);
-  }
-}
 
 // ═══════════════════════════════════════════════════════════
 // INIT
