@@ -67,7 +67,7 @@ body::before{content:'';position:fixed;inset:0;opacity:.4;pointer-events:none;z-
 .sidebar-footer{padding:8px 14px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:.5px;line-height:1.7;flex-shrink:0;}
 /* MAIN */
 .main{margin-left:var(--sidebar-w);min-height:100vh;position:relative;z-index:1;transition:margin-left .2s;}
-.topbar{position:sticky;top:0;background:rgba(11,15,26,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:8px;z-index:50;flex-wrap:wrap;}
+.topbar{position:sticky;top:0;background:rgba(11,15,26,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:6px;z-index:50;flex-wrap:nowrap;overflow:hidden;}
 .hamburger{display:none;background:transparent;border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;padding:6px 10px;min-height:40px;min-width:40px;align-items:center;justify-content:center;border-radius:7px;}
 .hamburger:hover{background:var(--surface2);}
 .topbar h2{font-size:15px;font-weight:800;flex:1;}
@@ -288,7 +288,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
 @media(max-width:400px){
   .kpi-grid{grid-template-columns:1fr 1fr;}
   .fleet-grid,.emp-grid{grid-template-columns:1fr;}
-  .topbar{padding:8px 12px;gap:6px;}
+  .topbar{padding:6px 10px;gap:4px;}
   .content{padding:8px;}
   .btn{padding:7px 10px;font-size:11px;}
   .btn-sm{padding:5px 8px;font-size:10px;}
@@ -484,7 +484,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <h2 id="page-title">Dashboard</h2>
     <span class="company-name-badge" id="topbar-company" style="display:none"></span>
     <div style="flex:1"></div>
-    <div class="search-wrap"><span class="si">&#128269;</span><input type="text" id="global-search" placeholder="Search..." oninput="handleSearch(this.value)"></div>
+    <div class="search-wrap" style="flex:1;min-width:80px;max-width:200px"><span class="si">&#128269;</span><input type="text" id="global-search" placeholder="Search..." oninput="handleSearch(this.value)"></div>
     <button class="btn btn-outline btn-sm" onclick="exportToExcel()">&#11015; Excel</button>
     <button class="btn btn-gold btn-sm" id="topbar-add-btn" style="display:none" onclick="topbarAddFn()">&#xff0b; Add</button>
     <!-- Notification Bell -->
@@ -492,10 +492,10 @@ tr:hover td{background:rgba(255,255,255,.015);}
       🔔<span id="notif-count" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:8px;font-family:var(--font-mono);padding:1px 4px;border-radius:8px;display:none">0</span>
     </button>
     <!-- User chip -->
-    <div id="topbar-user-chip" style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 6px;cursor:default">
+    <div id="topbar-user-chip" style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 6px;cursor:default;flex-shrink:0;max-width:160px;overflow:hidden">
       <div id="topbar-avatar" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#0b0f1a">?</div>
       <div style="display:flex;flex-direction:column;line-height:1.1">
-        <span id="topbar-username" style="font-size:11px;font-weight:700">Viewer</span>
+        <span id="topbar-username" style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px">Viewer</span>
         <span id="topbar-role" style="font-size:9px;color:var(--text-dim);font-family:var(--font-mono)">viewer</span>
       </div>
     </div>
@@ -940,6 +940,12 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
         <button class="btn btn-outline btn-sm" onclick="exportTimesheets()">⬇ Excel</button>
         <button class="btn btn-gold" onclick="reqLogin(openTSModal)">＋ Log Hours</button>
+      </div>
+      <div class="kpi-grid" id="ts-kpis" style="margin-bottom:12px">
+        <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">—</div><div class="kpi-sub">this period</div></div>
+        <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">—</div><div class="kpi-sub">this period</div></div>
+        <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">—</div><div class="kpi-sub">timesheets</div></div>
+        <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">—</div><div class="kpi-sub">total logged</div></div>
       </div>
       <div class="tcard">
         <div class="tcard-head">
@@ -5128,17 +5134,15 @@ function renderTimesheets() {
   const kpiEl = document.getElementById('ts-kpis');
   if (kpiEl) {
     const allRows = db.timesheets || [];
-    if (!allRows.length) { kpiEl.style.display = 'none'; } else {
-      const totalHrs = allRows.reduce((s, r) => s + parseFloat(r.total_hrs || r.totalHrs || 0), 0);
-      const otHrs    = allRows.reduce((s, r) => s + parseFloat(r.ot_hrs || r.otHrs || 0), 0);
-      const pending  = allRows.filter(r => r.status === 'Pending').length;
-      kpiEl.style.display = 'grid';
-      kpiEl.innerHTML = `
-        <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">${totalHrs.toFixed(1)}</div></div>
-        <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">${otHrs.toFixed(1)}</div></div>
-        <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
-        <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">${allRows.length}</div></div>`;
-    }
+    const totalHrs = allRows.reduce((s, r) => s + parseFloat(r.total_hrs || r.totalHrs || 0), 0);
+    const otHrs    = allRows.reduce((s, r) => s + parseFloat(r.ot_hrs || r.otHrs || 0), 0);
+    const pending  = allRows.filter(r => r.status === 'Pending').length;
+    kpiEl.style.display = 'grid';
+    kpiEl.innerHTML = `
+      <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">${totalHrs.toFixed(1)||'0'}</div><div class="kpi-sub">this period</div></div>
+      <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">${otHrs.toFixed(1)||'0'}</div><div class="kpi-sub">this period</div></div>
+      <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div><div class="kpi-sub">timesheets</div></div>
+      <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">${allRows.length}</div><div class="kpi-sub">total logged</div></div>`;
   }
 }
 
