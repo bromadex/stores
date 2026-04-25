@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -351,6 +350,30 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .ss-option:hover,.ss-option.focused{background:rgba(244,162,97,.12);color:var(--gold);}
 .ss-option.selected{color:var(--teal);}
 .ss-empty{padding:10px 14px;color:var(--text-dim);font-size:11px;font-family:var(--font-mono);}
+
+/* ========== LAYOUT FIXES ========== */
+.content { padding: 16px 20px !important; }
+.tcard-head { padding: 8px 12px !important; }
+.kpi-grid:empty { display: none !important; }
+#page-earthmovers > div:first-child,
+#page-generators > div:first-child,
+#page-timesheets > div:first-child,
+#page-requisitions > div:first-child {
+  display: flex !important; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+}
+#page-earthmovers .kpi-grid,
+#page-generators .kpi-grid,
+#page-requisitions .kpi-grid { flex: 1; min-width: 180px; margin-bottom: 0; }
+@media (max-width: 768px) {
+  #page-earthmovers > div:first-child,
+  #page-generators > div:first-child,
+  #page-timesheets > div:first-child,
+  #page-requisitions > div:first-child { flex-direction: column; align-items: stretch; }
+  .btn { align-self: flex-end; }
+  #page-timesheets .table-scroll { overflow-x: auto; }
+  #page-timesheets table { min-width: 700px; }
+}
 </style>
 </head>
 <body>
@@ -914,14 +937,9 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
     <!-- TIMESHEETS -->
     <div class="page" id="page-timesheets">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <div class="ftabs">
-          <button class="ftab active" onclick="setTSView('daily',this)">Daily</button>
-          <button class="ftab" onclick="setTSView('weekly',this)">Weekly</button>
-          <button class="ftab" onclick="setTSView('monthly',this)">Monthly</button>
-        </div>
-        <button class="btn btn-gold btn-sm" onclick="reqLogin(openTSModal)" style="margin-left:auto">＋ Log Hours</button>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
         <button class="btn btn-outline btn-sm" onclick="exportTimesheets()">⬇ Excel</button>
+        <button class="btn btn-gold" onclick="reqLogin(openTSModal)">＋ Log Hours</button>
       </div>
       <div class="kpi-grid" id="ts-kpis" style="margin-bottom:14px"></div>
       <div class="tcard">
@@ -1140,7 +1158,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="section-label" style="margin-bottom:6px">Items Received</div>
   <div style="overflow-x:auto">
     <div style="display:grid;grid-template-columns:2fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr auto;gap:4px;font-family:var(--font-mono);font-size:8px;color:var(--text-dim);padding:0 2px;margin-bottom:4px;min-width:700px">
-      <span>ITEM NAME</span><span>CATEGORY</span><span>UNIT</span><span>ORDERED</span><span>RECEIVED</span><span>UNIT COST</span><span>TOTAL</span><span>LOT/BATCH</span><span></span>
+      <span>ITEM NAME</span><span>CATEGORY</span><span>UNIT</span><span>ORDERED QTY</span><span>RECEIVED QTY</span><span>UNIT COST(USD)</span><span>TOTAL</span><span>LOT/BATCH</span><span></span>
     </div>
     <div id="grn-rows"></div>
   </div>
@@ -1173,7 +1191,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Time</label><input type="time" id="f-time"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Fuel Type</label><select id="f-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
+    <div class="fg"><label>Fuel Type</label><select id="f-type" onchange="draftSave('fuel')"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
     <div class="fg"><label>Amount (Litres)</label><input type="number" id="f-amount" placeholder="0" min="1"></div>
   </div>
   <div class="fg" style="margin-bottom:8px">
@@ -1210,7 +1228,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🚛 Fuel <span>Delivery</span></div>
   <div class="fr">
     <div class="fg"><label>Date</label><input type="date" id="fd-date"></div>
-    <div class="fg"><label>Fuel Type</label><select id="fd-type"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
+    <div class="fg"><label>Fuel Type</label><select id="fd-type" onchange="draftSave('fueldelivery')"><option>DIESEL</option><option>PETROL</option><option>PARAFFIN</option><option>OTHER</option></select></div>
   </div>
   <div class="fr">
     <div class="fg"><label>Quantity Delivered (Litres)</label><input type="number" id="fd-qty" placeholder="0" min="1" oninput="draftSave('fueldelivery')"></div>
@@ -1286,7 +1304,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🏗️ Batch Plant <span>Material</span></div>
   <div class="fr">
     <div class="fg"><label>Material Type</label>
-      <select id="c-material"><option value="CEMENT">Cement (Tonnes)</option><option value="QUARRY_STONE">Quarry Stone (m³)</option><option value="QUARRY_DUST">Quarry Dust (m³)</option><option value="SAND">Sand (m³)</option></select>
+      <select id="c-material" onchange="draftSave('concrete')"><option value="CEMENT">Cement (Tonnes)</option><option value="QUARRY_STONE">Quarry Stone (m³)</option><option value="QUARRY_DUST">Quarry Dust (m³)</option><option value="SAND">Sand (m³)</option></select>
     </div>
     <div class="fg"><label>Date</label><input type="date" id="c-date"></div>
   </div>
@@ -1311,7 +1329,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="mtitle">🏕️ Campsite <span>Supply</span></div>
   <div class="fr">
     <div class="fg"><label>Supply Item</label>
-      <select id="cs-item" onchange="updateCampsiteUnit()"><option value="Water (Cases)">Water (Cases)</option><option value="Soap (bars)">Soap (bars)</option><option value="Washing Powder (kg)">Washing Powder (kg)</option><option value="Toilet Paper (rolls)">Toilet Paper (rolls)</option><option value="Cleaning Chemicals (L)">Cleaning Chemicals (L)</option><option value="Food Supplies (kg)">Food Supplies (kg)</option><option value="Other">Other</option></select>
+      <select id="cs-item" onchange="updateCampsiteUnit();draftSave('campsite')"><option value="Water (Cases)">Water (Cases)</option><option value="Soap (bars)">Soap (bars)</option><option value="Washing Powder (kg)">Washing Powder (kg)</option><option value="Toilet Paper (rolls)">Toilet Paper (rolls)</option><option value="Cleaning Chemicals (L)">Cleaning Chemicals (L)</option><option value="Food Supplies (kg)">Food Supplies (kg)</option><option value="Other">Other</option></select>
     </div>
     <div class="fg"><label>Date</label><input type="date" id="cs-date"></div>
   </div>
@@ -1476,15 +1494,15 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="fg"><label>Date</label><input type="date" id="ts-date"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Site / Project</label><select id="ts-site"><option>Main Site</option><option>Batch Plant</option><option>Workshop</option><option>Admin Block</option><option>Campsite</option><option>Other</option></select></div>
-    <div class="fg"><label>Work Type</label><select id="ts-type"><option value="Normal">Normal</option><option value="Overtime">Overtime</option><option value="Holiday">Holiday</option></select></div>
+    <div class="fg"><label>Site / Project</label><select id="ts-site" onchange="draftSave('timesheet')"><option>Main Site</option><option>Batch Plant</option><option>Workshop</option><option>Admin Block</option><option>Campsite</option><option>Other</option></select></div>
+    <div class="fg"><label>Work Type</label><select id="ts-type" onchange="draftSave('timesheet')"><option value="Normal">Normal</option><option value="Overtime">Overtime</option><option value="Holiday">Holiday</option></select></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Start Time</label><input type="time" id="ts-start" oninput="calcTSHours()"></div>
-    <div class="fg"><label>End Time</label><input type="time" id="ts-end" oninput="calcTSHours()"></div>
+    <div class="fg"><label>Start Time</label><input type="time" id="ts-start" oninput="calcTSHours();draftSave('timesheet')"></div>
+    <div class="fg"><label>End Time</label><input type="time" id="ts-end" oninput="calcTSHours();draftSave('timesheet')"></div>
   </div>
   <div class="fr">
-    <div class="fg"><label>Break (minutes)</label><input type="number" id="ts-break" placeholder="0" min="0" value="0" oninput="calcTSHours()"></div>
+    <div class="fg"><label>Break (minutes)</label><input type="number" id="ts-break" placeholder="0" min="0" value="0" oninput="calcTSHours();draftSave('timesheet')"></div>
     <div class="fg" id="ts-calc-display" style="display:flex;flex-direction:column;justify-content:flex-end">
       <div style="font-family:var(--font-mono);font-size:10px;color:var(--teal);padding:8px">Total: <span id="ts-total-hrs" style="font-weight:700">—</span> hrs · OT: <span id="ts-ot-hrs" style="color:var(--yellow)">—</span> hrs</div>
     </div>
@@ -3522,10 +3540,15 @@ function openSIFor(itemId) { populateSI(itemId); document.getElementById('si-dat
 function openSOFor(itemId) { populateSO(itemId); document.getElementById('so-date').value = today(); updateAvail(); openM('m-so'); }
 function openStocktakeModal() { document.getElementById('st-item').innerHTML = itemOptions(); createSearchableSelect('st-emp-ss', empSearchOptions(true), '— Counted By —'); document.getElementById('st-date').value = today(); showSTCurrent(); openM('m-st'); }
 function openGRModal() {
+  document.getElementById('gr-edit-id').value = '';
+  document.getElementById('gr-modal-title').innerHTML = '📦 Goods Received <span>Note (GRN)</span>';
   document.getElementById('gr-date').value = today();
+  ['gr-driver','gr-notes'].forEach(f => { const el = document.getElementById(f); if(el) el.value=''; });
   document.getElementById('gr-vehicle').innerHTML = fleetOptions();
   createSearchableSelect('gr-emp-ss', empSearchOptions(true), '— Received By —');
   initGRNRows();
+  const draftGR = checkDraft('grn');
+  if (draftGR) toast('📝 You have a GRN draft. Open Drafts Manager to restore.', 'info');
   openM('m-gr');
 }
 function openFuelModal() {
@@ -3830,45 +3853,77 @@ async function doStocktake() {
 }
 
 async function doGRN() {
-  const date = document.getElementById('gr-date').value;
+  const date     = document.getElementById('gr-date').value;
   const vehicleSel = document.getElementById('gr-vehicle');
-  const vehicle = vehicleSel.value || vehicleSel.options[vehicleSel.selectedIndex]?.text || '';
-  const driver = document.getElementById('gr-driver').value.trim();
-  const empId = document.getElementById('val-ss-gr-emp-ss')?.value || '';
-  const notes = document.getElementById('gr-notes').value.trim();
-  const rowEls = document.querySelectorAll('#grn-rows .grn-row');
-  const items = [];
-  rowEls.forEach(row => {
-    const inputs = row.querySelectorAll('input');
-    const selects = row.querySelectorAll('select');
-    const name = inputs[0].value.trim();
-    const cat = selects[0].value;
-    const ordered = parseInt(inputs[1].value) || 0;
-    const received = parseInt(inputs[2].value) || 0;
-    if (name && received > 0) items.push({ name, category:cat, ordered, received });
-  });
+  const vehicle  = vehicleSel?.value || vehicleSel?.options[vehicleSel?.selectedIndex]?.text || '';
+  const driver   = document.getElementById('gr-driver').value.trim();
+  const empId    = document.getElementById('val-ss-gr-emp-ss')?.value || '';
+  const notes    = document.getElementById('gr-notes').value.trim();
   if (!date) return toast('Enter a delivery date', 'err');
-  if (!items.length) return toast('Add at least one received item with a received qty > 0', 'err');
+
+  // Extract enhanced rows
+  const rowEls = document.querySelectorAll('#grn-rows > div');
+  const items = [];
+  for (const row of rowEls) {
+    const inputs  = row.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input:not([type])');
+    const selects = row.querySelectorAll('select');
+    // Grid order: name(text), category(select), unit(text), ordered(number), received(number), unit_cost(number), total(span), lot_batch(text), [expiry(date)], [location(text)]
+    const allInputs = Array.from(row.querySelectorAll('input'));
+    const name      = allInputs[0]?.value.trim() || '';
+    const unit      = allInputs[1]?.value.trim() || 'pcs';
+    const ordered   = parseFloat(allInputs[2]?.value) || 0;
+    const received  = parseFloat(allInputs[3]?.value) || 0;
+    const unitCost  = parseFloat(allInputs[4]?.value) || 0;
+    const lotBatch  = allInputs[5]?.value.trim() || '';
+    const category  = selects[0]?.value || '';
+    if (name && received > 0) {
+      items.push({ name, category, unit, ordered, received, unit_cost: unitCost, lot_batch: lotBatch });
+    }
+  }
+  if (!items.length) return toast('Add at least one item with received qty > 0', 'err');
+
   const grnId = uid();
-  await sbSave('goods_received', { id: grnId, date, vehicle, driver, received_by: empName(empId), notes, items, user_name: session.user });
-  db.goodsReceived.push({ id: grnId, date, vehicle, driver, receivedBy: empName(empId), notes, items, user_name: session.user });
+  const receivedBy = empName(empId);
+
+  // Save GRN record
+  await sbSave('goods_received', {
+    id: grnId, date, vehicle, driver, received_by: receivedBy,
+    notes, items: items, user_name: session.user
+  });
+  db.goodsReceived.unshift({ id: grnId, date, vehicle, driver, receivedBy, notes, items, user_name: session.user });
+
+  // Update inventory for each item
   for (const it of items) {
-    let inv = db.items.find(i => i.name.toLowerCase() === it.name.toLowerCase() && i.category === it.category);
+    let inv = db.items.find(i => i.name.toLowerCase() === it.name.toLowerCase());
     if (!inv) {
       const nid = uid();
-      inv = { id: nid, name: it.name, category: it.category, balance: 0, threshold: 5, totalIn: 0, totalOut: 0, unit: 'pcs', cost: 0 };
+      inv = { id: nid, name: it.name, category: it.category, balance: 0, threshold: 5, totalIn: 0, totalOut: 0, unit: it.unit, cost: it.unit_cost, notes: '' };
+      await sbSave('items', { id: inv.id, name: inv.name, category: inv.category, balance: 0, threshold: 5, total_in: 0, total_out: 0, unit: inv.unit, cost: inv.cost, notes: '' });
       db.items.push(inv);
+    } else if (it.unit_cost > 0) {
+      // Weighted average cost
+      const newCost = ((inv.cost || 0) * inv.balance + it.unit_cost * it.received) / (inv.balance + it.received);
+      inv.cost = parseFloat(newCost.toFixed(4));
     }
-    inv.balance += it.received; inv.totalIn += it.received;
-    await sbSave('items', { id: inv.id, name: inv.name, category: inv.category, balance: inv.balance, threshold: inv.threshold, total_in: inv.totalIn, total_out: inv.totalOut, unit: inv.unit, cost: inv.cost, notes: inv.notes || '' });
+    inv.balance    += it.received;
+    inv.totalIn    = (inv.totalIn || 0) + it.received;
+    await sbSave('items', { id: inv.id, name: inv.name, category: inv.category, balance: inv.balance, threshold: inv.threshold || 5, total_in: inv.totalIn, total_out: inv.totalOut || 0, unit: inv.unit, cost: inv.cost || 0, notes: inv.notes || '' });
+
+    // Create transaction record
     const txId = uid();
-    await sbSave('transactions', { id: txId, type: 'GRN', item_id: inv.id, item_name: inv.name, category: inv.category, qty: it.received, date, delivered_by: driver||vehicle, received_by: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
-    db.transactions.push({ id: txId, type: 'GRN', itemId: inv.id, itemName: inv.name, category: inv.category, qty: it.received, date, deliveredBy: driver||vehicle, receivedBy: empName(empId), notes: `GRN: ${vehicle||'—'}`, user_name: session.user });
+    await sbSave('transactions', {
+      id: txId, type: 'GRN', item_id: inv.id, item_name: inv.name, category: inv.category,
+      qty: it.received, date, delivered_by: driver || vehicle, received_by: receivedBy,
+      notes: `GRN · ${vehicle || '—'}`, user_name: session.user
+    });
+    db.transactions.push({ id: txId, type: 'GRN', itemId: inv.id, itemName: inv.name, category: inv.category, qty: it.received, date, deliveredBy: driver || vehicle, receivedBy, notes: `GRN · ${vehicle || '—'}`, user_name: session.user });
   }
-  logAction('CREATE_GRN', 'grn', grnId, `GRN: ${vehicle||today()}`);
+
+  logAction('CREATE_GRN', 'grn', grnId, `GRN: ${vehicle || today()} · ${items.length} items`);
+  dismissDraft('grn');
   closeM('m-gr');
-  ['gr-vehicle','gr-driver','gr-notes'].forEach(f => document.getElementById(f).value = '');
-  toast(`✓ GRN saved — ${items.length} item(s) stocked in`); refreshAll();
+  toast(`✓ GRN saved — ${items.length} item(s) received`);
+  refreshAll();
 }
 
 async function doFuelIssuance() {
@@ -4432,14 +4487,14 @@ function addGRNRow() {
   d.style.cssText = 'display:grid;grid-template-columns:2fr 1.2fr 0.7fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr auto;gap:4px;margin-bottom:6px;align-items:center;min-width:700px';
   const itemOpts = db.items.map(i => `<option value="${i.name}" data-unit="${i.unit||'pcs'}">${i.name}</option>`).join('');
   d.innerHTML = `
-    <input type="text" list="grn-items-list" placeholder="Item name / description" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px;font-family:var(--font-head)" oninput="autoFillGRNUnit(this,\'${id}\');updateGRNTotal();draftSave(\'grn\')">
-    <select style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px;font-size:11px">${catOptions()}</select>
-    <input type="text" placeholder="pcs" id="${id}-unit" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
-    <input type="number" placeholder="Ordered" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
-    <input type="number" placeholder="Received" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
-    <input type="number" placeholder="Cost" min="0" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input class="grn-name" type="text" list="grn-items-list" placeholder="Item name / description" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px;font-family:var(--font-head)" oninput="autoFillGRNUnit(this,\'${id}\');updateGRNTotal();draftSave(\'grn\')">
+    <select class="grn-cat" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px;font-size:11px">${catOptions()}</select>
+    <input class="grn-unit" type="text" placeholder="pcs" id="${id}-unit" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
+    <input class="grn-ordered" type="number" placeholder="Ordered" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input class="grn-received" type="number" placeholder="Received" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
+    <input class="grn-cost" type="number" placeholder="Cost" min="0" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px" oninput="updateGRNTotal()">
     <span id="${id}-total" style="font-family:var(--font-mono);font-size:10px;color:var(--teal);padding:0 4px">$0.00</span>
-    <input type="text" placeholder="Lot/Batch" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
+    <input class="grn-lot" type="text" placeholder="Lot/Batch" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 9px;font-size:11px">
     <button onclick="document.getElementById('${id}').remove();updateGRNTotal()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:var(--red);border-radius:6px;padding:6px 9px;cursor:pointer;font-size:12px">✕</button>`;
   document.getElementById('grn-rows').appendChild(d);
   // Add datalist if not exists
@@ -4771,6 +4826,7 @@ function renderGenerators() {
       <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">MAINTENANCE</div><div class="kpi-val">${maint}</div></div>
       <div class="kpi-card c-red" style="cursor:default"><div class="kpi-label">OFFLINE</div><div class="kpi-val">${offline}</div></div>
       <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">TOTAL</div><div class="kpi-val">${gens.length}</div></div>`;
+    kpiEl.style.display = gens.length === 0 ? 'none' : 'grid';
   }
 
   // Run log table
@@ -4896,17 +4952,24 @@ function renderEarthMovers() {
         </div>
       </div>`).join('');
 
-  // Fuel table
+  // Fuel table + hide if empty
   const ftb = document.getElementById('earthmover-fuel-tbody');
-  if (ftb) {
-    ftb.innerHTML = !db.earthMovers.length ? `<tr><td colspan="4"><div class="empty"><div class="ei">⛽</div><p>No data</p></div></td></tr>`
-      : db.earthMovers.map(e => `<tr>
+  const fuelCard = document.querySelector('#page-earthmovers .tcard:last-child');
+  if (db.earthMovers.length === 0) {
+    if (fuelCard) fuelCard.style.display = 'none';
+  } else {
+    if (fuelCard) fuelCard.style.display = '';
+    if (ftb) {
+      ftb.innerHTML = db.earthMovers.map(e => `<tr>
           <td style="font-family:var(--font-mono);font-weight:700;color:var(--gold)">${e.reg}</td>
           <td><span class="badge bg-blue">${e.type}</span></td>
           <td style="font-family:var(--font-mono);color:var(--blue)">${(fuelByEm[e.id] || 0).toLocaleString()} L</td>
           <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">—</td>
         </tr>`).join('');
+    }
   }
+  // Hide earthmover KPI grid if empty
+  const emKpiEl = document.getElementById('gen-status-kpis');
 }
 
 function openEarthMoverModal() {
@@ -5021,9 +5084,11 @@ async function doSaveTimesheet() {
   if (!db.timesheets) db.timesheets = [];
   db.timesheets.push({ ...rec, empId, empName: empName(empId), startTime: start, endTime: end, workType: type, totalHrs, otHrs, approverId, approverName: empName(approverId) });
   logAction('CREATE_TIMESHEET', 'timesheet', id, empName(empId), null, { date, total_hrs: totalHrs });
+  dismissDraft('timesheet');
   closeM('m-ts');
   toast(`✓ Timesheet saved — ${totalHrs}hrs`);
   renderTimesheets();
+  updateNotifications();
 }
 
 function renderTimesheets() {
@@ -5064,14 +5129,17 @@ function renderTimesheets() {
   const kpiEl = document.getElementById('ts-kpis');
   if (kpiEl) {
     const allRows = db.timesheets || [];
-    const totalHrs = allRows.reduce((s, r) => s + parseFloat(r.total_hrs || r.totalHrs || 0), 0);
-    const otHrs    = allRows.reduce((s, r) => s + parseFloat(r.ot_hrs || r.otHrs || 0), 0);
-    const pending  = allRows.filter(r => r.status === 'Pending').length;
-    kpiEl.innerHTML = `
-      <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">${totalHrs.toFixed(1)}</div></div>
-      <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">${otHrs.toFixed(1)}</div></div>
-      <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
-      <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">${allRows.length}</div></div>`;
+    if (!allRows.length) { kpiEl.style.display = 'none'; } else {
+      const totalHrs = allRows.reduce((s, r) => s + parseFloat(r.total_hrs || r.totalHrs || 0), 0);
+      const otHrs    = allRows.reduce((s, r) => s + parseFloat(r.ot_hrs || r.otHrs || 0), 0);
+      const pending  = allRows.filter(r => r.status === 'Pending').length;
+      kpiEl.style.display = 'grid';
+      kpiEl.innerHTML = `
+        <div class="kpi-card c-teal" style="cursor:default"><div class="kpi-label">TOTAL HOURS</div><div class="kpi-val">${totalHrs.toFixed(1)}</div></div>
+        <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">OVERTIME HRS</div><div class="kpi-val">${otHrs.toFixed(1)}</div></div>
+        <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
+        <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">ENTRIES</div><div class="kpi-val">${allRows.length}</div></div>`;
+    }
   }
 }
 
@@ -5088,6 +5156,7 @@ async function approvTS(id, status) {
   logAction(status === 'Approved' ? 'APPROVE_TIMESHEET' : 'REJECT_TIMESHEET', 'timesheet', id, ts.emp_name || ts.empName);
   toast(`✓ Timesheet ${status.toLowerCase()} by ${approverName}`);
   renderTimesheets();
+  updateNotifications();
 }
 
 function exportTimesheets() {
@@ -5264,7 +5333,18 @@ function renderAuditLog() {
   let rows = [...(db.auditLogs || [])];
   if (fromV) rows = rows.filter(r => r.created_at >= fromV);
   if (toV)   rows = rows.filter(r => r.created_at <= toV + 'T23:59:59');
-  if (actF)  rows = rows.filter(r => r.action.includes(actF));
+  if (actF) {
+    const actionMap = {
+      'LOGIN': ['LOGIN_SUCCESS','LOGIN_FAILED','LOGOUT','PASSWORD_CHANGE'],
+      'STOCK': ['STOCK_IN','STOCK_OUT','CREATE_ITEM','UPDATE_ITEM','DELETE_ITEM','STOCK_TAKE','CREATE_GRN','UPDATE_STOCK_IN','UPDATE_STOCK_OUT'],
+      'FUEL': ['FUEL_ISSUANCE','FUEL_DELIVERY','DIPSTICK_RECORD','UPDATE_FUEL','DELETE_FUEL'],
+      'REQ': ['CREATE_REQ','UPDATE_REQ','SUBMIT_REQ','APPROVE_REQ','REJECT_REQ','DELETE_REQ'],
+      'HR': ['CREATE_EMPLOYEE','UPDATE_EMPLOYEE','DELETE_EMPLOYEE','CREATE_USER','DELETE_USER','CREATE_TIMESHEET','UPDATE_TIMESHEET','APPROVE_TIMESHEET','REJECT_TIMESHEET','DELETE_TIMESHEET'],
+      'FLEET': ['CREATE_VEHICLE','UPDATE_VEHICLE','DELETE_VEHICLE','CREATE_GENERATOR','UPDATE_GENERATOR','DELETE_GENERATOR','CREATE_EQUIPMENT','UPDATE_EQUIPMENT','DELETE_EQUIPMENT']
+    };
+    if (actionMap[actF]) rows = rows.filter(r => actionMap[actF].includes(r.action));
+    else rows = rows.filter(r => r.action.includes(actF));
+  }
   const total = rows.length;
   const pageRows = rows.slice(auditPage * AUDIT_PER_PAGE, (auditPage+1) * AUDIT_PER_PAGE);
   const cntEl = document.getElementById('audit-count');
@@ -5426,15 +5506,20 @@ function restoreDraft(formName) {
         addGRNRow();
         const row = document.getElementById('grn-rows').lastElementChild;
         if (!row) return;
-        const ins = row.querySelectorAll('input');
-        const sels = row.querySelectorAll('select');
-        if (ins[0]) ins[0].value = r.name || '';
-        if (sels[0]) sels[0].value = r.category || '';
-        if (ins[1]) ins[1].value = r.unit || 'pcs';
-        if (ins[2]) ins[2].value = r.ordered || '';
-        if (ins[3]) ins[3].value = r.received || '';
-        if (ins[4]) ins[4].value = r.unit_cost || '';
-        if (ins[5]) ins[5].value = r.lot_batch || '';
+        const nameEl = row.querySelector('.grn-name') || row.querySelectorAll('input')[0];
+        const catEl  = row.querySelector('.grn-cat')  || row.querySelectorAll('select')[0];
+        const unitEl = row.querySelector('.grn-unit')  || row.querySelectorAll('input[type="text"]')[1];
+        const ordEl  = row.querySelector('.grn-ordered');
+        const recEl  = row.querySelector('.grn-received');
+        const costEl = row.querySelector('.grn-cost');
+        const lotEl  = row.querySelector('.grn-lot');
+        if (nameEl) nameEl.value = r.name || '';
+        if (catEl)  catEl.value  = r.category || '';
+        if (unitEl) unitEl.value = r.unit || 'pcs';
+        if (ordEl)  ordEl.value  = r.ordered || '';
+        if (recEl)  recEl.value  = r.received || '';
+        if (costEl) costEl.value = r.unit_cost || '';
+        if (lotEl)  lotEl.value  = r.lot_batch || '';
       });
       updateGRNTotal();
     }
@@ -5600,15 +5685,20 @@ function renderRequisitions() {
   // KPIs
   const kpi = document.getElementById('req-kpis');
   if (kpi) {
-    const all = db.requisitions;
-    const pending = all.filter(r => r.status === 'submitted').length;
-    const approved = all.filter(r => r.status === 'approved').length;
+    const all = db.requisitions || [];
+    const pending   = all.filter(r => r.status === 'submitted').length;
+    const approved  = all.filter(r => r.status === 'approved').length;
     const fulfilled = all.filter(r => r.status === 'fulfilled').length;
-    kpi.innerHTML = `
-      <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
-      <div class="kpi-card c-green" style="cursor:default"><div class="kpi-label">APPROVED</div><div class="kpi-val">${approved}</div></div>
-      <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">FULFILLED</div><div class="kpi-val">${fulfilled}</div></div>
-      <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">TOTAL</div><div class="kpi-val">${all.length}</div></div>`;
+    if (!all.length) {
+      kpi.style.display = 'none';
+    } else {
+      kpi.style.display = 'grid';
+      kpi.innerHTML = `
+        <div class="kpi-card c-yellow" style="cursor:default"><div class="kpi-label">PENDING APPROVAL</div><div class="kpi-val">${pending}</div></div>
+        <div class="kpi-card c-green" style="cursor:default"><div class="kpi-label">APPROVED</div><div class="kpi-val">${approved}</div></div>
+        <div class="kpi-card c-blue" style="cursor:default"><div class="kpi-label">FULFILLED</div><div class="kpi-val">${fulfilled}</div></div>
+        <div class="kpi-card c-gold" style="cursor:default"><div class="kpi-label">TOTAL</div><div class="kpi-val">${all.length}</div></div>`;
+    }
   }
 
   const tb = document.getElementById('req-tbody');
